@@ -20,6 +20,9 @@ module.exports = {
         "brand-primary": {
           DEFAULT: "hsl(var(--brand-primary))",
         },
+        "brand-secondary": {
+          DEFAULT: "hsl(var(--brand-secondary))",
+        },
         "app-bg": {
           DEFAULT: "hsl(var(--app-bg))",
         },

@@ -52,9 +52,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
     location,
   });
 
-  const setCloseDateModal = useBoundStore((state) => state.setCloseDateModal);
-  const showDateModal = useBoundStore((state) => state.showDateModal);
-
   if (!equipments.data) return <div>404</div>;
 
   return (
@@ -75,6 +72,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
               categories={categories}
               setCategory={setCategory}
               setLocation={setLocation}
+              selectedCategory={category}
             />
             <div className="col-span-9 flex flex-col gap-4">
               <section className="flex gap-4 rounded-sm bg-white p-4 shadow-sm">
@@ -99,6 +97,7 @@ type LeftBarProps = {
   categories: Category[];
   setCategory: Dispatch<SetStateAction<string>>;
   setLocation: Dispatch<SetStateAction<string>>;
+  selectedCategory: string;
 };
 
 const LeftBar = ({
@@ -106,6 +105,7 @@ const LeftBar = ({
   locations,
   setCategory,
   setLocation,
+  selectedCategory,
 }: LeftBarProps) => {
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
@@ -150,10 +150,28 @@ const LeftBar = ({
       </div>
 
       <div className="grid gap-2">
-        <Label>Categoría:</Label>
+        <p className="font-semibold">Categorías:</p>
         <ul className="grid gap-2">
+          <li
+            onClick={() => setCategory("")}
+            className={`cursor-pointer rounded-sm px-2 py-1 ${
+              !selectedCategory
+                ? "bg-brand-secondary font-semibold text-white"
+                : ""
+            }`}
+          >
+            Todos
+          </li>
           {categories.map((category) => (
-            <li key={category.id} onClick={() => setCategory(category.id)}>
+            <li
+              key={category.id}
+              onClick={() => setCategory(category.id)}
+              className={`cursor-pointer rounded-sm px-2 py-1 ${
+                selectedCategory === category.id
+                  ? "bg-brand-secondary font-semibold text-white"
+                  : ""
+              }`}
+            >
               {category.name}
             </li>
           ))}
@@ -230,10 +248,21 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
           style={{ objectFit: "contain" }}
         />
       </div>
-      <p className="font-bold">
-        {equipment.name} {equipment.brand}
-      </p>
-      <p>{equipment.model}</p>
+
+      <div>
+        <p className="font-bold">
+          {equipment.name} {equipment.brand}
+        </p>
+        <p>{equipment.model}</p>
+      </div>
+
+      <div className="flex items-center justify-end gap-2">
+        <p>Disponible</p>
+        <Button size="sm" variant="darklink">
+          ver más
+        </Button>
+      </div>
+
       <div className="flex items-center justify-between">
         <p className="text-lg font-bold">{formatPrice(equipment.price)}</p>
         <Button size="sm" variant="secondary">
