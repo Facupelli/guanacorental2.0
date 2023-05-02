@@ -1,9 +1,12 @@
+import { useBoundStore } from "@/zustand/store";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Nav = () => {
   const { data: session } = useSession();
+
+  const setOpenCartModal = useBoundStore((state) => state.setOpenCartModal);
 
   return (
     <header>
@@ -20,7 +23,14 @@ const Nav = () => {
               </div>
             </Link>
           </li>
+
           <li className="ml-auto">
+            <p className="cursor-pointer text-white" onClick={setOpenCartModal}>
+              CARRITO
+            </p>
+          </li>
+
+          <li>
             <button
               onClick={async () => await signIn("google")}
               className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
