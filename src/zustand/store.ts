@@ -1,3 +1,4 @@
+import { Equipment } from "@/types/models";
 import { create, StateCreator } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -9,7 +10,7 @@ interface LocationSlice {
 }
 
 const createLocationSlice: StateCreator<
-  LocationSlice & DateSlice,
+  LocationSlice & DateSlice & CartSlice,
   [],
   [],
   LocationSlice
@@ -31,7 +32,7 @@ interface DateSlice {
 }
 
 const createDateSlice: StateCreator<
-  LocationSlice & DateSlice,
+  LocationSlice & DateSlice & CartSlice,
   [],
   [],
   DateSlice
@@ -45,9 +46,37 @@ const createDateSlice: StateCreator<
   setCloseDateModal: () => set(() => ({ showDateModal: false })),
 });
 
-export const useBoundStore = create<LocationSlice & DateSlice>()(
+interface CartSlice {
+  cartItems: Equipment[];
+  showCartModal: boolean;
+  setOpenCartModal: () => void;
+  setCloseCartModal: () => void;
+  addToCart: (equipment: Equipment) => void;
+  deleteFromCart: (id: string) => void;
+}
+
+const createCartSlice: StateCreator<
+  LocationSlice & DateSlice & CartSlice,
+  [],
+  [],
+  CartSlice
+> = (set) => ({
+  cartItems: [],
+  showCartModal: false,
+  setOpenCartModal: () => set(() => ({ showCartModal: true })),
+  setCloseCartModal: () => set(() => ({ showCartModal: false })),
+  addToCart: (equipment) =>
+    set((state) => ({ cartItems: [...state.cartItems, equipment] })),
+  deleteFromCart: (id) =>
+    set((state) => ({
+      cartItems: state.cartItems.filter((item) => item.id !== id),
+    })),
+});
+
+export const useBoundStore = create<LocationSlice & DateSlice & CartSlice>()(
   devtools((...a) => ({
     ...createLocationSlice(...a),
     ...createDateSlice(...a),
+    ...createCartSlice(...a),
   }))
 );
