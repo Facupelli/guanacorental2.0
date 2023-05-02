@@ -10,30 +10,37 @@ const Cart = () => {
   const cartItems = useBoundStore((state) => state.cartItems);
 
   return (
-    <aside
-      className={`fixed  ${
-        showCartModal ? "right-0" : "right-[-30vw]"
-      } top-[70px] z-10 h-[calc(100vh_-_70px)] w-[25%] bg-white p-4 transition-all duration-300 ease-in-out`}
-    >
-      <div className="relative flex h-full flex-col gap-3 ">
-        <div className="flex items-center justify-between">
-          <h1 className="font-bold">MI PEDIDO</h1>
-          <button onClick={closeCartModal}>X</button>
-        </div>
+    <>
+      <aside
+        className={`fixed  ${
+          showCartModal ? "right-0" : "right-[-30vw]"
+        } top-[70px] z-20 h-[calc(100vh_-_70px)] w-[25%] bg-white p-4 transition-all duration-300 ease-in-out`}
+      >
+        <div className="relative flex h-full flex-col gap-3 ">
+          <div className="flex items-center justify-between">
+            <h1 className="font-bold">MI PEDIDO</h1>
+            <button onClick={closeCartModal}>X</button>
+          </div>
 
-        <Button size="sm">seleccionar fecha de alquiler</Button>
+          <Button size="sm">seleccionar fecha de alquiler</Button>
 
-        <div className="grid gap-6 overflow-y-auto py-4">
-          {cartItems?.map((item) => (
-            <CartItem key={item.id} item={item} />
-          ))}
-        </div>
+          <div className="grid gap-6 overflow-y-auto py-4">
+            {cartItems?.map((item) => (
+              <CartItem key={item.id} item={item} />
+            ))}
+          </div>
 
-        <div className="absolute bottom-0 grid w-full ">
-          <Button size="sm">VER CARRITO</Button>
+          <div className="absolute bottom-0 grid w-full ">
+            <Button size="sm">VER CARRITO</Button>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+      <div
+        className={`fixed top-[70px] z-10 h-screen w-screen bg-[rgba(0,0,0,0.3)] backdrop-blur-[1px] ${
+          showCartModal ? "right-0" : "right-[1000%]"
+        }`}
+      />
+    </>
   );
 };
 
