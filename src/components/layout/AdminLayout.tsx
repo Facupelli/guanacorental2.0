@@ -11,7 +11,9 @@ const AdminLayout = ({ children }: Props) => {
       <div className="fixed top-[70px] w-[180px]">
         <AdminNav />
       </div>
-      <div className="ml-[180px] px-6">{children}</div>
+      <div className="ml-[180px] min-h-[calc(100vh_-_70px)] bg-app-bg p-6">
+        {children}
+      </div>
     </div>
   );
 };

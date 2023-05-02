@@ -12,13 +12,13 @@ const adminRoutes = [
 
 const AdminNav = () => {
   return (
-    <nav className="h-screen w-[180px]">
+    <nav className="h-screen w-[180px] bg-brand-primary/90">
       <ul className="grid gap-2 p-4">
         {adminRoutes.map((route, i) => (
           <li key={i} className="">
             <Link
               href={route.route}
-              className={buttonVariants({ variant: "ghost" })}
+              className={buttonVariants({ variant: "link" })}
             >
               {route.name}
             </Link>
