@@ -10,6 +10,17 @@ const Nav = () => {
       <nav className="fixed w-full bg-brand-primary px-6 ">
         <ul className="flex h-[70px] items-center gap-4">
           <li>
+            <Link href="/">
+              <div className="relative aspect-square w-14">
+                <Image
+                  src="/guanaco-rental-logo.svg"
+                  alt="guanaco rental logo"
+                  fill
+                />
+              </div>
+            </Link>
+          </li>
+          <li className="ml-auto">
             <button
               onClick={async () => await signIn("google")}
               className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
