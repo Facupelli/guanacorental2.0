@@ -22,6 +22,18 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { useBoundStore } from "@/zustand/store";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import Calendar from "react-calendar";
+import { Value } from "react-calendar/dist/cjs/shared/types";
 
 type Props = {
   locations: Location[];
@@ -30,6 +42,9 @@ type Props = {
 
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const equipments = api.equipment.getAllEquipment.useQuery({ name: "" });
+
+  const setCloseDateModal = useBoundStore((state) => state.setCloseDateModal);
+  const showDateModal = useBoundStore((state) => state.showDateModal);
 
   if (!equipments.data) return <div>404</div>;
 
@@ -71,11 +86,42 @@ type LeftBarProps = {
 };
 
 const LeftBar = ({ categories, locations }: LeftBarProps) => {
+  const setStartDate = useBoundStore((state) => state.setStartDate);
+  const setEndDate = useBoundStore((state) => state.setEndDate);
+
+  const handleDateChange = (e: Value) => {
+    if (e && Array.isArray(e)) {
+      setStartDate(e[0]);
+      setEndDate(e[1]);
+    }
+  };
+
   return (
     <section className="col-span-3 grid gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation locations={locations} />
 
-      <Button size="sm">SELECCIONAR FECHA</Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button size="sm">Seleccionar Fecha</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
+            <DialogDescription>
+              selecciona primero la fecha de inicio y luego la fecha final.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            <Calendar
+              selectRange={true}
+              locale="es-ES"
+              minDate={new Date()}
+              onChange={(e) => handleDateChange(e)}
+            />
+          </div>
+          <DialogFooter>footer</DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div>
         <p>Retiro:</p>
@@ -147,12 +193,13 @@ type EquipmentCardProps = {
 };
 const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   return (
-    <article className="rounded-sm bg-white p-4 shadow-sm">
-      <div className="relative h-24 w-24">
+    <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
+      <div className="relative h-[200px] w-auto">
         <Image
           src={equipment.image}
           alt={`${equipment.name} ${equipment.brand} equipment picture`}
           fill
+          style={{ objectFit: "contain" }}
         />
       </div>
       <p className="font-bold">
@@ -160,7 +207,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
       </p>
       <p>{equipment.model}</p>
       <div className="flex items-center justify-between">
-        <p className="font-bold">{formatPrice(equipment.price)}</p>
+        <p className="text-lg font-bold">{formatPrice(equipment.price)}</p>
         <Button size="sm">Agregar</Button>
       </div>
     </article>

@@ -21,10 +21,13 @@ const createLocationSlice: StateCreator<
 });
 
 interface DateSlice {
+  showDateModal: boolean;
+  setOpenDateModal: () => void;
+  setCloseDateModal: () => void;
   startDate: Date | null;
   endDate: Date | null;
-  setStartDate: (date: Date) => void;
-  setEndDate: (date: Date) => void;
+  setStartDate: (date: Date | null) => void;
+  setEndDate: (date: Date | null) => void;
 }
 
 const createDateSlice: StateCreator<
@@ -33,10 +36,13 @@ const createDateSlice: StateCreator<
   [],
   DateSlice
 > = (set) => ({
+  showDateModal: false,
   startDate: null,
   endDate: null,
   setStartDate: (startDate) => set(() => ({ startDate })),
   setEndDate: (endDate) => set(() => ({ endDate })),
+  setOpenDateModal: () => set(() => ({ showDateModal: true })),
+  setCloseDateModal: () => set(() => ({ showDateModal: false })),
 });
 
 export const useBoundStore = create<LocationSlice & DateSlice>()(
