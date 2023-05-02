@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import Calendar from "react-calendar";
 import { Value } from "react-calendar/dist/cjs/shared/types";
+import { Dispatch, SetStateAction, useState } from "react";
 
 type Props = {
   locations: Location[];
@@ -41,7 +42,15 @@ type Props = {
 };
 
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
-  const equipments = api.equipment.getAllEquipment.useQuery({ name: "" });
+  const [sort, setSort] = useState<string>("default");
+  const [category, setCategory] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+
+  const equipments = api.equipment.getAllEquipment.useQuery({
+    sort,
+    category,
+    location,
+  });
 
   const setCloseDateModal = useBoundStore((state) => state.setCloseDateModal);
   const showDateModal = useBoundStore((state) => state.showDateModal);
@@ -61,11 +70,16 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       <main className="min-h-screen bg-app-bg px-6 pt-[70px]">
         <div className="mx-auto max-w-7xl ">
           <section className="mt-12 grid grid-cols-12 gap-4">
-            <LeftBar locations={locations} categories={categories} />
+            <LeftBar
+              locations={locations}
+              categories={categories}
+              setCategory={setCategory}
+              setLocation={setLocation}
+            />
             <div className="col-span-9 flex flex-col gap-4">
               <section className="flex gap-4 rounded-sm bg-white p-4 shadow-sm">
                 <Input type="search" placeholder="Buscar equipos" />
-                <SelectOrder />
+                <SelectOrder setSort={setSort} />
               </section>
               <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
                 {equipments.data.map((equipment) => (
@@ -83,9 +97,16 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 type LeftBarProps = {
   locations: Location[];
   categories: Category[];
+  setCategory: Dispatch<SetStateAction<string>>;
+  setLocation: Dispatch<SetStateAction<string>>;
 };
 
-const LeftBar = ({ categories, locations }: LeftBarProps) => {
+const LeftBar = ({
+  categories,
+  locations,
+  setCategory,
+  setLocation,
+}: LeftBarProps) => {
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
 
@@ -98,7 +119,7 @@ const LeftBar = ({ categories, locations }: LeftBarProps) => {
 
   return (
     <section className="col-span-3 grid gap-4 rounded bg-white p-4 shadow-sm">
-      <SelectLocation locations={locations} />
+      <SelectLocation locations={locations} setLocation={setLocation} />
 
       <Dialog>
         <DialogTrigger asChild>
@@ -132,7 +153,9 @@ const LeftBar = ({ categories, locations }: LeftBarProps) => {
         <Label>Categoría:</Label>
         <ul className="grid gap-2">
           {categories.map((category) => (
-            <li key={category.id}>{category.name}</li>
+            <li key={category.id} onClick={() => setCategory(category.id)}>
+              {category.name}
+            </li>
           ))}
         </ul>
       </div>
@@ -142,13 +165,14 @@ const LeftBar = ({ categories, locations }: LeftBarProps) => {
 
 type SelectLocationProps = {
   locations: Location[];
+  setLocation: Dispatch<SetStateAction<string>>;
 };
 
-const SelectLocation = ({ locations }: SelectLocationProps) => {
+const SelectLocation = ({ locations, setLocation }: SelectLocationProps) => {
   return (
     <div className="flex items-center gap-2">
       {/* <Label htmlFor="location">Sucursal:</Label> */}
-      <Select>
+      <Select onValueChange={(e) => setLocation(e)}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Elegir sucursal" />
         </SelectTrigger>
@@ -156,7 +180,7 @@ const SelectLocation = ({ locations }: SelectLocationProps) => {
           <SelectGroup>
             <SelectLabel>Sucursales</SelectLabel>
             {locations.map((location) => (
-              <SelectItem value={location.name} key={location.id}>
+              <SelectItem value={location.id} key={location.id}>
                 {location.name}
               </SelectItem>
             ))}
@@ -167,11 +191,15 @@ const SelectLocation = ({ locations }: SelectLocationProps) => {
   );
 };
 
-const SelectOrder = () => {
+const SelectOrder = ({
+  setSort,
+}: {
+  setSort: Dispatch<SetStateAction<string>>;
+}) => {
   return (
     <div className="flex items-center gap-2">
       {/* <Label htmlFor="location">Sucursal:</Label> */}
-      <Select>
+      <Select onValueChange={(e) => setSort(e)}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Ordenar por precio" />
         </SelectTrigger>
@@ -179,8 +207,8 @@ const SelectOrder = () => {
           <SelectGroup>
             <SelectLabel>Precio</SelectLabel>
             <SelectItem value="default">Default</SelectItem>
-            <SelectItem value="desc">Descendente</SelectItem>
             <SelectItem value="asc">Ascendente</SelectItem>
+            <SelectItem value="desc">Descendente</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -208,7 +236,9 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
       <p>{equipment.model}</p>
       <div className="flex items-center justify-between">
         <p className="text-lg font-bold">{formatPrice(equipment.price)}</p>
-        <Button size="sm">Agregar</Button>
+        <Button size="sm" variant="secondary">
+          Agregar
+        </Button>
       </div>
     </article>
   );
@@ -224,7 +254,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const categories = await prisma.category.findMany({});
   const locations = await prisma.location.findMany({});
 
-  await helpers.equipment.getAllEquipment.prefetch({ name: "" });
+  await helpers.equipment.getAllEquipment.prefetch({ sort: "" });
 
   return {
     props: {
