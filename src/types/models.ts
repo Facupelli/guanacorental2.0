@@ -10,7 +10,7 @@ export type Location = {
 
 export type Equipment = {
   id: string;
-  location: Location;
+  location?: Location;
   name: string;
   brand: string;
   model: string;
@@ -18,6 +18,6 @@ export type Equipment = {
   stock: number;
   price: number;
   accessories: string[];
-  category: Category;
+  category?: Category;
   available: boolean;
 };

@@ -19,18 +19,20 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { api } from "@/utils/api";
+import Image from "next/image";
+import { formatPrice } from "@/lib/utils";
 
 type Props = {
   locations: Location[];
   categories: Category[];
-  equipments: Equipment[];
 };
 
-const Home: NextPage<Props> = ({
-  locations,
-  categories,
-  equipments,
-}: Props) => {
+const Home: NextPage<Props> = ({ locations, categories }: Props) => {
+  const equipments = api.equipment.getAllEquipment.useQuery({ name: "" });
+
+  if (!equipments.data) return <div>404</div>;
+
   return (
     <>
       <Head>
@@ -41,16 +43,20 @@ const Home: NextPage<Props> = ({
 
       <Nav />
 
-      <main className="min-h-screen bg-app-bg pt-[70px]">
+      <main className="min-h-screen bg-app-bg px-6 pt-[70px]">
         <div className="mx-auto max-w-7xl ">
           <section className="mt-12 grid grid-cols-12 gap-4">
             <LeftBar locations={locations} categories={categories} />
-            <div className="col-span-9">
+            <div className="col-span-9 flex flex-col gap-4">
               <section className="flex gap-4 rounded-sm bg-white p-4 shadow-sm">
                 <Input type="search" placeholder="Buscar equipos" />
                 <SelectOrder />
               </section>
-              <section>hola</section>
+              <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
+                {equipments.data.map((equipment) => (
+                  <EquipmentCard key={equipment.id} equipment={equipment} />
+                ))}
+              </section>
             </div>
           </section>
         </div>
@@ -133,6 +139,31 @@ const SelectOrder = () => {
         </SelectContent>
       </Select>
     </div>
+  );
+};
+
+type EquipmentCardProps = {
+  equipment: Equipment;
+};
+const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
+  return (
+    <article className="rounded-sm bg-white p-4 shadow-sm">
+      <div className="relative h-24 w-24">
+        <Image
+          src={equipment.image}
+          alt={`${equipment.name} ${equipment.brand} equipment picture`}
+          fill
+        />
+      </div>
+      <p className="font-bold">
+        {equipment.name} {equipment.brand}
+      </p>
+      <p>{equipment.model}</p>
+      <div className="flex items-center justify-between">
+        <p className="font-bold">{formatPrice(equipment.price)}</p>
+        <Button size="sm">Agregar</Button>
+      </div>
+    </article>
   );
 };
 
