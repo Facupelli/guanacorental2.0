@@ -16,26 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { useBoundStore } from "@/zustand/store";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import Calendar from "react-calendar";
-import { Value } from "react-calendar/dist/cjs/shared/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
+import SelectDateButton from "@/components/ui/SelectDateButton";
 
 type Props = {
   locations: Location[];
@@ -110,42 +99,11 @@ const LeftBar = ({
   setLocation,
   selectedCategory,
 }: LeftBarProps) => {
-  const setStartDate = useBoundStore((state) => state.setStartDate);
-  const setEndDate = useBoundStore((state) => state.setEndDate);
-
-  const handleDateChange = (e: Value) => {
-    if (e && Array.isArray(e)) {
-      setStartDate(e[0]);
-      setEndDate(e[1]);
-    }
-  };
-
   return (
     <section className="col-span-3 grid gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation locations={locations} setLocation={setLocation} />
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button size="sm">Seleccionar Fecha</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
-            <DialogDescription>
-              selecciona primero la fecha de inicio y luego la fecha final.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center py-4">
-            <Calendar
-              selectRange={true}
-              locale="es-ES"
-              minDate={new Date()}
-              onChange={(e) => handleDateChange(e)}
-            />
-          </div>
-          <DialogFooter>footer</DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SelectDateButton />
 
       <div>
         <p>Retiro:</p>

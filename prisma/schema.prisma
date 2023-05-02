@@ -146,7 +146,7 @@ model Equipment {
   brand               String
   model               String
   image               String
-  stock               Int
+  quantity            Int
   price               Int
   accessories         String[]
   category            Category            @relation(fields: [categoryId], references: [id])

@@ -2,13 +2,20 @@ import { useBoundStore } from "@/zustand/store";
 import { Button } from "./ui/button";
 import { Equipment } from "@/types/models";
 import { formatPrice } from "@/lib/utils";
+import { useRouter } from "next/router";
+import SelectDateButton from "./ui/SelectDateButton";
 
 const Cart = () => {
+  const router = useRouter();
+
   const showCartModal = useBoundStore((state) => state.showCartModal);
   const closeCartModal = useBoundStore((state) => state.setCloseCartModal);
 
   const cartItems = useBoundStore((state) => state.cartItems);
 
+  const handleGoToCartPage = () => {
+    router.push("/cart");
+  };
   return (
     <>
       <aside
@@ -22,7 +29,7 @@ const Cart = () => {
             <button onClick={closeCartModal}>X</button>
           </div>
 
-          <Button size="sm">seleccionar fecha de alquiler</Button>
+          <SelectDateButton />
 
           <div className="grid gap-6 overflow-y-auto py-4">
             {cartItems?.map((item) => (
@@ -31,7 +38,9 @@ const Cart = () => {
           </div>
 
           <div className="absolute bottom-0 grid w-full ">
-            <Button size="sm">VER CARRITO</Button>
+            <Button size="sm" onClick={handleGoToCartPage}>
+              VER CARRITO
+            </Button>
           </div>
         </div>
       </aside>
