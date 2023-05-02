@@ -46,6 +46,10 @@ export const equipmentRouter = createTRPCRouter({
       const equipment = await prisma.equipment.findMany({
         where: wherePipe,
         orderBy: sortPipe,
+        include: {
+          location: true,
+          owner: true,
+        },
       });
 
       return equipment;

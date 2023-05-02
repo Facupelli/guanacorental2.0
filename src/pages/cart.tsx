@@ -104,7 +104,7 @@ const Item = ({ item }: ItemProps) => {
         <strong className="font-medium">{item.model}</strong>
       </p>
       <p className="col-span-2">contador</p>
-      <p className="col-span-2">{formatPrice(item.price)}</p>
+      <p className="col-span-2">{formatPrice(item.price * item.quantity)}</p>
     </div>
   );
 };

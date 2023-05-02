@@ -159,8 +159,8 @@ model Book {
   id             String              @default(cuid()) @id
   start_date     DateTime
   end_date       DateTime
-  pickupHour     String?
-  returnHour     String? 
+  pickup_hour     String?
+  return_hour     String? 
   equipments     BookOnEquipment[]
   order          Order?
 }

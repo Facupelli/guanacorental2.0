@@ -10,14 +10,48 @@ export type Location = {
 
 export type Equipment = {
   id: string;
-  location?: Location;
   name: string;
   brand: string;
   model: string;
   image: string;
-  stock: number;
+  quantity: number;
   price: number;
   accessories: string[];
-  category?: Category;
   available: boolean;
+  location?: Location;
+  category?: Category;
+  owner?: EquipmentOnOwner[];
+};
+
+export type Owner = {
+  id: string;
+  name: string;
+  equipments?: EquipmentOnOwner[];
+};
+
+export type EquipmentOnOwner = {
+  id: string;
+  equipment: Equipment;
+  owner: Owner;
+  stock: number;
+  created_at: Date;
+  book: string;
+};
+
+export type Book = {
+  id: string;
+  start_date: Date;
+  end_date: Date;
+  pickup_hour: string;
+  return_hour: string;
+  equipments: BookOnEquipment;
+};
+
+export type BookOnEquipment = {
+  equipment: EquipmentOnOwner;
+  equipmentId: string;
+  book: Book;
+  bookId: string;
+  quantity: number;
+  created_at: Date;
 };
