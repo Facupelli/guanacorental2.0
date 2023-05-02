@@ -243,6 +243,7 @@ type EquipmentCardProps = {
 const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   const cartItems = useBoundStore((state) => state.cartItems);
   const addToCart = useBoundStore((state) => state.addToCart);
+  const openCartModal = useBoundStore((state) => state.setOpenCartModal);
 
   const isAlreadyInCart = !!cartItems.find((item) => item.id === equipment.id);
 
@@ -250,6 +251,8 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
     if (isAlreadyInCart) return;
 
     addToCart(equipment);
+
+    if (cartItems.length === 0) openCartModal();
   };
 
   return (
