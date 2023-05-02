@@ -35,7 +35,7 @@ const CartItemCounter = ({ item }: Props) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <Button
         size="sm"
         onClick={() => handleSubstractItemQuantity(item.id)}

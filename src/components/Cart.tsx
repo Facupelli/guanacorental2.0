@@ -4,6 +4,7 @@ import { Equipment } from "@/types/models";
 import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/router";
 import SelectDateButton from "./ui/SelectDateButton";
+import CartItemCounter from "./CartItemCounter";
 
 const Cart = () => {
   const router = useRouter();
@@ -72,8 +73,10 @@ const CartItem = ({ item }: CartItemProps) => {
       </div>
       <p>{item.model}</p>
 
-      <div className="flex justify-between">
-        <div>counter</div>
+      <div className="flex items-center justify-between pt-2">
+        <div>
+          <CartItemCounter item={item} />
+        </div>
         <p className="font-semibold">{formatPrice(item.price)}</p>
       </div>
     </div>
