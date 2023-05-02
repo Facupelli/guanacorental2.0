@@ -53,6 +53,8 @@ interface CartSlice {
   setCloseCartModal: () => void;
   addToCart: (equipment: Equipment) => void;
   deleteFromCart: (id: string) => void;
+  addItemQuantity: (id: string) => void;
+  substractItemQuantity: (id: string) => void;
 }
 
 const createCartSlice: StateCreator<
@@ -70,6 +72,32 @@ const createCartSlice: StateCreator<
   deleteFromCart: (id) =>
     set((state) => ({
       cartItems: state.cartItems.filter((item) => item.id !== id),
+    })),
+  addItemQuantity: (id) =>
+    set((state) => ({
+      cartItems: state.cartItems.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            quantity: item.quantity + 1,
+          };
+        } else {
+          return item;
+        }
+      }),
+    })),
+  substractItemQuantity: (id) =>
+    set((state) => ({
+      cartItems: state.cartItems.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            quantity: item.quantity - 1,
+          };
+        } else {
+          return item;
+        }
+      }),
     })),
 });
 

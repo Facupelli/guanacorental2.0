@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import { formatPrice } from "@/lib/utils";
 import { Equipment } from "@/types/models";
+import CartItemCounter from "@/components/CartItemCounter";
 
 const CartPage: NextPage = () => {
   const startDate = useBoundStore((state) => state.startDate);
@@ -103,7 +104,9 @@ const Item = ({ item }: ItemProps) => {
         </strong>{" "}
         <strong className="font-medium">{item.model}</strong>
       </p>
-      <p className="col-span-2">contador</p>
+      <div className="col-span-2">
+        <CartItemCounter item={item} />
+      </div>
       <p className="col-span-2">{formatPrice(item.price * item.quantity)}</p>
     </div>
   );

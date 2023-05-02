@@ -31,11 +31,13 @@ export type Owner = {
 
 export type EquipmentOnOwner = {
   id: string;
-  equipment: Equipment;
-  owner: Owner;
+  equipment?: Equipment;
+  equipmentId: string;
+  owner?: Owner;
+  ownerId: string;
   stock: number;
   created_at: Date;
-  book: string;
+  book?: string;
 };
 
 export type Book = {
@@ -44,13 +46,13 @@ export type Book = {
   end_date: Date;
   pickup_hour: string;
   return_hour: string;
-  equipments: BookOnEquipment;
+  equipments?: BookOnEquipment;
 };
 
 export type BookOnEquipment = {
-  equipment: EquipmentOnOwner;
+  equipment?: EquipmentOnOwner;
   equipmentId: string;
-  book: Book;
+  book?: Book;
   bookId: string;
   quantity: number;
   created_at: Date;
