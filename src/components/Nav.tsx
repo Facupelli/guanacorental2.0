@@ -7,7 +7,7 @@ const Nav = () => {
 
   return (
     <header>
-      <nav className="px-6">
+      <nav className="fixed bg-white px-6">
         <ul className="flex h-[70px] items-center gap-4">
           <li>
             <button

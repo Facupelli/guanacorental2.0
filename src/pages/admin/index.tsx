@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 
 import Nav from "@/components/Nav";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 const Admin: NextPage = () => {
   return (
@@ -14,7 +15,11 @@ const Admin: NextPage = () => {
 
       <Nav />
 
-      <main className="">ADMIN</main>
+      <main className="">
+        <AdminLayout>
+          <div>CALENDARIO</div>
+        </AdminLayout>
+      </main>
     </>
   );
 };
