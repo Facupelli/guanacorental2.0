@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useSession } from "next-auth/react";
+import { Loader2 } from "lucide-react";
 
 type NewUserFormData = {
   full_name: string;
@@ -41,12 +43,14 @@ type NewUserFormData = {
 };
 
 const NewUserPage: NextPage = () => {
+  const { data: session } = useSession();
   const { register, handleSubmit } = useForm<NewUserFormData>();
 
   const [showModal, setShowModal] = useState(false);
 
   const onSubmit = (data: NewUserFormData) => {
     console.log(data);
+    console.log(session?.user.id);
   };
 
   useEffect(() => {
@@ -270,6 +274,7 @@ const NewUserPage: NextPage = () => {
             </div>
 
             <Button className="font-semibold" type="submit">
+              {/* <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
               Enviar
             </Button>
           </form>
