@@ -149,10 +149,10 @@ type SelectLocationProps = {
 
 const SelectLocation = ({ locations, setLocation }: SelectLocationProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 ">
       {/* <Label htmlFor="location">Sucursal:</Label> */}
       <Select onValueChange={(e) => setLocation(e)}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger>
           <SelectValue placeholder="Elegir sucursal" />
         </SelectTrigger>
         <SelectContent>
@@ -243,6 +243,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
         <Button
           size="sm"
           variant="secondary"
+          className="font-bold"
           onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
         >
           {isAlreadyInCart ? "Agregado" : "Agregar"}

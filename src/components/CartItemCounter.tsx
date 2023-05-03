@@ -38,6 +38,7 @@ const CartItemCounter = ({ item }: Props) => {
     <div className="flex items-center gap-3">
       <Button
         size="sm"
+        className="h-6 w-4"
         onClick={() => handleSubstractItemQuantity(item.id)}
         disabled={item.quantity === 1}
       >
@@ -46,6 +47,7 @@ const CartItemCounter = ({ item }: Props) => {
       <p>{item.quantity}</p>
       <Button
         size="sm"
+        className="h-6 w-4"
         onClick={() => handleAddItemQuantity(item.id)}
         disabled={equipmentStock === item.quantity}
       >

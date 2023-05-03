@@ -9,12 +9,11 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import { formatPrice } from "@/lib/utils";
 import { Equipment } from "@/types/models";
 import CartItemCounter from "@/components/CartItemCounter";
+import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { useMemo } from "react";
 
 const CartPage: NextPage = () => {
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
   const cartItems = useBoundStore((state) => state.cartItems);
-  const location = useBoundStore((state) => state.location);
 
   return (
     <>
@@ -36,41 +35,7 @@ const CartPage: NextPage = () => {
             </div>
             <ItemsList items={cartItems} />
           </section>
-          <section className="col-span-4 grid gap-6 ">
-            {!startDate || !endDate ? (
-              <SelectDateButton />
-            ) : (
-              <div className="flex justify-between">
-                <p>Retiro: {new Date(startDate).toLocaleDateString()}</p>
-                <p>Devolución: {new Date(endDate).toLocaleDateString()}</p>
-              </div>
-            )}
-            <Button>Continuar Alquilando</Button>
-
-            <textarea
-              placeholder="Algo que nos quieras decir?"
-              className="p-2 text-sm"
-            />
-
-            <div className="flex items-center justify-between">
-              <p>sucursal:</p>
-              <p>{location}</p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <p>Total:</p>
-              <p>{formatPrice(1000)}</p>
-            </div>
-
-            <div className="grid gap-2">
-              <Button disabled={!startDate || !endDate}>Agendar Pedido</Button>
-              {/* {(!startDate || !endDate) && (
-                <p className="flex justify-center text-sm text-red-500">
-                  Selecciona una fecha para alquilar!
-                </p>
-              )} */}
-            </div>
-          </section>
+          <RightBar cartItems={cartItems} />
         </section>
       </main>
     </>
@@ -83,7 +48,7 @@ type ItemsListProps = {
 
 const ItemsList = ({ items }: ItemsListProps) => {
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-8">
       {items?.map((item) => (
         <Item key={item.id} item={item} />
       ))}
@@ -97,18 +62,89 @@ type ItemProps = {
 
 const Item = ({ item }: ItemProps) => {
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12 items-center">
       <p className="col-span-8">
-        <strong>
+        <strong className="font-extrabold">
           {item.name} {item.brand}
         </strong>{" "}
-        <strong className="font-medium">{item.model}</strong>
+        <strong className="font-semibold">{item.model}</strong>
       </p>
       <div className="col-span-2">
         <CartItemCounter item={item} />
       </div>
-      <p className="col-span-2">{formatPrice(item.price * item.quantity)}</p>
+      <p className="col-span-2 text-lg font-semibold">
+        {formatPrice(item.price * item.quantity)}
+      </p>
     </div>
+  );
+};
+
+type RightBarProps = {
+  cartItems: Equipment[];
+};
+
+const RightBar = ({ cartItems }: RightBarProps) => {
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
+  const location = useBoundStore((state) => state.location);
+
+  const workingDays = useMemo(() => {
+    if (startDate && endDate) {
+      const datesInRange = getDatesInRange(startDate, endDate);
+      return getTotalWorkingDays(datesInRange, "20:00");
+    }
+    return undefined;
+  }, [startDate, endDate]);
+
+  const cartTotal = useMemo(() => {
+    const cartSum = cartItems.reduce(
+      (acc, curr) => acc + curr.price * curr.quantity,
+      0
+    );
+    if (workingDays) {
+      return workingDays * cartSum;
+    }
+    return 0;
+  }, [workingDays, cartItems]);
+
+  return (
+    <section className="col-span-4 grid gap-6 ">
+      {!startDate || !endDate ? (
+        <SelectDateButton />
+      ) : (
+        <div className="flex justify-between">
+          <p>Retiro: {new Date(startDate).toLocaleDateString()}</p>
+          <p>Devolución: {new Date(endDate).toLocaleDateString()}</p>
+        </div>
+      )}
+      <Button>Continuar Alquilando</Button>
+
+      <textarea
+        placeholder="Algo que nos quieras decir?"
+        className="p-2 text-sm"
+      />
+
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between font-semibold">
+          <p>Sucursal:</p>
+          <p>{location}</p>
+        </div>
+        <div className="flex items-center justify-between font-semibold">
+          <p>Total:</p>
+          {!startDate || !endDate ? (
+            <p className="flex justify-center">
+              Selecciona una fecha para alquilar!
+            </p>
+          ) : (
+            <p className="text-xl font-bold">{formatPrice(cartTotal)}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        <Button disabled={!startDate || !endDate}>Agendar Pedido</Button>
+      </div>
+    </section>
   );
 };
 
