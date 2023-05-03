@@ -56,9 +56,9 @@ model User {
     accounts             Account[]
     sessions             Session[]
 
-    customer_approved    Boolean @default(false)
-    address              Address @relation(fields: [addressId], references: [id])
-    addressId            String  @unique
+    customer_approved    Boolean    @default(false)
+    address              Address?   @relation(fields: [addressId], references: [id])
+    addressId            String?     @unique
     orders               Order[]
     carts                Cart[]
 }
