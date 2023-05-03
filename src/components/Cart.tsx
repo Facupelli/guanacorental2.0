@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/router";
 import SelectDateButton from "./ui/SelectDateButton";
 import CartItemCounter from "./CartItemCounter";
+import { ArrowRight, X } from "lucide-react";
 
 const Cart = () => {
   const router = useRouter();
@@ -31,7 +32,9 @@ const Cart = () => {
         <div className="relative flex h-full flex-col gap-3 ">
           <div className="flex items-center justify-between">
             <h1 className="font-bold">MI PEDIDO</h1>
-            <button onClick={closeCartModal}>X</button>
+            <button onClick={closeCartModal}>
+              <X className="h-4 w-4" />{" "}
+            </button>
           </div>
 
           {!startDate || !endDate ? (
@@ -39,7 +42,7 @@ const Cart = () => {
           ) : (
             <div className="flex items-center justify-between">
               <p>{new Date(startDate).toLocaleDateString()}</p>
-              <p>{"->"}</p>
+              <ArrowRight className="h-4 w-4" />{" "}
               <p>{new Date(endDate).toLocaleDateString()}</p>
             </div>
           )}

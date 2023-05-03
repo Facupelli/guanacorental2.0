@@ -11,6 +11,7 @@ import { Equipment } from "@/types/models";
 import CartItemCounter from "@/components/CartItemCounter";
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { useMemo } from "react";
+import { X } from "lucide-react";
 
 const CartPage: NextPage = () => {
   const cartItems = useBoundStore((state) => state.cartItems);
@@ -29,7 +30,7 @@ const CartPage: NextPage = () => {
         <section className="mt-12 grid grid-cols-12 gap-8">
           <section className="col-span-8 ">
             <div className="grid grid-cols-12 pb-6">
-              <p className="col-span-8">Equipos</p>
+              <p className="col-span-7">Equipos</p>
               <p className="col-span-2">Cantidad</p>
               <p className="col-span-2">Precio</p>
             </div>
@@ -61,9 +62,11 @@ type ItemProps = {
 };
 
 const Item = ({ item }: ItemProps) => {
+  const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
+
   return (
     <div className="grid grid-cols-12 items-center">
-      <p className="col-span-8">
+      <p className="col-span-7">
         <strong className="font-extrabold">
           {item.name} {item.brand}
         </strong>{" "}
@@ -75,6 +78,9 @@ const Item = ({ item }: ItemProps) => {
       <p className="col-span-2 text-lg font-semibold">
         {formatPrice(item.price * item.quantity)}
       </p>
+      <button onClick={() => deleteFromCart(item.id)}>
+        <X className="col-span-1 h-4 w-4" />
+      </button>
     </div>
   );
 };
