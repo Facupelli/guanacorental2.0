@@ -61,6 +61,7 @@ model User {
     addressId            String?     @unique
     orders               Order[]
     carts                Cart[]
+    role                 Role[]
 }
 
 model VerificationToken {
@@ -101,6 +102,12 @@ model Address {
 
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt
+}
+
+model Role {
+  id                String      @default(cuid()) @id
+  name              String
+  users             User[]
 }
 
 // RENTAL

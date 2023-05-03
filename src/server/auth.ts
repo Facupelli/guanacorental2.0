@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "@/env.mjs";
 import { prisma } from "@/server/db";
+import type { Role } from "@/types/models";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,7 +21,7 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: Role[];
     } & DefaultSession["user"];
   }
 
@@ -37,13 +38,21 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const userRole = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: { select: { name: true } } },
+      });
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+          role: userRole?.role,
+        },
+      };
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [

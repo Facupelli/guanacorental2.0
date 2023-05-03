@@ -32,10 +32,17 @@ export const userRouter = createTRPCRouter({
         },
       });
 
+      const customerRole = await prisma.role.findFirst({
+        where: { name: "Customer" },
+      });
+
+      if (!customerRole) return;
+
       await prisma.user.update({
         where: { id: input.userId },
         data: {
           address: { connect: { id: address.id } },
+          role: { connect: { id: customerRole.id } },
         },
       });
 

@@ -8,6 +8,11 @@ export type Location = {
   name: string;
 };
 
+export type Role = {
+  id: string;
+  name: string;
+};
+
 export type Equipment = {
   id: string;
   name: string;

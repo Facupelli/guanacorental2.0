@@ -63,18 +63,18 @@ const NewUserPage: NextPage = () => {
 
   const onSubmit = (data: NewUserFormData) => {
     if (!session?.user.id) return;
-    // mutate(
-    //   { ...data, userId: session?.user.id },
-    //   {
-    //     onSuccess: () => {
-    //       console.log("sucess");
-    //       setShowSuccessModal(true);
-    //     },
-    //     onError: (err) => {
-    //       console.log("error", err);
-    //     },
-    //   }
-    // );
+    mutate(
+      { ...data, userId: session?.user.id },
+      {
+        onSuccess: () => {
+          console.log("sucess");
+          setShowSuccessModal(true);
+        },
+        onError: (err) => {
+          console.log("error", err);
+        },
+      }
+    );
   };
 
   useEffect(() => {

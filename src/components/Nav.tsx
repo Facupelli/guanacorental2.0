@@ -2,12 +2,20 @@ import { useBoundStore } from "@/zustand/store";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, UserCog } from "lucide-react";
+import { ROLES } from "@/lib/magic_strings";
+import { Session } from "next-auth";
+import { useRouter } from "next/router";
 
 const Nav = () => {
+  const router = useRouter();
   const { data: session } = useSession();
 
   const setOpenCartModal = useBoundStore((state) => state.setOpenCartModal);
+
+  const isAdmin = (session: Session | null) => {
+    return !!session?.user.role.find((role) => role.name === ROLES.ADMIN);
+  };
 
   return (
     <header>
@@ -34,6 +42,18 @@ const Nav = () => {
               <ShoppingCart className="h-4 w-4" />
             </p>
           </li>
+
+          {isAdmin(session) && (
+            <li className="cursor-pointer  text-white">
+              <button
+                className="flex items-center gap-2"
+                onClick={() => router.push("/admin")}
+              >
+                ADMIN
+                <UserCog className="h-4 w-4" />
+              </button>
+            </li>
+          )}
 
           {session ? (
             <li className="text-white">
