@@ -77,20 +77,20 @@ model Address {
   id                String      @default(cuid()) @id
   customer          User?
   full_name         String
-  company           String
   phone             String
   province          String
   city              String
-  postal_code       String
+  postal_code       String?
   address_1         String
-  address_2         String
+  address_2         String?
   dni_number        String
   birth_date        String
   occupation        String
-  student           Boolean
-  employee          Boolean
-  bussines_name     String
-  cuit              String
+  company           String?
+  student           Boolean?
+  employee          Boolean?
+  bussines_name     String?
+  cuit              String?
   contact_1         String
   contact_2         String
   bond_1            String
