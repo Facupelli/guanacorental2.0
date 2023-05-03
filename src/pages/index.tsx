@@ -99,6 +99,9 @@ const LeftBar = ({
   setLocation,
   selectedCategory,
 }: LeftBarProps) => {
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
+
   return (
     <section className="col-span-3 grid gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation locations={locations} setLocation={setLocation} />
@@ -106,8 +109,22 @@ const LeftBar = ({
       <SelectDateButton />
 
       <div>
-        <p>Retiro:</p>
-        <p>Devolución:</p>
+        <div className="flex items-center justify-between">
+          <p>Retiro:</p>
+          <p className="font-semibold">
+            {(startDate && new Date(startDate).toLocaleDateString()) ?? (
+              <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
+            )}
+          </p>
+        </div>
+        <div className="flex items-center justify-between">
+          <p>Devolución:</p>
+          <p className="font-semibold">
+            {(endDate && new Date(endDate).toLocaleDateString()) ?? (
+              <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
+            )}
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-2">

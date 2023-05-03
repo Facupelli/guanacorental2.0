@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./button";
 import { useBoundStore } from "@/zustand/store";
+import { CalendarDays } from "lucide-react";
 
 const SelectDateButton = () => {
   const setStartDate = useBoundStore((state) => state.setStartDate);
@@ -26,7 +27,9 @@ const SelectDateButton = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm">Seleccionar Fecha</Button>
+        <Button size="sm">
+          <CalendarDays className="mr-2 h-4 w-4" /> Seleccionar Fecha
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

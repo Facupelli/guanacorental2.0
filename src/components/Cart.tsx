@@ -9,6 +9,9 @@ import CartItemCounter from "./CartItemCounter";
 const Cart = () => {
   const router = useRouter();
 
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
+
   const showCartModal = useBoundStore((state) => state.showCartModal);
   const closeCartModal = useBoundStore((state) => state.setCloseCartModal);
 
@@ -16,6 +19,7 @@ const Cart = () => {
 
   const handleGoToCartPage = () => {
     router.push("/cart");
+    closeCartModal();
   };
   return (
     <>
@@ -30,12 +34,25 @@ const Cart = () => {
             <button onClick={closeCartModal}>X</button>
           </div>
 
-          <SelectDateButton />
+          {!startDate || !endDate ? (
+            <SelectDateButton />
+          ) : (
+            <div className="flex items-center justify-between">
+              <p>{new Date(startDate).toLocaleDateString()}</p>
+              <p>{"->"}</p>
+              <p>{new Date(endDate).toLocaleDateString()}</p>
+            </div>
+          )}
 
           <div className="grid gap-6 overflow-y-auto py-4">
-            {cartItems?.map((item) => (
-              <CartItem key={item.id} item={item} />
-            ))}
+            {cartItems.length === 0 ? (
+              <div>
+                Tu carrito está vacío. Agrega equipos desde reservas para poder
+                alquilarlos!
+              </div>
+            ) : (
+              cartItems.map((item) => <CartItem key={item.id} item={item} />)
+            )}
           </div>
 
           <div className="absolute bottom-0 grid w-full ">
