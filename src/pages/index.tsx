@@ -36,13 +36,27 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const [category, setCategory] = useState<string>("");
   const [location, setLocation] = useState<string>("");
 
-  const equipments = api.equipment.getAllEquipment.useQuery({
-    sort,
-    category,
-    location,
-  });
+  const { data, fetchNextPage } =
+    api.equipment.getAllEquipment.useInfiniteQuery(
+      {
+        sort,
+        category,
+        location,
 
-  if (!equipments.data) return <div>404</div>;
+        limit: 20,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      }
+    );
+
+  if (!data) return <div>404</div>;
+
+  const handleLoadMore = () => {
+    fetchNextPage();
+  };
+
+  const equipments = data.pages.map((page) => page.equipments).flat();
 
   return (
     <>
@@ -72,10 +86,13 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 <SelectOrder setSort={setSort} />
               </section>
               <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
-                {equipments.data.map((equipment) => (
+                {equipments?.map((equipment) => (
                   <EquipmentCard key={equipment.id} equipment={equipment} />
                 ))}
               </section>
+              <div className="flex justify-center py-6">
+                <Button onClick={handleLoadMore}>cargar más</Button>
+              </div>
             </div>
           </section>
         </div>
@@ -280,7 +297,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const categories = await prisma.category.findMany({});
   const locations = await prisma.location.findMany({});
 
-  await helpers.equipment.getAllEquipment.prefetch({ sort: "" });
+  await helpers.equipment.getAllEquipment.prefetch({ sort: "", limit: 20 });
 
   return {
     props: {

@@ -21,9 +21,14 @@ export const equipmentRouter = createTRPCRouter({
         sort: z.string().optional(),
         category: z.string().optional(),
         location: z.string().optional(),
+        cursor: z.string().nullish(),
+        limit: z.number(),
+        skip: z.number().optional(),
       })
     )
     .query(async ({ input }) => {
+      const { limit, skip, cursor } = input;
+
       const sortPipe: Array<object> = [];
       const wherePipe: WherePipe = {};
 
@@ -43,7 +48,10 @@ export const equipmentRouter = createTRPCRouter({
         wherePipe.locationId = input.location;
       }
 
-      const equipment = await prisma.equipment.findMany({
+      const equipments = await prisma.equipment.findMany({
+        take: limit + 1,
+        skip,
+        cursor: cursor ? { id: cursor } : undefined,
         where: wherePipe,
         orderBy: sortPipe,
         include: {
@@ -52,6 +60,12 @@ export const equipmentRouter = createTRPCRouter({
         },
       });
 
-      return equipment;
+      let nextCursor: undefined | typeof cursor = undefined;
+      if (equipments.length > limit) {
+        const nextItem = equipments.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return { equipments, nextCursor };
     }),
 });
