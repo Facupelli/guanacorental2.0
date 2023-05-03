@@ -150,17 +150,17 @@ model EquipmentOnOwner {
 model Equipment {
   id                  String              @default(cuid()) @id
   location            Location            @relation(fields: [locationId], references: [id])
-  locationId          String
+  locationId          String  
   carts               Cart[]
   name                String
   brand               String
   model               String
-  image               String
-  quantity            Int
+  image               String?
+  quantity            Int                 @default(1)
   price               Int
   accessories         String[]
   category            Category            @relation(fields: [categoryId], references: [id])
-  categoryId          String
+  categoryId          String 
   owner               EquipmentOnOwner[]
   available           Boolean             @default(true)
 }

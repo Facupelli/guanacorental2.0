@@ -3,6 +3,7 @@ import Head from "next/head";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
+import Calendar from "react-calendar";
 
 const Admin: NextPage = () => {
   return (
@@ -17,7 +18,14 @@ const Admin: NextPage = () => {
 
       <main className="">
         <AdminLayout>
-          <div>CALENDARIO</div>
+          <h1 className="text-lg font-bold">CALENDARIO</h1>
+          <div className="pt-6">
+            <Calendar
+              locale="es-ES"
+              minDate={new Date()}
+              className="rounded-lg p-4"
+            />
+          </div>
         </AdminLayout>
       </main>
     </>

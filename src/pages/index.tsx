@@ -103,7 +103,7 @@ const LeftBar = ({
   const endDate = useBoundStore((state) => state.endDate);
 
   return (
-    <section className="col-span-3 grid gap-4 rounded bg-white p-4 shadow-sm">
+    <section className="col-span-3 flex h-[calc(100vh_-_148px)] flex-col gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation locations={locations} setLocation={setLocation} />
 
       <SelectDateButton />
@@ -232,14 +232,14 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
 
   return (
     <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
-      <div className="relative h-[200px] w-auto">
+      {/* <div className="relative h-[200px] w-auto">
         <Image
           src={equipment.image}
           alt={`${equipment.name} ${equipment.brand} equipment picture`}
           fill
           style={{ objectFit: "contain" }}
         />
-      </div>
+      </div> */}
 
       <div>
         <p className="font-bold">
