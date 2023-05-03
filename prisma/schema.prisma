@@ -76,8 +76,7 @@ model VerificationToken {
 model Address {
   id                String      @default(cuid()) @id
   customer          User?
-  first_name        String
-  last_name         String
+  full_name         String
   company           String
   phone             String
   province          String
@@ -89,9 +88,13 @@ model Address {
   birth_date        String
   occupation        String
   student           Boolean
-  Employee          Boolean
+  employee          Boolean
+  bussines_name     String
   cuit              String
-  contacts          Json
+  contact_1         String
+  contact_2         String
+  bond_1            String
+  bond_2            String
   bank              String
   alias             String
   cbu               String
