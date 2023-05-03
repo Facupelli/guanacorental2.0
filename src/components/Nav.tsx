@@ -2,6 +2,7 @@ import { useBoundStore } from "@/zustand/store";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 
 const Nav = () => {
   const { data: session } = useSession();
@@ -11,7 +12,7 @@ const Nav = () => {
   return (
     <header>
       <nav className="fixed w-full bg-brand-primary px-6 ">
-        <ul className="flex h-[70px] items-center gap-4">
+        <ul className="flex h-[70px] items-center gap-6">
           <li>
             <Link href="/">
               <div className="relative aspect-square w-14">
@@ -25,8 +26,12 @@ const Nav = () => {
           </li>
 
           <li className="ml-auto">
-            <p className="cursor-pointer text-white" onClick={setOpenCartModal}>
+            <p
+              className="flex cursor-pointer items-center gap-2 text-white"
+              onClick={setOpenCartModal}
+            >
               CARRITO
+              <ShoppingCart className="h-4 w-4" />
             </p>
           </li>
 
