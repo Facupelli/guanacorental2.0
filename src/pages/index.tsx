@@ -111,8 +111,8 @@ const LeftBar = ({
       </div>
 
       <div className="grid gap-2">
-        <p className="font-semibold">Categorías:</p>
-        <ul className="grid gap-2">
+        <p className="font-bold">Categorías:</p>
+        <ul className="grid">
           <li
             onClick={() => setCategory("")}
             className={`cursor-pointer rounded-sm px-2 py-1 ${
