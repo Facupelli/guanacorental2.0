@@ -13,7 +13,7 @@ import { useBoundStore } from "@/zustand/store";
 type SelectLocationProps = {
   locations: Location[];
   placeholder: string;
-  defaultValue: string;
+  defaultValue?: string;
   onValueChange: (e: string) => void;
   height?: string;
 };
@@ -38,7 +38,7 @@ const SelectLocation = ({
           <SelectGroup>
             <SelectLabel>Sucursales</SelectLabel>
             {locations.map((location) => (
-              <SelectItem value={location.name} key={location.id}>
+              <SelectItem value={location.id} key={location.id}>
                 {location.name}
               </SelectItem>
             ))}

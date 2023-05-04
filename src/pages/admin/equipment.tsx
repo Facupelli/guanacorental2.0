@@ -12,14 +12,48 @@ import { formatPrice } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
+import type {
+  Equipment,
+  EquipmentOnOwner,
+  Location,
+  Owner,
+} from "@/types/models";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SelectLocation from "@/components/ui/SelectLocation";
-import type { Location } from "@/types/models";
+import { Input } from "@/components/ui/input";
+import { Plus, X } from "lucide-react";
+import {
+  FieldValue,
+  UseFieldArrayRemove,
+  UseFormRegister,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 
 type Props = {
   locations: Location[];
+  owners: Owner[];
 };
 
-const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
+const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   const location = useBoundStore((state) => state.location);
 
   const { data, fetchNextPage } =
@@ -42,7 +76,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
 
   const equipments = data.pages.map((page) => page.equipments).flat();
 
-  console.log(equipments);
+  // console.log(equipments);
 
   return (
     <>
@@ -79,17 +113,13 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
                       {formatPrice(equipment.price)}
                     </td>
                     <td className="px-4 py-2">
-                      {equipment.owner.map((owner) => owner.owner.name)}
-                    </td>
-                    {/* <td className="px-4 py-2">
-                      <SelectLocation
+                      <OwnerLocationStockModal
+                        owners={owners}
+                        owner={equipment.owner}
+                        equipment={equipment}
                         locations={locations}
-                        placeholder=""
-                        defaultValue={equipment.location.name}
-                        onValueChange={(e) => console.log(e)}
-                        height="h-6"
                       />
-                    </td> */}
+                    </td>
                     <td className="px-4 py-2">
                       <Switch defaultChecked={equipment.available} />
                     </td>
@@ -104,6 +134,175 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
   );
 };
 
+type OwnerLocationStockProps = {
+  equipment: Equipment;
+  locations: Location[];
+  owner: EquipmentOnOwner[];
+  owners: Owner[];
+};
+
+type Form = {
+  owner: {
+    name: string;
+    location: string;
+    stock: number;
+  }[];
+};
+
+const OwnerLocationStockModal = ({
+  equipment,
+  locations,
+  owner,
+  owners,
+}: OwnerLocationStockProps) => {
+  const { register, control } = useForm<Form>({
+    defaultValues: {
+      owner: owner.map((owner) => ({
+        name: owner.ownerId,
+        location: owner.locationId,
+        stock: owner.stock,
+      })),
+    },
+  });
+  const { fields, append, remove, move, swap } = useFieldArray({
+    control,
+    name: "owner",
+  });
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm" className="h-4 text-xs">
+          ver
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {equipment.name} {equipment.brand}
+          </DialogTitle>
+          <DialogDescription>{equipment.model}</DialogDescription>
+        </DialogHeader>
+        <div>
+          <h2>agregar nuevo</h2>
+
+          <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
+            <p className="col-span-2">Dueño</p>
+            <p className="col-span-2">Sucursal</p>
+            <p className="col-span-2">Stock</p>
+          </div>
+          <div>
+            {fields.map((field, index) => (
+              <FieldArray
+                key={field.id}
+                field={field}
+                remove={remove}
+                locations={locations}
+                owners={owners}
+                register={register}
+                index={index}
+              />
+            ))}
+          </div>
+          <div className="flex justify-center pt-6">
+            <button
+              onClick={() => append({ name: "", stock: 1, location: "" })}
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button>Actualizar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+type FieldArrayProps = {
+  field: {
+    name: string;
+    location: string;
+    stock: number;
+  };
+  owners: Owner[];
+  locations: Location[];
+  register: UseFormRegister<Form>;
+  index: number;
+  remove: UseFieldArrayRemove;
+};
+
+const FieldArray = ({
+  field,
+  owners,
+  locations,
+  register,
+  index,
+  remove,
+}: FieldArrayProps) => {
+  return (
+    <div>
+      <section className="grid grid-cols-7 items-center gap-2">
+        <div className="col-span-2">
+          <SelectOwner defaultValue={field.name} owners={owners} />
+        </div>
+        <div className="col-span-2">
+          <SelectLocation
+            locations={locations}
+            placeholder="elegir"
+            defaultValue={field.location}
+            onValueChange={(e) => console.log(e)}
+            height="h-6"
+            {...register(`owner.${index}.name` as const, {
+              required: true,
+            })}
+          />
+        </div>
+        <Input
+          type="text"
+          {...register(`owner.${index}.stock` as const, {
+            required: true,
+          })}
+          className="col-span-2 h-6"
+        />
+        <Button
+          variant="link"
+          className="text-gray-800"
+          onClick={() => remove(index)}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </section>
+    </div>
+  );
+};
+
+type SelectOwnerProps = {
+  defaultValue: string;
+  owners: Owner[];
+};
+
+const SelectOwner = ({ defaultValue, owners }: SelectOwnerProps) => {
+  return (
+    <Select defaultValue={defaultValue}>
+      <SelectTrigger className="h-6">
+        <SelectValue placeholder="elegir" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Dueños</SelectLabel>
+          {owners.map((owner) => (
+            <SelectItem value={owner.id} key={owner.id}>
+              {owner.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+};
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const helpers = createServerSideHelpers({
     router: appRouter,
@@ -112,6 +311,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 
   const locations = await prisma.location.findMany({});
+  const owners = await prisma.owner.findMany({});
 
   await helpers.equipment.getAllEquipment.prefetch({ sort: "", limit: 20 });
 
@@ -119,6 +319,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       trpcState: helpers.dehydrate(),
       locations,
+      owners,
     },
   };
 };

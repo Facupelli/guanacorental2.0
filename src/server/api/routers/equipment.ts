@@ -6,7 +6,7 @@ import { SORT_TYPES } from "@/lib/magic_strings";
 
 type WherePipe = {
   categoryId?: string;
-  owner?: { some: { location: { name: string } } };
+  owner?: { some: { location: { id: string } } };
 };
 
 export const equipmentRouter = createTRPCRouter({
@@ -40,7 +40,7 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       if (input.location) {
-        wherePipe.owner = { some: { location: { name: input.location } } };
+        wherePipe.owner = { some: { location: { id: input.location } } };
       }
 
       const equipments = await prisma.equipment.findMany({
