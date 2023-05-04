@@ -58,35 +58,40 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="pt-6">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Modelo</th>
-                  <th>Precio</th>
-                  <th>Dueño y Stock</th>
-                  <th>Sucursal</th>
-                  <th>Disponible</th>
+            <table className="w-full rounded-md bg-white">
+              <thead className="border-b border-app-bg">
+                <tr className="text-left text-sm">
+                  <th className="p-4">Nombre</th>
+                  <th className="p-4">Marca</th>
+                  <th className="p-4">Modelo</th>
+                  <th className="p-4">Precio</th>
+                  <th className="p-4">Dueño y Stock</th>
+                  <th className="p-4">Sucursal</th>
+                  <th className="p-4">Disponible</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-[14px]">
                 {equipments?.map((equipment) => (
                   <tr key={equipment.id}>
-                    <td>{equipment.name}</td>
-                    <td>{equipment.brand}</td>
-                    <td>{equipment.model}</td>
-                    <td>{formatPrice(equipment.price)}</td>
-                    <td>{equipment.owner.map((owner) => owner.owner.name)}</td>
-                    <td>
+                    <td className="px-4 py-2">{equipment.name}</td>
+                    <td className="px-4 py-2">{equipment.brand}</td>
+                    <td className="px-4 py-2">{equipment.model}</td>
+                    <td className="px-4 py-2">
+                      {formatPrice(equipment.price)}
+                    </td>
+                    <td className="px-4 py-2">
+                      {equipment.owner.map((owner) => owner.owner.name)}
+                    </td>
+                    <td className="px-4 py-2">
                       <SelectLocation
                         locations={locations}
                         placeholder=""
                         defaultValue={equipment.location.name}
                         onValueChange={(e) => console.log(e)}
+                        height="h-6"
                       />
                     </td>
-                    <td>
+                    <td className="px-4 py-2">
                       <Switch defaultChecked={equipment.available} />
                     </td>
                   </tr>
