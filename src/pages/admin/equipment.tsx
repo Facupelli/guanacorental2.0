@@ -7,7 +7,6 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { api } from "@/utils/api";
 import { useBoundStore } from "@/zustand/store";
-import { SORT_TYPES } from "@/lib/magic_strings";
 import { formatPrice } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -77,8 +76,6 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   });
 
   if (!data) return <div>404</div>;
-
-  // console.log(equipments);
 
   return (
     <>
@@ -211,25 +208,33 @@ const OwnerLocationStockModal = ({
                 key={owner.id}
                 className="grid grid-cols-7 items-center gap-2"
               >
-                <p className="col-span-2">{owner.owner?.name}</p>
-                <p className="col-span-2">{owner.location.name}</p>
-                <p className="col-span-2">{owner.stock}</p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.owner?.name}
+                </p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.location.name}
+                </p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.stock}
+                </p>
                 <Button variant="link" className="text-gray-800">
                   <X className="h-3 w-3" />
                 </Button>
               </div>
             ))}
-            {fields?.map((field, index) => (
-              <FieldArray
-                key={field.id}
-                remove={remove}
-                locations={locations}
-                owners={owners}
-                register={register}
-                setValue={setValue}
-                index={index}
-              />
-            ))}
+            <div className="pt-4">
+              {fields?.map((field, index) => (
+                <FieldArray
+                  key={field.id}
+                  remove={remove}
+                  locations={locations}
+                  owners={owners}
+                  register={register}
+                  setValue={setValue}
+                  index={index}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-center pt-6">
@@ -271,34 +276,32 @@ const FieldArray = ({
   setValue,
 }: FieldArrayProps) => {
   return (
-    <div>
-      <section className="grid grid-cols-7 items-center gap-2">
-        <div className="col-span-2">
-          <SelectOwner owners={owners} index={index} setValue={setValue} />
-        </div>
-        <div className="col-span-2">
-          <AdminSelectLocation
-            index={index}
-            locations={locations}
-            setValue={setValue}
-          />
-        </div>
-        <Input
-          type="text"
-          {...register(`owner.${index}.stock` as const, {
-            valueAsNumber: true,
-          })}
-          className="col-span-2 h-6"
+    <section className="grid grid-cols-7 items-center gap-2 rounded-md bg-slate-50 p-2">
+      <div className="col-span-2">
+        <SelectOwner owners={owners} index={index} setValue={setValue} />
+      </div>
+      <div className="col-span-2">
+        <AdminSelectLocation
+          index={index}
+          locations={locations}
+          setValue={setValue}
         />
-        <Button
-          variant="link"
-          className="text-gray-800"
-          onClick={() => remove(index)}
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </section>
-    </div>
+      </div>
+      <Input
+        type="text"
+        {...register(`owner.${index}.stock` as const, {
+          valueAsNumber: true,
+        })}
+        className="col-span-2 h-6"
+      />
+      <Button
+        variant="link"
+        className="text-gray-800"
+        onClick={() => remove(index)}
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </section>
   );
 };
 
