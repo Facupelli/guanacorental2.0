@@ -42,7 +42,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       {
         sort,
         category,
-        location,
+        location: location ?? "Mendoza",
 
         limit: 20,
       },
@@ -58,6 +58,8 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   };
 
   const equipments = data.pages.map((page) => page.equipments).flat();
+
+  console.log(data);
 
   return (
     <>

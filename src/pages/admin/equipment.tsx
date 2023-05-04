@@ -65,8 +65,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
                   <th className="p-4">Marca</th>
                   <th className="p-4">Modelo</th>
                   <th className="p-4">Precio</th>
-                  <th className="p-4">Dueño y Stock</th>
-                  <th className="p-4">Sucursal</th>
+                  <th className="p-4">Dueño, Sucursal y Stock</th>
                   <th className="p-4">Disponible</th>
                 </tr>
               </thead>
@@ -82,7 +81,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
                     <td className="px-4 py-2">
                       {equipment.owner.map((owner) => owner.owner.name)}
                     </td>
-                    <td className="px-4 py-2">
+                    {/* <td className="px-4 py-2">
                       <SelectLocation
                         locations={locations}
                         placeholder=""
@@ -90,7 +89,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations }: Props) => {
                         onValueChange={(e) => console.log(e)}
                         height="h-6"
                       />
-                    </td>
+                    </td> */}
                     <td className="px-4 py-2">
                       <Switch defaultChecked={equipment.available} />
                     </td>

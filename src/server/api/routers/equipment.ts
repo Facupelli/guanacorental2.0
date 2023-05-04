@@ -47,13 +47,31 @@ export const equipmentRouter = createTRPCRouter({
         take: limit + 1,
         skip,
         cursor: cursor ? { id: cursor } : undefined,
-        where: wherePipe,
+        // where: {
+        //   locationId
+        // },
         orderBy: sortPipe,
         include: {
-          location: true,
-          owner: { include: { owner: true } },
+          owner: { include: { owner: true, location: true } },
+        },
+        where: {
+          owner: {
+            some: {
+              location: { name: input.location },
+            },
+          },
         },
       });
+
+      // const equipments = await prisma.equipmentOnOwner.findMany({
+      //   where: {
+      //     locationId:""
+      //   },
+      //   distinct: ["locationId"],
+      //   include:{
+      //     equipment:true
+      //   }
+      // });
 
       let nextCursor: undefined | typeof cursor = undefined;
       if (equipments.length > limit) {

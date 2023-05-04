@@ -23,7 +23,6 @@ export type Equipment = {
   price: number;
   accessories: string[];
   available: boolean;
-  location?: Location;
   category?: Category;
   owner?: EquipmentOnOwner[];
 };
@@ -38,6 +37,8 @@ export type EquipmentOnOwner = {
   id: string;
   equipment?: Equipment;
   equipmentId: string;
+  location: Location;
+  locationId: string;
   owner?: Owner;
   ownerId: string;
   stock: number;

@@ -137,16 +137,18 @@ model Owner {
 
 model EquipmentOnOwner {
   id                      String              @default(cuid()) @id
+  stock                   Int
+  books                   BookOnEquipment[]
+  orders                  Order[]
   equipment               Equipment           @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
   equipmentId             String 
   owner                   Owner               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId                 String 
-  stock                   Int
-  books                   BookOnEquipment[]
-  orders                  Order[]
   location                Location            @relation(fields: [locationId], references: [id])
   locationId              String              
   created_at              DateTime            @default(now())
+
+  @@unique([equipmentId, ownerId, locationId])
 }
 
 model Equipment {
