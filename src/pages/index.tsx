@@ -25,6 +25,7 @@ import { useBoundStore } from "@/zustand/store";
 import { Dispatch, SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
 import SelectDateButton from "@/components/ui/SelectDateButton";
+import SelectLocation from "@/components/ui/SelectLocation";
 
 type Props = {
   locations: Location[];
@@ -34,7 +35,7 @@ type Props = {
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
+  const location = useBoundStore((state) => state.location);
 
   const { data, fetchNextPage } =
     api.equipment.getAllEquipment.useInfiniteQuery(
@@ -77,7 +78,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
               locations={locations}
               categories={categories}
               setCategory={setCategory}
-              setLocation={setLocation}
               selectedCategory={category}
             />
             <div className="col-span-9 flex flex-col gap-4">
@@ -105,7 +105,6 @@ type LeftBarProps = {
   locations: Location[];
   categories: Category[];
   setCategory: Dispatch<SetStateAction<string>>;
-  setLocation: Dispatch<SetStateAction<string>>;
   selectedCategory: string;
 };
 
@@ -113,15 +112,20 @@ const LeftBar = ({
   categories,
   locations,
   setCategory,
-  setLocation,
   selectedCategory,
 }: LeftBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
+  const setLocation = useBoundStore((state) => state.setLocation);
 
   return (
     <section className="col-span-3 flex h-[calc(100vh_-_148px)] flex-col gap-4 rounded bg-white p-4 shadow-sm">
-      <SelectLocation locations={locations} setLocation={setLocation} />
+      <SelectLocation
+        locations={locations}
+        placeholder="Elegir sucursal"
+        defaultValue=""
+        onValueChange={(e) => setLocation(e)}
+      />
 
       <SelectDateButton />
 
@@ -173,34 +177,6 @@ const LeftBar = ({
         </ul>
       </div>
     </section>
-  );
-};
-
-type SelectLocationProps = {
-  locations: Location[];
-  setLocation: Dispatch<SetStateAction<string>>;
-};
-
-const SelectLocation = ({ locations, setLocation }: SelectLocationProps) => {
-  return (
-    <div className="flex items-center gap-2 ">
-      {/* <Label htmlFor="location">Sucursal:</Label> */}
-      <Select onValueChange={(e) => setLocation(e)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Elegir sucursal" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Sucursales</SelectLabel>
-            {locations.map((location) => (
-              <SelectItem value={location.id} key={location.id}>
-                {location.name}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
   );
 };
 

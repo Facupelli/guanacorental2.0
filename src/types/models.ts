@@ -18,7 +18,7 @@ export type Equipment = {
   name: string;
   brand: string;
   model: string;
-  image: string;
+  image: string | null;
   quantity: number;
   price: number;
   accessories: string[];

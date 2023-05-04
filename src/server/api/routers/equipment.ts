@@ -2,16 +2,11 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
-
-export const SORT_TYPES = {
-  DEFAULT: "default",
-  DESC: "desc",
-  ASC: "asc",
-};
+import { SORT_TYPES } from "@/lib/magic_strings";
 
 type WherePipe = {
   categoryId?: string;
-  locationId?: string;
+  location: { name?: string };
 };
 
 export const equipmentRouter = createTRPCRouter({
@@ -30,7 +25,7 @@ export const equipmentRouter = createTRPCRouter({
       const { limit, skip, cursor } = input;
 
       const sortPipe: Array<object> = [];
-      const wherePipe: WherePipe = {};
+      const wherePipe: WherePipe = { location: {} };
 
       if (input.sort === SORT_TYPES.DESC) {
         sortPipe.push({ price: "desc" });
@@ -45,7 +40,7 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       if (input.location) {
-        wherePipe.locationId = input.location;
+        wherePipe.location.name = input.location;
       }
 
       const equipments = await prisma.equipment.findMany({
@@ -56,7 +51,7 @@ export const equipmentRouter = createTRPCRouter({
         orderBy: sortPipe,
         include: {
           location: true,
-          owner: true,
+          owner: { include: { owner: true } },
         },
       });
 
