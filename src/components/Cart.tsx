@@ -6,9 +6,13 @@ import { useRouter } from "next/router";
 import SelectDateButton from "./ui/SelectDateButton";
 import CartItemCounter from "./CartItemCounter";
 import { ArrowRight, X } from "lucide-react";
+import useOnClickOutside from "@/hooks/useOnClickOutside";
+import { useCallback, useRef } from "react";
 
 const Cart = () => {
   const router = useRouter();
+
+  const cartModalRef = useRef(null);
 
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
@@ -18,6 +22,11 @@ const Cart = () => {
 
   const cartItems = useBoundStore((state) => state.cartItems);
 
+  useOnClickOutside(
+    cartModalRef,
+    useCallback(() => closeCartModal(), [closeCartModal])
+  );
+
   const handleGoToCartPage = () => {
     router.push("/cart");
     closeCartModal();
@@ -25,6 +34,7 @@ const Cart = () => {
   return (
     <>
       <aside
+        ref={cartModalRef}
         className={`fixed  ${
           showCartModal ? "right-0" : "right-[-30vw]"
         } top-[70px] z-20 h-[calc(100vh_-_70px)] w-[25%] bg-white p-4 transition-all duration-300 ease-in-out`}
