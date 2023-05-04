@@ -47,6 +47,8 @@ import {
   useForm,
 } from "react-hook-form";
 import { Label } from "@/components/ui/label";
+import Pagination from "@/components/ui/Pagination";
+import { useState } from "react";
 
 type Props = {
   locations: Location[];
@@ -54,9 +56,14 @@ type Props = {
 };
 
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
+
   const location = useBoundStore((state) => state.location);
 
   const { data } = api.equipment.adminGetEquipment.useQuery({
+    take: pageSize,
+    skip: (currentPage - 1) * pageSize,
     locationId: location,
   });
 
@@ -90,7 +97,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 </tr>
               </thead>
               <tbody className="text-[14px]">
-                {data?.map((equipment) => (
+                {data?.equipment.map((equipment) => (
                   <tr key={equipment.id}>
                     <td className="px-4 py-2">{equipment.name}</td>
                     <td className="px-4 py-2">{equipment.brand}</td>
@@ -113,6 +120,13 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 ))}
               </tbody>
             </table>
+
+            <Pagination
+              totalCount={data.totalCount}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={(page) => setCurrentPage(page as number)}
+            />
           </div>
         </AdminLayout>
       </main>
@@ -335,7 +349,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const locations = await prisma.location.findMany({});
   const owners = await prisma.owner.findMany({});
 
-  await helpers.equipment.adminGetEquipment.prefetch({});
+  await helpers.equipment.adminGetEquipment.prefetch({ take: 15, skip: 0 });
 
   return {
     props: {
