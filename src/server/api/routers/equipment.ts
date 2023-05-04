@@ -6,7 +6,7 @@ import { SORT_TYPES } from "@/lib/magic_strings";
 
 type WherePipe = {
   categoryId?: string;
-  location: { name?: string };
+  owner?: { some: { location: { name: string } } };
 };
 
 export const equipmentRouter = createTRPCRouter({
@@ -25,7 +25,7 @@ export const equipmentRouter = createTRPCRouter({
       const { limit, skip, cursor } = input;
 
       const sortPipe: Array<object> = [];
-      const wherePipe: WherePipe = { location: {} };
+      const wherePipe: WherePipe = {};
 
       if (input.sort === SORT_TYPES.DESC) {
         sortPipe.push({ price: "desc" });
@@ -40,26 +40,17 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       if (input.location) {
-        wherePipe.location.name = input.location;
+        wherePipe.owner = { some: { location: { name: input.location } } };
       }
 
       const equipments = await prisma.equipment.findMany({
         take: limit + 1,
         skip,
         cursor: cursor ? { id: cursor } : undefined,
-        // where: {
-        //   locationId
-        // },
+        where: wherePipe,
         orderBy: sortPipe,
         include: {
           owner: { include: { owner: true, location: true } },
-        },
-        where: {
-          owner: {
-            some: {
-              location: { name: input.location },
-            },
-          },
         },
       });
 
