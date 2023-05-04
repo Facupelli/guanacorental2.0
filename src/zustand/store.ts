@@ -3,7 +3,7 @@ import { create, StateCreator } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface LocationSlice {
-  showModal: boolean;
+  showLocationModal: boolean;
   location: string;
   setLocation: (location: string) => void;
   setToggleModal: () => void;
@@ -15,10 +15,11 @@ const createLocationSlice: StateCreator<
   [],
   LocationSlice
 > = (set) => ({
-  showModal: false,
-  location: "San Juan",
+  showLocationModal: false,
+  location: "",
   setLocation: (location) => set(() => ({ location })),
-  setToggleModal: () => set((state) => ({ showModal: !state.showModal })),
+  setToggleModal: () =>
+    set((state) => ({ showLocationModal: !state.showLocationModal })),
 });
 
 interface DateSlice {

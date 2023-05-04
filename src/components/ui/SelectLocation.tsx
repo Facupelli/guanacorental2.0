@@ -24,27 +24,21 @@ const SelectLocation = ({
   onValueChange,
 }: SelectLocationProps) => {
   return (
-    <div className="flex items-center gap-2 ">
-      {/* <Label htmlFor="location">Sucursal:</Label> */}
-      <Select
-        onValueChange={(e) => onValueChange(e)}
-        defaultValue={defaultValue}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Sucursales</SelectLabel>
-            {locations.map((location) => (
-              <SelectItem value={location.id} key={location.id}>
-                {location.name}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
+    <Select onValueChange={(e) => onValueChange(e)} defaultValue={defaultValue}>
+      <SelectTrigger>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Sucursales</SelectLabel>
+          {locations.map((location) => (
+            <SelectItem value={location.id} key={location.id}>
+              {location.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
