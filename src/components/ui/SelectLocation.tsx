@@ -7,8 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Form } from "@/pages/admin/equipment";
 import type { Location } from "@/types/models";
-import { useBoundStore } from "@/zustand/store";
+import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type SelectLocationProps = {
   locations: Location[];
@@ -46,6 +47,37 @@ const SelectLocation = ({
         </SelectContent>
       </Select>
     </div>
+  );
+};
+
+type AdminSelectLocationProps = {
+  index: number;
+  locations: Location[];
+  setValue: UseFormSetValue<Form>;
+};
+export const AdminSelectLocation = ({
+  index,
+  setValue,
+  locations,
+}: AdminSelectLocationProps) => {
+  return (
+    <Select
+      onValueChange={(e) => setValue(`owner.${index}.locationId` as const, e)}
+    >
+      <SelectTrigger className="h-6">
+        <SelectValue placeholder="elegir" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Sucursales</SelectLabel>
+          {locations.map((location) => (
+            <SelectItem value={location.id} key={location.id}>
+              {location.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 

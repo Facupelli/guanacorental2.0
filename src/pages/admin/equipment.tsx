@@ -37,16 +37,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import SelectLocation from "@/components/ui/SelectLocation";
+import SelectLocation, {
+  AdminSelectLocation,
+} from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 import {
-  FieldValue,
   UseFieldArrayRemove,
   UseFormRegister,
+  UseFormSetValue,
   useFieldArray,
   useForm,
 } from "react-hook-form";
+import { Label } from "@/components/ui/label";
 
 type Props = {
   locations: Location[];
@@ -141,10 +144,10 @@ type OwnerLocationStockProps = {
   owners: Owner[];
 };
 
-type Form = {
+export type Form = {
   owner: {
-    name: string;
-    location: string;
+    ownerId: string;
+    locationId: string;
     stock: number;
   }[];
 };
@@ -155,19 +158,36 @@ const OwnerLocationStockModal = ({
   owner,
   owners,
 }: OwnerLocationStockProps) => {
-  const { register, control } = useForm<Form>({
-    defaultValues: {
-      owner: owner.map((owner) => ({
-        name: owner.ownerId,
-        location: owner.locationId,
-        stock: owner.stock,
-      })),
-    },
-  });
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<Form>();
   const { fields, append, remove, move, swap } = useFieldArray({
     control,
     name: "owner",
   });
+
+  const { mutate, isLoading } =
+    api.equipment.createEquipmentOnOwner.useMutation();
+
+  const onSubmit = (data: Form) => {
+    const mutateData = {
+      owner: data.owner.map((owner) => ({
+        ...owner,
+        equipmentId: equipment.id,
+      })),
+    };
+
+    mutate(mutateData, {
+      onSuccess: () => {},
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+  };
 
   return (
     <Dialog>
@@ -183,86 +203,95 @@ const OwnerLocationStockModal = ({
           </DialogTitle>
           <DialogDescription>{equipment.model}</DialogDescription>
         </DialogHeader>
-        <div>
-          <h2>agregar nuevo</h2>
 
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
-            <p className="col-span-2">Dueño</p>
-            <p className="col-span-2">Sucursal</p>
-            <p className="col-span-2">Stock</p>
+            <Label className="col-span-2">Dueño</Label>
+            <Label className="col-span-2">Sucursal</Label>
+            <Label className="col-span-2">Stock</Label>
           </div>
           <div>
-            {fields.map((field, index) => (
+            {owner.map((owner) => (
+              <div
+                key={owner.id}
+                className="grid grid-cols-7 items-center gap-2"
+              >
+                <p className="col-span-2">{owner.owner?.name}</p>
+                <p className="col-span-2">{owner.location.name}</p>
+                <p className="col-span-2">{owner.stock}</p>
+                <Button variant="link" className="text-gray-800">
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+            {fields?.map((field, index) => (
               <FieldArray
                 key={field.id}
-                field={field}
                 remove={remove}
                 locations={locations}
                 owners={owners}
                 register={register}
+                setValue={setValue}
                 index={index}
               />
             ))}
           </div>
+
           <div className="flex justify-center pt-6">
-            <button
-              onClick={() => append({ name: "", stock: 1, location: "" })}
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => append({ ownerId: "", stock: 1, locationId: "" })}
+              className="flex items-center gap-2 "
             >
-              <Plus className="h-4 w-4" />
-            </button>
+              Agregar dueño <Plus className="h-4 w-4" />
+            </Button>
           </div>
-        </div>
-        <DialogFooter>
-          <Button>Actualizar</Button>
-        </DialogFooter>
+
+          <div className="flex justify-end pt-4">
+            <Button type="submit">Actualizar</Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
 };
 
 type FieldArrayProps = {
-  field: {
-    name: string;
-    location: string;
-    stock: number;
-  };
   owners: Owner[];
   locations: Location[];
   register: UseFormRegister<Form>;
   index: number;
+  setValue: UseFormSetValue<Form>;
   remove: UseFieldArrayRemove;
 };
 
 const FieldArray = ({
-  field,
   owners,
   locations,
   register,
   index,
   remove,
+  setValue,
 }: FieldArrayProps) => {
   return (
     <div>
       <section className="grid grid-cols-7 items-center gap-2">
         <div className="col-span-2">
-          <SelectOwner defaultValue={field.name} owners={owners} />
+          <SelectOwner owners={owners} index={index} setValue={setValue} />
         </div>
         <div className="col-span-2">
-          <SelectLocation
+          <AdminSelectLocation
+            index={index}
             locations={locations}
-            placeholder="elegir"
-            defaultValue={field.location}
-            onValueChange={(e) => console.log(e)}
-            height="h-6"
-            {...register(`owner.${index}.name` as const, {
-              required: true,
-            })}
+            setValue={setValue}
           />
         </div>
         <Input
           type="text"
           {...register(`owner.${index}.stock` as const, {
-            required: true,
+            valueAsNumber: true,
           })}
           className="col-span-2 h-6"
         />
@@ -279,13 +308,23 @@ const FieldArray = ({
 };
 
 type SelectOwnerProps = {
-  defaultValue: string;
+  defaultValue?: string;
   owners: Owner[];
+  index: number;
+  setValue: UseFormSetValue<Form>;
 };
 
-const SelectOwner = ({ defaultValue, owners }: SelectOwnerProps) => {
+const SelectOwner = ({
+  defaultValue,
+  owners,
+  index,
+  setValue,
+}: SelectOwnerProps) => {
   return (
-    <Select defaultValue={defaultValue}>
+    <Select
+      defaultValue={defaultValue}
+      onValueChange={(e) => setValue(`owner.${index}.ownerId` as const, e)}
+    >
       <SelectTrigger className="h-6">
         <SelectValue placeholder="elegir" />
       </SelectTrigger>

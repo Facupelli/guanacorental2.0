@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { SORT_TYPES } from "@/lib/magic_strings";
 
@@ -10,6 +14,38 @@ type WherePipe = {
 };
 
 export const equipmentRouter = createTRPCRouter({
+  createEquipmentOnOwner: protectedProcedure
+    .input(
+      z.object({
+        owner: z.array(
+          z.object({
+            equipmentId: z.string(),
+            ownerId: z.string(),
+            locationId: z.string(),
+            stock: z.number(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { owner } = input;
+
+      await prisma.$transaction(
+        owner.map((owner) => {
+          return prisma.equipmentOnOwner.create({
+            data: {
+              equipmentId: owner.equipmentId,
+              ownerId: owner.ownerId,
+              locationId: owner.locationId,
+              stock: owner.stock,
+            },
+          });
+        })
+      );
+
+      return { message: "success" };
+    }),
+
   getAllEquipment: publicProcedure
     .input(
       z.object({
@@ -53,16 +89,6 @@ export const equipmentRouter = createTRPCRouter({
           owner: { include: { owner: true, location: true } },
         },
       });
-
-      // const equipments = await prisma.equipmentOnOwner.findMany({
-      //   where: {
-      //     locationId:""
-      //   },
-      //   distinct: ["locationId"],
-      //   include:{
-      //     equipment:true
-      //   }
-      // });
 
       let nextCursor: undefined | typeof cursor = undefined;
       if (equipments.length > limit) {
