@@ -121,7 +121,7 @@ model Category {
 model Location {
   id            String      @default(cuid()) @id
   name          String
-  equipments    Equipment[]
+  equipments    EquipmentOnOwner[]
   orders        Order[]
 }
 
@@ -144,13 +144,13 @@ model EquipmentOnOwner {
   stock                   Int
   books                   BookOnEquipment[]
   orders                  Order[]
+  location                Location            @relation(fields: [locationId], references: [id])
+  locationId              String              
   created_at              DateTime            @default(now())
 }
 
 model Equipment {
   id                  String              @default(cuid()) @id
-  location            Location            @relation(fields: [locationId], references: [id])
-  locationId          String  
   carts               Cart[]
   name                String
   brand               String
