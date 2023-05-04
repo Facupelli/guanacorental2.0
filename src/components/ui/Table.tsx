@@ -17,9 +17,9 @@ type Props = {
 const Table = ({ headTitles, children }: Props) => {
   return (
     <div className="w-full rounded-md bg-white p-4">
-      <table className="w-full  text-gray-800">
+      <table className="w-full border-collapse text-gray-800">
         <thead>
-          <tr className="border-b border-app-bg  text-sm">
+          <tr className="border-b border-gray-300 text-sm">
             {headTitles.map((head) => (
               <th key={head.title} className="pb-2 text-left font-bold">
                 {head.title}

@@ -40,7 +40,7 @@ const AdminUsers: NextPage = () => {
             <Table headTitles={columns}>
               {data.users.map((user) => (
                 <tr key={user.id} className="text-sm">
-                  <td className="py-3">
+                  <td className="py-4 ">
                     {user.address?.created_at &&
                       new Date(user.address?.created_at).toLocaleDateString(
                         "es-AR",
@@ -51,10 +51,10 @@ const AdminUsers: NextPage = () => {
                         }
                       )}
                   </td>
-                  <td className="py-3">{user.name}</td>
-                  <td className="py-3">{user.address?.phone}</td>
-                  <td className="py-3">{user.address?.dni_number}</td>
-                  <td className="py-3">{user.address?.province}</td>
+                  <td className="py-4">{user.name}</td>
+                  <td className="py-4">{user.address?.phone}</td>
+                  <td className="py-4">{user.address?.dni_number}</td>
+                  <td className="py-4">{user.address?.province}</td>
                 </tr>
               ))}
             </Table>

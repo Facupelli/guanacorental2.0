@@ -49,6 +49,15 @@ import {
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
+import Table from "@/components/ui/Table";
+
+const tableTitles = [
+  { title: "Nombre" },
+  { title: "Model" },
+  { title: "Precio" },
+  { title: "Dueño, Sucursal y Stock" },
+  { title: "Disponible" },
+];
 
 type Props = {
   locations: Location[];
@@ -85,41 +94,30 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="pt-6">
-            <table className="w-full rounded-md bg-white">
-              <thead className="border-b border-app-bg">
-                <tr className="text-left text-sm">
-                  <th className="p-4">Nombre</th>
-                  <th className="p-4">Marca</th>
-                  <th className="p-4">Modelo</th>
-                  <th className="p-4">Precio</th>
-                  <th className="p-4">Dueño, Sucursal y Stock</th>
-                  <th className="p-4">Disponible</th>
+            <Table headTitles={tableTitles}>
+              {data?.equipment.map((equipment) => (
+                <tr
+                  key={equipment.id}
+                  className="border-b border-app-bg text-sm"
+                >
+                  <td className="py-4">{equipment.name}</td>
+                  <td className="py-4">{equipment.brand}</td>
+                  <td className="py-4">{equipment.model}</td>
+                  <td className="py-4">{formatPrice(equipment.price)}</td>
+                  <td className="py-4">
+                    <OwnerLocationStockModal
+                      owners={owners}
+                      owner={equipment.owner}
+                      equipment={equipment}
+                      locations={locations}
+                    />
+                  </td>
+                  <td className="py-4">
+                    <Switch defaultChecked={equipment.available} />
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                {data?.equipment.map((equipment) => (
-                  <tr key={equipment.id}>
-                    <td className="px-4 py-2">{equipment.name}</td>
-                    <td className="px-4 py-2">{equipment.brand}</td>
-                    <td className="px-4 py-2">{equipment.model}</td>
-                    <td className="px-4 py-2">
-                      {formatPrice(equipment.price)}
-                    </td>
-                    <td className="px-4 py-2">
-                      <OwnerLocationStockModal
-                        owners={owners}
-                        owner={equipment.owner}
-                        equipment={equipment}
-                        locations={locations}
-                      />
-                    </td>
-                    <td className="px-4 py-2">
-                      <Switch defaultChecked={equipment.available} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              ))}
+            </Table>
 
             <Pagination
               totalCount={data.totalCount}
