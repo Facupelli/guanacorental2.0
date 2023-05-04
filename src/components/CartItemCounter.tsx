@@ -1,25 +1,34 @@
-import type { Equipment } from "@/types/models";
+import type { Equipment, EquipmentOnOwner } from "@/types/models";
 import { Button } from "./ui/button";
 import { useBoundStore } from "@/zustand/store";
-import { EquipmentOnOwner } from "@prisma/client";
 
 type Props = {
   item: Equipment;
 };
 
 const CartItemCounter = ({ item }: Props) => {
+  const location = useBoundStore((state) => state.location);
   const addItemQuantity = useBoundStore((state) => state.addItemQuantity);
   const substractItemQuantity = useBoundStore(
     (state) => state.substractItemQuantity
   );
 
-  const getEquipmentStock = (owner: EquipmentOnOwner[] | undefined) => {
-    return owner?.reduce((acc, curr) => {
-      return acc + curr.stock;
-    }, 0);
+  const getEquipmentStock = (
+    owner: EquipmentOnOwner[] | undefined,
+    location: string
+  ) => {
+    if (owner) {
+      return owner
+        .filter((owner) => owner.location.name === location)
+        .reduce((acc, curr) => {
+          return acc + curr.stock;
+        }, 0);
+    }
   };
 
-  const equipmentStock = getEquipmentStock(item.owner);
+  const equipmentStock = getEquipmentStock(item.owner, location);
+
+  console.log(item);
 
   const handleAddItemQuantity = (id: string) => {
     console.log(equipmentStock);

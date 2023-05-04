@@ -59,8 +59,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
   const equipments = data.pages.map((page) => page.equipments).flat();
 
-  console.log(data);
-
   return (
     <>
       <Head>

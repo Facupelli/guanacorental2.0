@@ -35,15 +35,15 @@ export type Owner = {
 
 export type EquipmentOnOwner = {
   id: string;
+  stock: number;
+  books?: string;
   equipment?: Equipment;
   equipmentId: string;
-  location: Location;
-  locationId: string;
   owner?: Owner;
   ownerId: string;
-  stock: number;
+  location: Location;
+  locationId: string;
   created_at: Date;
-  book?: string;
 };
 
 export type Book = {
