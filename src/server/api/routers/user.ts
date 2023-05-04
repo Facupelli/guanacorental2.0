@@ -4,6 +4,30 @@ import { validationAddress } from "@/lib/validation";
 import { z } from "zod";
 
 export const userRouter = createTRPCRouter({
+  getAllUsers: protectedProcedure
+    .input(
+      z.object({
+        take: z.number(),
+        skip: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { take, skip } = input;
+
+      const users = await prisma.user.findMany({
+        take,
+        skip,
+        include: {
+          role: true,
+          address: true,
+        },
+      });
+
+      const totalCount = await prisma.user.count();
+
+      return { users, totalCount };
+    }),
+
   createUserAddress: protectedProcedure
     .input(validationAddress.extend({ userId: z.string().nonempty() }))
     .mutation(async ({ input }) => {
