@@ -23,7 +23,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -37,9 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import SelectLocation, {
-  AdminSelectLocation,
-} from "@/components/ui/SelectLocation";
+import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 import {
@@ -59,25 +56,11 @@ type Props = {
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   const location = useBoundStore((state) => state.location);
 
-  const { data, fetchNextPage } =
-    api.equipment.getAllEquipment.useInfiniteQuery(
-      {
-        sort: SORT_TYPES.DEFAULT,
-        location,
-        limit: 20,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      }
-    );
+  const { data } = api.equipment.adminGetEquipment.useQuery({
+    locationId: location,
+  });
 
   if (!data) return <div>404</div>;
-
-  const handleLoadMore = () => {
-    fetchNextPage();
-  };
-
-  const equipments = data.pages.map((page) => page.equipments).flat();
 
   // console.log(equipments);
 
@@ -107,7 +90,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 </tr>
               </thead>
               <tbody className="text-[14px]">
-                {equipments?.map((equipment) => (
+                {data?.map((equipment) => (
                   <tr key={equipment.id}>
                     <td className="px-4 py-2">{equipment.name}</td>
                     <td className="px-4 py-2">{equipment.brand}</td>
@@ -352,7 +335,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const locations = await prisma.location.findMany({});
   const owners = await prisma.owner.findMany({});
 
-  await helpers.equipment.getAllEquipment.prefetch({ sort: "", limit: 20 });
+  await helpers.equipment.adminGetEquipment.prefetch({});
 
   return {
     props: {

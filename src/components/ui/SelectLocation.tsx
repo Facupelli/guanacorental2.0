@@ -16,14 +16,12 @@ type SelectLocationProps = {
   placeholder: string;
   defaultValue?: string;
   onValueChange: (e: string) => void;
-  height?: string;
 };
 const SelectLocation = ({
   locations,
   placeholder,
   defaultValue,
   onValueChange,
-  height,
 }: SelectLocationProps) => {
   return (
     <div className="flex items-center gap-2 ">
@@ -32,7 +30,7 @@ const SelectLocation = ({
         onValueChange={(e) => onValueChange(e)}
         defaultValue={defaultValue}
       >
-        <SelectTrigger className={height}>
+        <SelectTrigger>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

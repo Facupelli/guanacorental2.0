@@ -46,6 +46,20 @@ export const equipmentRouter = createTRPCRouter({
       return { message: "success" };
     }),
 
+  adminGetEquipment: protectedProcedure
+    .input(z.object({ locationId: z.string().optional() }))
+    .query(async ({ input }) => {
+      const wherePipe: WherePipe = {};
+
+      const equipment = prisma.equipment.findMany({
+        include: {
+          owner: { include: { owner: true, location: true } },
+        },
+      });
+
+      return equipment;
+    }),
+
   getAllEquipment: publicProcedure
     .input(
       z.object({
