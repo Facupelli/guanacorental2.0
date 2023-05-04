@@ -72,7 +72,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
-    locationId: location,
+    locationId: location.id,
   });
 
   if (!data) return <div>404</div>;

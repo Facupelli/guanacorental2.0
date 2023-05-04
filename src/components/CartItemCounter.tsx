@@ -26,7 +26,7 @@ const CartItemCounter = ({ item }: Props) => {
     }
   };
 
-  const equipmentStock = getEquipmentStock(item.owner, location);
+  const equipmentStock = getEquipmentStock(item.owner, location.id);
 
   console.log(item);
 

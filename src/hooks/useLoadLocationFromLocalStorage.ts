@@ -14,7 +14,7 @@ export const useLoadLocationFromLocalStorage = () => {
       const location = localStorage.getItem("location");
 
       if (location) {
-        return setLocation(location);
+        return setLocation(JSON.parse(location));
       }
 
       toggleModal();

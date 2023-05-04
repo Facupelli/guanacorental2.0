@@ -32,7 +32,10 @@ const SelectLocation = ({
         <SelectGroup>
           <SelectLabel>Sucursales</SelectLabel>
           {locations.map((location) => (
-            <SelectItem value={location.id} key={location.id}>
+            <SelectItem
+              value={`${location.id}-${location.name}`}
+              key={location.id}
+            >
               {location.name}
             </SelectItem>
           ))}

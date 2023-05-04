@@ -133,7 +133,7 @@ const RightBar = ({ cartItems }: RightBarProps) => {
       <div className="grid gap-2">
         <div className="flex items-center justify-between font-semibold">
           <p>Sucursal:</p>
-          <p>{location}</p>
+          <p>{location.name}</p>
         </div>
         <div className="flex items-center justify-between font-semibold">
           <p>Total:</p>

@@ -53,7 +53,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       {
         sort,
         category,
-        location: location ?? "Mendoza",
+        location: location.id ?? "Mendoza",
 
         limit: 20,
       },
@@ -125,9 +125,16 @@ const SelectLocationModal = ({
   const setLocation = useBoundStore((state) => state.setLocation);
 
   const handleChange = (e: string) => {
-    setLocation(e);
-    localStorage.setItem("location", e);
-    toggleModal();
+    const locationId = e.split("-")[0];
+    const locationName = e.split("-")[1];
+    if (locationId && locationName) {
+      setLocation({ locationId, locationName });
+      localStorage.setItem(
+        "location",
+        JSON.stringify({ locationId, locationName })
+      );
+      toggleModal();
+    }
   };
 
   return (
@@ -169,13 +176,21 @@ const LeftBar = ({
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
 
+  const handleChange = (e: string) => {
+    const locationId = e.split("-")[0];
+    const locationName = e.split("-")[1];
+    if (locationId && locationName) {
+      setLocation({ locationId, locationName });
+    }
+  };
+
   return (
     <section className="col-span-3 flex h-[calc(100vh_-_148px)] flex-col gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation
         locations={locations}
         placeholder="Elegir sucursal"
-        defaultValue={location}
-        onValueChange={(e) => setLocation(e)}
+        defaultValue={location.id}
+        onValueChange={(e) => handleChange(e)}
       />
 
       <SelectDateButton />

@@ -1,11 +1,17 @@
-import { Equipment } from "@/types/models";
+import { Equipment, Location } from "@/types/models";
 import { create, StateCreator } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface LocationSlice {
   showLocationModal: boolean;
-  location: string;
-  setLocation: (location: string) => void;
+  location: Location;
+  setLocation: ({
+    locationName,
+    locationId,
+  }: {
+    locationName: string;
+    locationId: string;
+  }) => void;
   setToggleModal: () => void;
 }
 
@@ -16,8 +22,9 @@ const createLocationSlice: StateCreator<
   LocationSlice
 > = (set) => ({
   showLocationModal: false,
-  location: "",
-  setLocation: (location) => set(() => ({ location })),
+  location: { name: "", id: "" },
+  setLocation: ({ locationId, locationName }) =>
+    set(() => ({ location: { name: locationName, id: locationId } })),
   setToggleModal: () =>
     set((state) => ({ showLocationModal: !state.showLocationModal })),
 });
