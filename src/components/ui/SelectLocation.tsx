@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Form } from "@/pages/admin/equipment";
 import type { Location } from "@/types/models";
+import { ReactNode } from "react";
 import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 type SelectLocationProps = {
@@ -16,12 +17,14 @@ type SelectLocationProps = {
   placeholder: string;
   defaultValue?: string;
   onValueChange: (e: string) => void;
+  children?: ReactNode;
 };
 const SelectLocation = ({
   locations,
   placeholder,
   defaultValue,
   onValueChange,
+  children,
 }: SelectLocationProps) => {
   return (
     <Select onValueChange={(e) => onValueChange(e)} defaultValue={defaultValue}>
@@ -31,6 +34,7 @@ const SelectLocation = ({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Sucursales</SelectLabel>
+          {children}
           {locations.map((location) => (
             <SelectItem
               value={`${location.id}-${location.name}`}

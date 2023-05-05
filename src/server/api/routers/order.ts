@@ -6,13 +6,36 @@ import { TRPCError } from "@trpc/server";
 import { getEquipmentOnOwnerIds } from "@/server/utils/order";
 import { STATUS } from "@/lib/magic_strings";
 
+type Query = {
+  where?: {
+    locationId?: string;
+  };
+  take: number;
+  skip: number;
+  include: {
+    customer: {
+      include: {
+        address: boolean;
+      };
+    };
+    location: boolean;
+    book: boolean;
+  };
+};
+
 export const orderRouter = createTRPCRouter({
   getOrders: protectedProcedure
-    .input(z.object({ take: z.number(), skip: z.number() }))
+    .input(
+      z.object({
+        take: z.number(),
+        skip: z.number(),
+        location: z.string(),
+      })
+    )
     .query(async ({ input }) => {
-      const { skip, take } = input;
+      const { skip, take, location } = input;
 
-      const orders = await prisma.order.findMany({
+      const query: Query = {
         take,
         skip,
         include: {
@@ -22,7 +45,15 @@ export const orderRouter = createTRPCRouter({
           location: true,
           book: true,
         },
-      });
+      };
+
+      if (location !== "all") {
+        query.where = { locationId: location };
+      }
+
+      console.log("QUERYYYYYYYYYYYY", location);
+
+      const orders = await prisma.order.findMany(query);
 
       const totalCount = await prisma.order.count();
 

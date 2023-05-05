@@ -9,21 +9,48 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { STATUS } from "@/lib/magic_strings";
+import SelectLocation from "@/components/ui/SelectLocation";
+import { useBoundStore } from "@/zustand/store";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface StatusStyles {
   [status: string]: string;
 }
 
 const AdminOrders: NextPage = () => {
-  const { data } = api.order.getOrders.useQuery({ take: 10, skip: 0 });
+  const setLocation = useBoundStore((state) => state.setLocation);
+  const location = useBoundStore((state) => state.location);
 
-  if (!data) return <div>404</div>;
+  const locations = api.location.getAllLocations.useQuery();
+  const { data } = api.order.getOrders.useQuery({
+    take: 10,
+    skip: 0,
+    location: location.id,
+  });
+
+  const handleChange = (e: string) => {
+    const locationId = e.split("-")[0];
+    const locationName = e.split("-")[1];
+    if (locationId && locationName) {
+      setLocation({ locationId, locationName });
+    }
+  };
+
+  if (!data || !locations.data) return <div>404</div>;
 
   const columns = [
     { title: "N°" },
     { title: "Nombre" },
     { title: "Celular" },
-    { title: "DNI" },
     { title: "Retiro" },
     { title: "Devolución" },
     { title: "Estado" },
@@ -33,9 +60,9 @@ const AdminOrders: NextPage = () => {
   ];
 
   const statusClass: StatusStyles = {
-    [STATUS.PENDING]: "py-1 px-3 bg-yellow-200 rounded-xl text-slate-700",
-    [STATUS.TODAY]: "py-1 px-3 bg-blue-200 rounded-xl text-slate-700",
-    [STATUS.DELIVERED]: "py-1 px-3 bg-green-200 rounded-xl text-slate-700",
+    [STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
+    [STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
+    [STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
   };
 
   return (
@@ -51,14 +78,26 @@ const AdminOrders: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
-          <div className="pt-6">
+          <div className="grid gap-6 pt-6">
+            <div className="flex w-2/3 items-center gap-6 rounded-md bg-white p-4">
+              <Label>Sucursal:</Label>
+              <SelectLocation
+                locations={locations.data}
+                placeholder="elegir"
+                defaultValue={`${location.id}-${location.name}`}
+                onValueChange={(e) => handleChange(e)}
+              >
+                <SelectItem value="all-all">Todos</SelectItem>
+              </SelectLocation>
+              <Label className="whitespace-nowrap	">Ordenar por:</Label>
+              <SelectSortOrders />
+            </div>
             <Table headTitles={columns}>
               {data.orders.map((order) => (
                 <tr key={order.id} className="text-sm">
                   <td className="py-4">{order.number}</td>
                   <td className="py-4">{order.customer.name}</td>
                   <td className="py-4">{order.customer.address?.phone}</td>
-                  <td className="py-4">{order.customer.address?.dni_number}</td>
                   <td className="py-4">
                     {new Date(order.book.start_date).toLocaleDateString()} -{" "}
                     {order.book.pickup_hour}hs
@@ -90,6 +129,22 @@ const AdminOrders: NextPage = () => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const SelectSortOrders = () => {
+  return (
+    <Select>
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Sucursales</SelectLabel>
+          <SelectItem value="asd">asd</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
