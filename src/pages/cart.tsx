@@ -7,7 +7,7 @@ import { useBoundStore } from "@/zustand/store";
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import { formatPrice } from "@/lib/utils";
-import { Equipment } from "@/types/models";
+import { Equipment, Location } from "@/types/models";
 import CartItemCounter from "@/components/CartItemCounter";
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { useMemo } from "react";
@@ -23,6 +23,7 @@ const CartPage: NextPage = () => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
   const location = useBoundStore((state) => state.location);
+  const pickupHour = useBoundStore((state) => state.pickupHour);
 
   const { mutate } = api.order.createOrder.useMutation();
 
@@ -61,7 +62,11 @@ const CartPage: NextPage = () => {
             </div>
             <ItemsList items={cartItems} />
           </section>
-          <RightBar cartItems={cartItems} />
+          <RightBar
+            cartItems={cartItems}
+            location={location}
+            pickupHour={pickupHour}
+          />
         </section>
       </main>
     </>
@@ -112,17 +117,18 @@ const Item = ({ item }: ItemProps) => {
 
 type RightBarProps = {
   cartItems: Equipment[];
+  location: Location;
+  pickupHour: string;
 };
 
-const RightBar = ({ cartItems }: RightBarProps) => {
+const RightBar = ({ cartItems, location, pickupHour }: RightBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
-  const location = useBoundStore((state) => state.location);
 
   const workingDays = useMemo(() => {
     if (startDate && endDate) {
       const datesInRange = getDatesInRange(startDate, endDate);
-      return getTotalWorkingDays(datesInRange, "20:00");
+      return getTotalWorkingDays(datesInRange, pickupHour);
     }
     return undefined;
   }, [startDate, endDate]);
@@ -143,9 +149,19 @@ const RightBar = ({ cartItems }: RightBarProps) => {
       {!startDate || !endDate ? (
         <SelectDateButton />
       ) : (
-        <div className="flex justify-between">
-          <p>Retiro: {new Date(startDate).toLocaleDateString()}</p>
-          <p>Devolución: {new Date(endDate).toLocaleDateString()}</p>
+        <div className="grid w-full gap-2">
+          <div className="flex w-full justify-between ">
+            <p className="font-semibold">Retiro:</p>
+            <p className="font-bold">
+              {new Date(startDate).toLocaleDateString()} {pickupHour}hs
+            </p>
+          </div>
+          <div className="flex justify-between">
+            <p className="font-semibold">Devolución: </p>
+            <p className="font-bold">
+              {new Date(endDate).toLocaleDateString()} 09:00hs
+            </p>
+          </div>
         </div>
       )}
       <Button>Continuar Alquilando</Button>

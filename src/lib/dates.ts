@@ -1,3 +1,5 @@
+import { SCHEDULES } from "./magic_strings";
+
 export const getDatesInRange = (startDate: Date, endDate: Date) => {
   const dates = [];
   const currentDate = new Date(startDate);
@@ -29,13 +31,14 @@ export const getTotalWorkingDays = (dates: Date[], pickupHour: string) => {
       if (
         new Date(day).getTime() === new Date(datesToBook[0]).getTime() &&
         newDay === 5 &&
-        pickupHour === "09:00"
+        pickupHour === SCHEDULES.SAN_JUAN["09:00"]
       ) {
         weekDay += 0.5;
       } else if (
         new Date(day).getTime() === new Date(datesToBook[0]).getTime() &&
         newDay === 5 &&
-        (pickupHour === "20:00" || pickupHour === "20:30")
+        (pickupHour === SCHEDULES.SAN_JUAN["20:00"] ||
+          pickupHour === SCHEDULES.MENDOZA["20:30"])
       ) {
         weekDay += 0;
       }
