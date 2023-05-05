@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { number, string, z } from "zod";
 
 import {
   createTRPCRouter,
@@ -6,6 +6,9 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
+import { TRPCError } from "@trpc/server";
+import { Book } from "@prisma/client";
+import { getEquipmentOnOwnerIds } from "@/server/utils/order";
 
 export const orderRouter = createTRPCRouter({
   createOrder: protectedProcedure
@@ -29,6 +32,7 @@ export const orderRouter = createTRPCRouter({
                 z.object({
                   id: z.string(),
                   ownerId: z.string(),
+                  ownerName: z.string().optional(),
                   stock: z.number(),
                   locationId: z.string(),
                 })
@@ -51,6 +55,7 @@ export const orderRouter = createTRPCRouter({
         total,
       } = input;
 
+      //CREATE BOOK WITH DATES AND HOUR OF RENT
       const newBook = await prisma.book.create({
         data: {
           start_date: startDate,
@@ -59,9 +64,23 @@ export const orderRouter = createTRPCRouter({
         },
       });
 
+      if (!newBook) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Create Book failed",
+        });
+      }
+
+      //CHOOSE THE EQUIPMENT TO BOOK
+
+      const equipmentOnOwnerIds = cart
+        .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
+        .flat();
+
+      //CREATE BOOK TO THOSE EQUIPMENTS
       try {
         await prisma.$transaction(
-          cart.map((item) =>
+          equipmentOnOwnerIds.map((item) =>
             prisma.bookOnEquipment.create({
               data: {
                 book: { connect: { id: newBook.id } },
@@ -72,24 +91,53 @@ export const orderRouter = createTRPCRouter({
           )
         );
       } catch (err) {
-        console.log("BOOK ON EQUIPMENT ERROR", err);
+        await prisma.book.delete({
+          where: { id: newBook.id },
+        });
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Create BookOnEquipment failed",
+        });
       }
 
-      const equipmentsIds = cart.map((item) => ({ id: item.id }));
+      const equipmentsIds = equipmentOnOwnerIds.map((item) => ({
+        id: item.id,
+      }));
 
-      const newOrder = await prisma.order.create({
-        data: {
-          customer: { connect: { id: customerId } },
-          equipments: { connect: equipmentsIds },
-          book: { connect: { id: newBook.id } },
-          location: { connect: { id: locationId } },
-          total,
-          subtotal,
-          message,
-          status: "",
-        },
-      });
+      //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
+      try {
+        const newOrder = await prisma.order.create({
+          data: {
+            customer: { connect: { id: customerId } },
+            equipments: { connect: equipmentsIds },
+            book: { connect: { id: newBook.id } },
+            location: { connect: { id: locationId } },
+            total,
+            subtotal,
+            message,
+            status: "",
+          },
+        });
 
-      return newOrder;
+        return newOrder;
+      } catch (err) {
+        await prisma.bookOnEquipment.deleteMany({
+          where: {
+            bookId: newBook.id,
+          },
+        });
+
+        await prisma.book.delete({
+          where: { id: newBook.id },
+        });
+
+        console.log(err);
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Create Order failed, please try again later",
+        });
+      }
     }),
 });

@@ -190,7 +190,7 @@ model BookOnEquipment {
 
 model Cart {
   id              String       @default(cuid()) @id
-  order           Order?   
+  // order           Order?   
   customer        User         @relation(fields: [customerId], references: [id])
   customerId      String
   equipments      Equipment[]
@@ -212,14 +212,14 @@ model Order {
   locationId      String
   equipments      EquipmentOnOwner[]
   status          String
-  cart            Cart?                 @relation(fields: [cartId], references: [id])
-  cartId          String                @unique
+  // cart            Cart?                 @relation(fields: [cartId], references: [id])
+  // cartId          String?               @unique
   subtotal        Int
   total           Int
   message         String?
 
   created_at      DateTime              @default(now())
-  updated_at       DateTime         @updatedAt
+  updated_at      DateTime         @updatedAt
 
 }
 

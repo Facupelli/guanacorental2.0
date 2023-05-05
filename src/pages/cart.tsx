@@ -58,10 +58,13 @@ const CartPage: NextPage = () => {
       owner: item.owner?.map((owner) => ({
         id: owner.id,
         ownerId: owner.ownerId,
+        onwerName: owner.owner?.name,
         stock: owner.stock,
         locationId: owner.locationId,
       })),
     }));
+
+    console.log(cart);
 
     if (startDate && endDate && session?.user) {
       mutate(
