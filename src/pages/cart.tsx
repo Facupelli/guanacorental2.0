@@ -14,9 +14,11 @@ import { useMemo } from "react";
 import { X } from "lucide-react";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
+import { UseFormRegister, useForm } from "react-hook-form";
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
+  const { register, getValues } = useForm<{ message: string }>();
 
   const cartItems = useBoundStore((state) => state.cartItems);
 
@@ -25,22 +27,62 @@ const CartPage: NextPage = () => {
   const location = useBoundStore((state) => state.location);
   const pickupHour = useBoundStore((state) => state.pickupHour);
 
-  const { mutate } = api.order.createOrder.useMutation();
+  const { mutate, isLoading } = api.order.createOrder.useMutation();
 
-  // const handleBookOrder = () => {
-  //   if(startDate && endDate && session?.user){
+  const workingDays = useMemo(() => {
+    if (startDate && endDate) {
+      const datesInRange = getDatesInRange(startDate, endDate);
+      return getTotalWorkingDays(datesInRange, pickupHour);
+    }
+    return undefined;
+  }, [startDate, endDate]);
 
-  //     mutate({
-  //       startDate,
-  //       endDate,
-  //       locationId: location.id,
-  //       customerId: session.user.id
-  //     },{
-  //       onSuccess:()=>{},
-  //       onError:(err)=> console.log(err);
-  //     })
-  //   }
-  // }
+  const cartTotal = useMemo(() => {
+    const cartSum = cartItems.reduce(
+      (acc, curr) => acc + curr.price * curr.quantity,
+      0
+    );
+    if (workingDays) {
+      return workingDays * cartSum;
+    }
+    return 0;
+  }, [workingDays, cartItems]);
+
+  const handleBookOrder = () => {
+    const message = getValues("message");
+
+    const cart = cartItems.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+      owner: item.owner?.map((owner) => ({
+        id: owner.id,
+        ownerId: owner.ownerId,
+        stock: owner.stock,
+        locationId: owner.locationId,
+      })),
+    }));
+
+    if (startDate && endDate && session?.user) {
+      mutate(
+        {
+          startDate,
+          endDate,
+          locationId: location.id,
+          customerId: session.user.id,
+          pickupHour,
+          subtotal: cartTotal,
+          total: cartTotal,
+          message,
+          cart,
+        },
+        {
+          onSuccess: () => {},
+          onError: (err) => console.log(err),
+        }
+      );
+    }
+  };
 
   return (
     <>
@@ -63,9 +105,12 @@ const CartPage: NextPage = () => {
             <ItemsList items={cartItems} />
           </section>
           <RightBar
-            cartItems={cartItems}
             location={location}
             pickupHour={pickupHour}
+            cartTotal={cartTotal}
+            register={register}
+            handleBookOrder={handleBookOrder}
+            isLoading={isLoading}
           />
         </section>
       </main>
@@ -116,86 +161,85 @@ const Item = ({ item }: ItemProps) => {
 };
 
 type RightBarProps = {
-  cartItems: Equipment[];
+  cartTotal: number;
   location: Location;
   pickupHour: string;
+  register: UseFormRegister<{ message: string }>;
+  handleBookOrder: () => void;
+  isLoading: boolean;
 };
 
-const RightBar = ({ cartItems, location, pickupHour }: RightBarProps) => {
+const RightBar = ({
+  cartTotal,
+  location,
+  pickupHour,
+  register,
+  handleBookOrder,
+  isLoading,
+}: RightBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
 
-  const workingDays = useMemo(() => {
-    if (startDate && endDate) {
-      const datesInRange = getDatesInRange(startDate, endDate);
-      return getTotalWorkingDays(datesInRange, pickupHour);
-    }
-    return undefined;
-  }, [startDate, endDate]);
-
-  const cartTotal = useMemo(() => {
-    const cartSum = cartItems.reduce(
-      (acc, curr) => acc + curr.price * curr.quantity,
-      0
-    );
-    if (workingDays) {
-      return workingDays * cartSum;
-    }
-    return 0;
-  }, [workingDays, cartItems]);
-
   return (
-    <section className="col-span-4 grid gap-6 ">
-      {!startDate || !endDate ? (
-        <SelectDateButton />
-      ) : (
-        <div className="grid w-full gap-2">
-          <div className="flex w-full justify-between ">
-            <p className="font-semibold">Retiro:</p>
-            <p className="font-bold">
-              {new Date(startDate).toLocaleDateString()} {pickupHour}hs
-            </p>
+    <section className="col-span-4 rounded-md bg-white p-4">
+      <div className="grid gap-6">
+        {!startDate || !endDate ? (
+          <SelectDateButton />
+        ) : (
+          <div className="grid w-full gap-2">
+            <div className="flex w-full justify-between ">
+              <p className="font-semibold">Retiro:</p>
+              <p className="font-bold">
+                {new Date(startDate).toLocaleDateString()} {pickupHour}hs
+              </p>
+            </div>
+            <div className="flex justify-between">
+              <p className="font-semibold">Devolución: </p>
+              <p className="font-bold">
+                {new Date(endDate).toLocaleDateString()} 09:00hs
+              </p>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <p className="font-semibold">Devolución: </p>
-            <p className="font-bold">
-              {new Date(endDate).toLocaleDateString()} 09:00hs
-            </p>
+        )}
+        <Button>Continuar Alquilando</Button>
+
+        <textarea
+          placeholder="Algo que nos quieras decir?"
+          className="rounded-md border border-input p-2 text-sm"
+          {...register("message")}
+        />
+
+        <div className="grid gap-3">
+          <div className="flex items-center justify-between font-semibold">
+            <p>Sucursal:</p>
+            <p>{location.name}</p>
+          </div>
+          <div className="flex items-center justify-between font-semibold">
+            <p>Subtotal:</p>
+            {(startDate || endDate) && (
+              <p className="font-semibold">{formatPrice(cartTotal)}</p>
+            )}
+          </div>
+          <div className="flex items-center justify-between font-semibold">
+            <p>Total:</p>
+            {!startDate || !endDate ? (
+              <p className="flex justify-center">
+                Selecciona una fecha para alquilar!
+              </p>
+            ) : (
+              <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
+            )}
           </div>
         </div>
-      )}
-      <Button>Continuar Alquilando</Button>
 
-      <textarea
-        placeholder="Algo que nos quieras decir?"
-        className="p-2 text-sm"
-      />
-
-      <div className="grid gap-3">
-        <div className="flex items-center justify-between font-semibold">
-          <p>Sucursal:</p>
-          <p>{location.name}</p>
+        <div className="grid gap-2">
+          <Button
+            disabled={!startDate || !endDate || isLoading}
+            onClick={handleBookOrder}
+          >
+            Agendar Pedido
+          </Button>
         </div>
-        <div className="flex items-center justify-between font-semibold">
-          <p>Subtotal:</p>
-          {(startDate || endDate) && (
-            <p className="font-semibold">{formatPrice(cartTotal)}</p>
-          )}
-        </div>
-        <div className="flex items-center justify-between font-semibold">
-          <p>Total:</p>
-          {!startDate || !endDate ? (
-            <p className="flex justify-center">
-              Selecciona una fecha para alquilar!
-            </p>
-          ) : (
-            <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid gap-2">
-        <Button disabled={!startDate || !endDate}>Agendar Pedido</Button>
       </div>
     </section>
   );

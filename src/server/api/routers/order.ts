@@ -24,12 +24,16 @@ export const orderRouter = createTRPCRouter({
             id: z.string(),
             quantity: z.number(),
             price: z.number(),
-            owner: z.object({
-              id: z.string(),
-              ownerId: z.string(),
-              stock: z.number(),
-              locationId: z.string(),
-            }),
+            owner: z
+              .array(
+                z.object({
+                  id: z.string(),
+                  ownerId: z.string(),
+                  stock: z.number(),
+                  locationId: z.string(),
+                })
+              )
+              .optional(),
           })
         ),
       })
@@ -55,17 +59,21 @@ export const orderRouter = createTRPCRouter({
         },
       });
 
-      await prisma.$transaction(
-        cart.map((item) =>
-          prisma.bookOnEquipment.create({
-            data: {
-              book: { connect: { id: newBook.id } },
-              equipment: { connect: { id: item.id } },
-              quantity: item.quantity,
-            },
-          })
-        )
-      );
+      try {
+        await prisma.$transaction(
+          cart.map((item) =>
+            prisma.bookOnEquipment.create({
+              data: {
+                book: { connect: { id: newBook.id } },
+                equipment: { connect: { id: item.id } },
+                quantity: item.quantity,
+              },
+            })
+          )
+        );
+      } catch (err) {
+        console.log("BOOK ON EQUIPMENT ERROR", err);
+      }
 
       const equipmentsIds = cart.map((item) => ({ id: item.id }));
 
