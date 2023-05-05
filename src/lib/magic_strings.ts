@@ -26,3 +26,9 @@ export const STATUS = {
   DELIVERED: "Entregado",
   TODAY: "Entrega Hoy",
 };
+
+export const ADMIN_ORDERS_SORT = {
+  "LAST ORDERS": "LAST ORDERS",
+  "NEXT ORDERS": "NEXT ORDERS",
+  HISTORY: "HISTORY",
+};

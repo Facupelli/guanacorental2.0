@@ -8,7 +8,7 @@ import Table from "@/components/ui/Table";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { STATUS } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { useBoundStore } from "@/zustand/store";
 import {
@@ -21,20 +21,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { UseFormSetValue, useForm } from "react-hook-form";
 
 interface StatusStyles {
   [status: string]: string;
 }
 
+const columns = [
+  { title: "N°" },
+  { title: "Nombre" },
+  { title: "Celular" },
+  { title: "Retiro" },
+  { title: "Devolución" },
+  { title: "Estado" },
+  { title: "Total" },
+  { title: "Remito" },
+  { title: "Sucursal" },
+];
+
 const AdminOrders: NextPage = () => {
+  const { setValue, watch } = useForm<{ sort: string }>();
+
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
 
   const locations = api.location.getAllLocations.useQuery();
+  const sort = watch("sort");
   const { data } = api.order.getOrders.useQuery({
     take: 10,
     skip: 0,
     location: location.id,
+    sort,
   });
 
   const handleChange = (e: string) => {
@@ -46,18 +63,6 @@ const AdminOrders: NextPage = () => {
   };
 
   if (!data || !locations.data) return <div>404</div>;
-
-  const columns = [
-    { title: "N°" },
-    { title: "Nombre" },
-    { title: "Celular" },
-    { title: "Retiro" },
-    { title: "Devolución" },
-    { title: "Estado" },
-    { title: "Total" },
-    { title: "Remito" },
-    { title: "Sucursal" },
-  ];
 
   const statusClass: StatusStyles = {
     [STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
@@ -77,7 +82,7 @@ const AdminOrders: NextPage = () => {
 
       <main className="">
         <AdminLayout>
-          <h1 className="text-lg font-bold">CLIENTES</h1>
+          <h1 className="text-lg font-bold">PEDIDOS</h1>
           <div className="grid gap-6 pt-6">
             <div className="flex w-2/3 items-center gap-6 rounded-md bg-white p-4">
               <Label>Sucursal:</Label>
@@ -90,7 +95,7 @@ const AdminOrders: NextPage = () => {
                 <SelectItem value="all-all">Todos</SelectItem>
               </SelectLocation>
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
-              <SelectSortOrders />
+              <SelectSortOrders setValue={setValue} />
             </div>
             <Table headTitles={columns}>
               {data.orders.map((order) => (
@@ -132,16 +137,28 @@ const AdminOrders: NextPage = () => {
   );
 };
 
-const SelectSortOrders = () => {
+type SelectSortOrdersProps = {
+  setValue: UseFormSetValue<{ sort: string }>;
+};
+
+const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
   return (
-    <Select>
+    <Select
+      defaultValue={ADMIN_ORDERS_SORT["NEXT ORDERS"]}
+      onValueChange={(e) => setValue("sort", e)}
+    >
       <SelectTrigger>
-        <SelectValue />
+        <SelectValue placeholder="elegir" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Sucursales</SelectLabel>
-          <SelectItem value="asd">asd</SelectItem>
+          <SelectItem value={ADMIN_ORDERS_SORT["NEXT ORDERS"]}>
+            Próximos pedidos a entregar
+          </SelectItem>
+          <SelectItem value={ADMIN_ORDERS_SORT["LAST ORDERS"]}>
+            Últimos pedidos
+          </SelectItem>
+          <SelectItem value={ADMIN_ORDERS_SORT.HISTORY}>Historial</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

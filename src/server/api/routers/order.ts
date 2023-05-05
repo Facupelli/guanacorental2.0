@@ -4,9 +4,18 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import { getEquipmentOnOwnerIds } from "@/server/utils/order";
-import { STATUS } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
+import { Prisma } from "@prisma/client";
+
+type SortPipe = {
+  // created_at?: string;
+  book?: {
+    start_date?: string;
+  };
+};
 
 type Query = {
+  orderBy?: Prisma.OrderOrderByWithRelationInput;
   where?: {
     locationId?: string;
   };
@@ -30,10 +39,11 @@ export const orderRouter = createTRPCRouter({
         take: z.number(),
         skip: z.number(),
         location: z.string(),
+        sort: z.string(),
       })
     )
     .query(async ({ input }) => {
-      const { skip, take, location } = input;
+      const { skip, take, location, sort } = input;
 
       const query: Query = {
         take,
@@ -51,7 +61,17 @@ export const orderRouter = createTRPCRouter({
         query.where = { locationId: location };
       }
 
-      console.log("QUERYYYYYYYYYYYY", location);
+      if (sort === ADMIN_ORDERS_SORT["NEXT ORDERS"]) {
+        query.orderBy = { book: { start_date: "asc" } };
+      }
+
+      if (sort === ADMIN_ORDERS_SORT["LAST ORDERS"]) {
+        query.orderBy = { created_at: "asc" };
+      }
+
+      if (sort === ADMIN_ORDERS_SORT.HISTORY) {
+        query.orderBy = { book: { start_date: "asc" } };
+      }
 
       const orders = await prisma.order.findMany(query);
 

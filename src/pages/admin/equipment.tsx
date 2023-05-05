@@ -52,6 +52,7 @@ import Table from "@/components/ui/Table";
 
 const tableTitles = [
   { title: "Nombre" },
+  { title: "Brand" },
   { title: "Model" },
   { title: "Precio" },
   { title: "Dueño, Sucursal y Stock" },
