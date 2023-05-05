@@ -64,8 +64,6 @@ const CartPage: NextPage = () => {
       })),
     }));
 
-    console.log(cart);
-
     if (startDate && endDate && session?.user) {
       mutate(
         {

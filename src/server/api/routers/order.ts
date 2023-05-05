@@ -1,16 +1,34 @@
-import { number, string, z } from "zod";
+import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
-import { Book } from "@prisma/client";
 import { getEquipmentOnOwnerIds } from "@/server/utils/order";
+import { STATUS } from "@/lib/magic_strings";
 
 export const orderRouter = createTRPCRouter({
+  getOrders: protectedProcedure
+    .input(z.object({ take: z.number(), skip: z.number() }))
+    .query(async ({ input }) => {
+      const { skip, take } = input;
+
+      const orders = await prisma.order.findMany({
+        take,
+        skip,
+        include: {
+          customer: {
+            include: { address: true },
+          },
+          location: true,
+          book: true,
+        },
+      });
+
+      const totalCount = await prisma.order.count();
+
+      return { orders, totalCount };
+    }),
+
   createOrder: protectedProcedure
     .input(
       z.object({
@@ -116,7 +134,7 @@ export const orderRouter = createTRPCRouter({
             total,
             subtotal,
             message,
-            status: "",
+            status: STATUS.PENDING,
           },
         });
 

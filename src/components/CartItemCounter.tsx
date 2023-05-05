@@ -29,7 +29,6 @@ const CartItemCounter = ({ item }: Props) => {
   const equipmentStock = getEquipmentStock(item.owner, location.id);
 
   const handleAddItemQuantity = (id: string) => {
-    console.log(equipmentStock);
     if (equipmentStock && item.quantity < equipmentStock) {
       addItemQuantity(id);
     }

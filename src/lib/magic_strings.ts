@@ -20,3 +20,9 @@ export const SCHEDULES = {
     "20:30": "20:30",
   },
 };
+
+export const STATUS = {
+  PENDING: "Pendiente",
+  DELIVERED: "Entregado",
+  TODAY: "Entrega Hoy",
+};
