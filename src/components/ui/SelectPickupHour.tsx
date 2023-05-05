@@ -17,7 +17,7 @@ const SelectPickupHour = () => {
   return (
     <Select onValueChange={(e) => setPickupHour(e)}>
       <SelectTrigger>
-        <SelectValue placeholder="hora de retiro" />
+        <SelectValue placeholder="seleccionar hora de retiro" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

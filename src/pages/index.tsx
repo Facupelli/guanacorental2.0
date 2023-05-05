@@ -189,7 +189,7 @@ const LeftBar = ({
       <SelectLocation
         locations={locations}
         placeholder="Elegir sucursal"
-        defaultValue={location.id}
+        defaultValue={`${location.id}-${location.name}`}
         onValueChange={(e) => handleChange(e)}
       />
 
