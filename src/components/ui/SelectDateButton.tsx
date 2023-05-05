@@ -12,6 +12,7 @@ import {
 import { Button } from "./button";
 import { useBoundStore } from "@/zustand/store";
 import { CalendarDays } from "lucide-react";
+import SelectPickupHour from "./SelectPickupHour";
 
 const SelectDateButton = () => {
   const setStartDate = useBoundStore((state) => state.setStartDate);
@@ -35,18 +36,23 @@ const SelectDateButton = () => {
         <DialogHeader>
           <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
           <DialogDescription>
-            selecciona primero la fecha de inicio y luego la fecha final.
+            Primero selecciona la fecha de inicio y después la fecha final.
+            Luego selecciona el horario de retiro de los equipos.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center py-4">
+        <div className="grid justify-center gap-6 py-4">
           <Calendar
             selectRange={true}
             locale="es-ES"
             minDate={new Date()}
             onChange={(e) => handleDateChange(e)}
           />
+
+          <SelectPickupHour />
         </div>
-        <DialogFooter>footer</DialogFooter>
+        <DialogFooter>
+          <Button>ACEPTAR</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

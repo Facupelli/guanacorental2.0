@@ -9,3 +9,14 @@ export const SORT_TYPES = {
   DESC: "desc",
   ASC: "asc",
 };
+
+export const SCHEDULES = {
+  SAN_JUAN: {
+    "09:00": "09:00",
+    "20:00": "20:00",
+  },
+  MENDOZA: {
+    "09:00": "20:00",
+    "20:30": "20:30",
+  },
+};

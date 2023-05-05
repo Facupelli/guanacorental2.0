@@ -19,7 +19,7 @@ const CartItemCounter = ({ item }: Props) => {
   ) => {
     if (owner) {
       return owner
-        .filter((owner) => owner.location.name === location)
+        .filter((owner) => owner.location.id === location)
         .reduce((acc, curr) => {
           return acc + curr.stock;
         }, 0);
@@ -28,7 +28,7 @@ const CartItemCounter = ({ item }: Props) => {
 
   const equipmentStock = getEquipmentStock(item.owner, location.id);
 
-  console.log(item);
+  console.log(equipmentStock);
 
   const handleAddItemQuantity = (id: string) => {
     console.log(equipmentStock);

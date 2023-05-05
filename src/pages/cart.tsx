@@ -12,9 +12,34 @@ import CartItemCounter from "@/components/CartItemCounter";
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { useMemo } from "react";
 import { X } from "lucide-react";
+import { api } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 const CartPage: NextPage = () => {
+  const { data: session } = useSession();
+
   const cartItems = useBoundStore((state) => state.cartItems);
+
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
+  const location = useBoundStore((state) => state.location);
+
+  const { mutate } = api.order.createOrder.useMutation();
+
+  // const handleBookOrder = () => {
+  //   if(startDate && endDate && session?.user){
+
+  //     mutate({
+  //       startDate,
+  //       endDate,
+  //       locationId: location.id,
+  //       customerId: session.user.id
+  //     },{
+  //       onSuccess:()=>{},
+  //       onError:(err)=> console.log(err);
+  //     })
+  //   }
+  // }
 
   return (
     <>
@@ -130,10 +155,16 @@ const RightBar = ({ cartItems }: RightBarProps) => {
         className="p-2 text-sm"
       />
 
-      <div className="grid gap-2">
+      <div className="grid gap-3">
         <div className="flex items-center justify-between font-semibold">
           <p>Sucursal:</p>
           <p>{location.name}</p>
+        </div>
+        <div className="flex items-center justify-between font-semibold">
+          <p>Subtotal:</p>
+          {(startDate || endDate) && (
+            <p className="font-semibold">{formatPrice(cartTotal)}</p>
+          )}
         </div>
         <div className="flex items-center justify-between font-semibold">
           <p>Total:</p>
@@ -142,7 +173,7 @@ const RightBar = ({ cartItems }: RightBarProps) => {
               Selecciona una fecha para alquilar!
             </p>
           ) : (
-            <p className="text-xl font-bold">{formatPrice(cartTotal)}</p>
+            <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
           )}
         </div>
       </div>

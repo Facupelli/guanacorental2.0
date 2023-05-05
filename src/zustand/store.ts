@@ -33,6 +33,8 @@ interface DateSlice {
   showDateModal: boolean;
   setOpenDateModal: () => void;
   setCloseDateModal: () => void;
+  pickupHour: string;
+  setPickupHour: (hour: string) => void;
   startDate: Date | null;
   endDate: Date | null;
   setStartDate: (date: Date | null) => void;
@@ -48,6 +50,8 @@ const createDateSlice: StateCreator<
   showDateModal: false,
   startDate: null,
   endDate: null,
+  pickupHour: "",
+  setPickupHour: (hour) => set(() => ({ pickupHour: hour })),
   setStartDate: (startDate) => set(() => ({ startDate })),
   setEndDate: (endDate) => set(() => ({ endDate })),
   setOpenDateModal: () => set(() => ({ showDateModal: true })),
