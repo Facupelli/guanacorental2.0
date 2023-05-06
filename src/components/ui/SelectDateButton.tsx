@@ -13,8 +13,12 @@ import { Button } from "./button";
 import { useBoundStore } from "@/zustand/store";
 import { CalendarDays } from "lucide-react";
 import SelectPickupHour from "./SelectPickupHour";
+import { useSession } from "next-auth/react";
+import { ROLES } from "@/lib/magic_strings";
+import dayjs from "dayjs";
 
 const SelectDateButton = () => {
+  const { data: session } = useSession();
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
 
@@ -23,6 +27,20 @@ const SelectDateButton = () => {
       setStartDate(e[0]);
       setEndDate(e[1]);
     }
+  };
+
+  const disableWeekend = ({ date }: { date: Date }) => {
+    if (session?.user.role.map((role) => role.name).includes(ROLES.ADMIN)) {
+      if (dayjs(date).day() !== 5 && dayjs().hour() > 19) {
+        return true;
+      }
+    }
+
+    if (dayjs(date).day() === 6 || dayjs(date).day() === 0) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -46,6 +64,7 @@ const SelectDateButton = () => {
             locale="es-ES"
             minDate={new Date()}
             onChange={(e) => handleDateChange(e)}
+            tileDisabled={disableWeekend}
           />
 
           <SelectPickupHour />
