@@ -46,7 +46,7 @@ const AdminOrders: NextPage = () => {
   const location = useBoundStore((state) => state.location);
 
   const locations = api.location.getAllLocations.useQuery();
-  const sort = watch("sort");
+  const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
   const { data } = api.order.getOrders.useQuery({
     take: 10,
     skip: 0,

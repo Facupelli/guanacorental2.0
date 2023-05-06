@@ -31,12 +31,13 @@ export type Owner = {
   id: string;
   name: string;
   equipments?: EquipmentOnOwner[];
+  books?: BookOnEquipment[];
 };
 
 export type EquipmentOnOwner = {
   id: string;
   stock: number;
-  books?: string;
+  books?: BookOnEquipment[];
   equipment?: Equipment;
   equipmentId: string;
   owner?: Owner;
@@ -50,8 +51,8 @@ export type Book = {
   id: string;
   start_date: Date;
   end_date: Date;
-  pickup_hour: string;
-  return_hour: string;
+  pickup_hour: string | null;
+  return_hour: string | null;
   equipments?: BookOnEquipment;
 };
 

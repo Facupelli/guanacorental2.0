@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import { useBoundStore } from "@/zustand/store";
 import { Dispatch, SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
@@ -278,6 +278,8 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   const cartItems = useBoundStore((state) => state.cartItems);
   const addToCart = useBoundStore((state) => state.addToCart);
   const openCartModal = useBoundStore((state) => state.setOpenCartModal);
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
 
   const isAlreadyInCart = !!cartItems.find((item) => item.id === equipment.id);
 
@@ -288,6 +290,10 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
 
     if (cartItems.length === 0) openCartModal();
   };
+
+  const available = isEquipmentAvailable(equipment, { startDate, endDate });
+
+  console.log(equipment);
 
   return (
     <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
@@ -308,7 +314,9 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        <p>Disponible</p>
+        <p className={`${available ? "text-green-500" : "text-red-500"}`}>
+          {available ? "Disponible" : "Reservado"}
+        </p>
         <Button size="sm" variant="darklink">
           ver más
         </Button>
