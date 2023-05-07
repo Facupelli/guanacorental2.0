@@ -66,8 +66,8 @@ const Admin: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">CALENDARIO</h1>
-          <div className="grid grid-cols-12 gap-6 pt-6">
-            <div className="col-span-4">
+          <div className="grid gap-6 pt-6">
+            <div className="flex gap-6">
               <Calendar
                 locale="es-ES"
                 minDate={new Date()}
@@ -107,6 +107,23 @@ const Admin: NextPage = () => {
                   return "";
                 }}
               />
+              <div className="flex flex-col gap-2 rounded-md bg-white p-4 text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 rounded-full bg-green-400" />
+                  <p>Retiro de equipos</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 rounded-full bg-red-400" />
+                  <p>Devolución de equipos</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    <div className="r h-4 w-2 rounded-bl-full rounded-tl-full bg-green-400" />
+                    <div className="r h-4 w-2 rounded-br-full rounded-tr-full bg-red-400" />
+                  </div>
+                  <p>Devolución y Retiro de equipos</p>
+                </div>
+              </div>
             </div>
             <div className="col-span-8">
               <Table headTitles={columnTitles}>

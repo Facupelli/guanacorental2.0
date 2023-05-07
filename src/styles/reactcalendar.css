@@ -121,16 +121,16 @@
 
 .pickup-and-return {
   border-bottom: 3px solid !important;
-  border-image: linear-gradient(to right, green 50%, red 50%) 2 !important;
+  border-image: linear-gradient(to right, #4ade80 50%, #f87171 50%) 2 !important;
 }
 
 .pickup-day {
-  border-bottom: 3px solid green !important;
+  border-bottom: 3px solid #4ade80 !important;
   /* padding: 1.2rem; */
   /* background-color: green; */
 }
 
 .return-day {
-  border-bottom: 3px solid red !important;
+  border-bottom: 3px solid #f87171 !important;
   /* padding: 1.2rem; */
 }

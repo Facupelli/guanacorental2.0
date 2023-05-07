@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { statusClass } from "@/lib/magic_strings";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -68,7 +68,11 @@ const OrderRow = ({
             size="sm"
             onClick={() => setShowMore((prev) => !prev)}
           >
-            <ChevronDown className="h-4 w-4" />
+            {showMore ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
         </td>
       </tr>
@@ -76,7 +80,7 @@ const OrderRow = ({
         order.equipments.map((ownerEquipment, i) => (
           <tr key={ownerEquipment.id} className="text-sm">
             <td
-              colSpan={3}
+              colSpan={4}
               className={`${
                 i === order.equipments.length - 1 ? "pb-5" : "py-1"
               } px-2`}
