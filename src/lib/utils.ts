@@ -47,13 +47,13 @@ export const isEquipmentAvailable = (
           dayjs(dates.startDate).isBefore(book.book?.end_date!, "day") &&
           dayjs(dates.endDate).isAfter(book.book?.start_date, "day")
         ) {
-          console.log("BOOK.QUANTITY", book.quantity);
           stockLeft -= book.quantity;
           // available = false;
         }
       }
     }
-    return stockLeft - equipment.quantity <= 0 ? false : true;
+    console.log("ACA", stockLeft, equipment.quantity);
+    return stockLeft - equipment.quantity < 0 ? false : true;
   }
   return true;
 };
