@@ -1,5 +1,5 @@
 type CartItem = {
-  id: string;
+  id?: string;
   quantity: number;
   price: number;
   owner?:
@@ -15,13 +15,13 @@ type CartItem = {
 
 export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   // Ordena el arreglo de owners según la prioridad especificada
-  function sortByOwnerPriority(owners: any[]): any[] {
+  const sortByOwnerPriority = (owners: any[]) => {
     const ownerPriority = ["Both", "Fede", "Oscar", "Sub"];
     return owners.sort(
       (a, b) =>
         ownerPriority.indexOf(a.ownerName) - ownerPriority.indexOf(b.ownerName)
     );
-  }
+  };
 
   const owners = sortByOwnerPriority(item.owner!);
 

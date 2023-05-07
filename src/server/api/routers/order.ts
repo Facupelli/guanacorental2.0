@@ -6,6 +6,8 @@ import { TRPCError } from "@trpc/server";
 import { getEquipmentOnOwnerIds } from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { Prisma } from "@prisma/client";
+import { Equipment } from "@/types/models";
+import { isEquipmentAvailable } from "@/lib/utils";
 
 type SortPipe = {
   // created_at?: string;
@@ -124,6 +126,49 @@ export const orderRouter = createTRPCRouter({
         total,
       } = input;
 
+      const equipmentIds = cart.map((item) => item.id);
+
+      //GET UPDATED CART WITH MOST RECENT BOOKS
+      const equipments = await prisma.equipment.findMany({
+        where: { id: { in: equipmentIds } },
+        include: {
+          owner: {
+            include: {
+              owner: true,
+              location: true,
+              books: { include: { book: true } },
+            },
+          },
+        },
+      });
+
+      const updatedCart = cart.map((item) => {
+        const equipment = equipments.find(
+          (equipment) => equipment.id === item.id
+        );
+
+        if (!equipment) {
+          throw new Error("Equipment id not found");
+        }
+
+        return {
+          ...equipment,
+          quanitty: item.quantity,
+        };
+      });
+
+      //CHECK ALL EQUIPMENT AVAILABILITY
+      if (
+        !updatedCart.every((item) =>
+          isEquipmentAvailable(item, { startDate, endDate })
+        )
+      ) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Some equipment is not available",
+        });
+      }
+
       //CREATE BOOK WITH DATES AND HOUR OF RENT
       const newBook = await prisma.book.create({
         data: {
@@ -142,7 +187,7 @@ export const orderRouter = createTRPCRouter({
 
       //CHOOSE THE EQUIPMENT TO BOOK
 
-      const equipmentOnOwnerIds = cart
+      const equipmentOnOwnerIds = updatedCart
         .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
         .flat();
 
@@ -200,8 +245,6 @@ export const orderRouter = createTRPCRouter({
         await prisma.book.delete({
           where: { id: newBook.id },
         });
-
-        console.log(err);
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
