@@ -10,6 +10,11 @@ import { useState } from "react";
 import { type Prisma } from "@prisma/client";
 import Table from "@/components/ui/Table";
 import OrderRow from "@/components/OrderRow";
+import { Label } from "@/components/ui/label";
+import SelectLocation from "@/components/ui/SelectLocation";
+import { SelectItem } from "@/components/ui/select";
+import { handleAdminLocationChange } from "@/lib/utils";
+import { useBoundStore } from "@/zustand/store";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -38,11 +43,16 @@ const columnTitles = [
 
 const Admin: NextPage = () => {
   // const [calendarValue, setCalendarValue] = useState();
+  const setLocation = useBoundStore((state) => state.setLocation);
+  const location = useBoundStore((state) => state.location);
   const [orders, setOrders] = useState<Order[] | null>(null);
 
-  const { data } = api.order.getCalendarOrders.useQuery();
+  const locations = api.location.getAllLocations.useQuery();
+  const { data } = api.order.getCalendarOrders.useQuery({
+    location: location.id,
+  });
 
-  if (!data) return <div>404</div>;
+  if (!data || !locations.data) return <div>404</div>;
 
   const handleClickDay = (day: Date) => {
     const orders = data.filter(
@@ -67,6 +77,17 @@ const Admin: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">CALENDARIO</h1>
           <div className="grid gap-6 pt-6">
+            <div className="col-span-12 flex w-1/3 items-center gap-2 rounded-md bg-white p-2">
+              <Label>Sucursal:</Label>
+              <SelectLocation
+                locations={locations.data}
+                placeholder="elegir"
+                defaultValue={`${location.id}-${location.name}`}
+                onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
+              >
+                <SelectItem value="all-all">Todos</SelectItem>
+              </SelectLocation>
+            </div>
             <div className="flex gap-6">
               <Calendar
                 locale="es-ES"
@@ -125,7 +146,7 @@ const Admin: NextPage = () => {
                 </div>
               </div>
             </div>
-            <div className="col-span-8">
+            <div className="col-span-12">
               <Table headTitles={columnTitles}>
                 {orders && orders.length === 0 ? (
                   <tr>

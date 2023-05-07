@@ -75,3 +75,14 @@ export const handleLocationChange = (
     }
   }
 };
+
+export const handleAdminLocationChange = (
+  e: string,
+  setLocation: (location: { locationId: string; locationName: string }) => void
+) => {
+  const locationId = e.split("-")[0];
+  const locationName = e.split("-")[1];
+  if (locationId && locationName) {
+    setLocation({ locationId, locationName });
+  }
+};

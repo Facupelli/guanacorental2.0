@@ -22,6 +22,7 @@ import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import OrderRow from "@/components/OrderRow";
+import { handleAdminLocationChange } from "@/lib/utils";
 
 const columns = [
   { title: "N°" },
@@ -53,14 +54,6 @@ const AdminOrders: NextPage = () => {
     sort,
   });
 
-  const handleChange = (e: string) => {
-    const locationId = e.split("-")[0];
-    const locationName = e.split("-")[1];
-    if (locationId && locationName) {
-      setLocation({ locationId, locationName });
-    }
-  };
-
   if (!data || !locations.data) return <div>404</div>;
 
   const filteredOrers = data.orders.map((order) => ({
@@ -88,7 +81,7 @@ const AdminOrders: NextPage = () => {
                 locations={locations.data}
                 placeholder="elegir"
                 defaultValue={`${location.id}-${location.name}`}
-                onValueChange={(e) => handleChange(e)}
+                onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
               >
                 <SelectItem value="all-all">Todos</SelectItem>
               </SelectLocation>
