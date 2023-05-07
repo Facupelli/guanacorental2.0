@@ -8,12 +8,33 @@ import { api } from "@/utils/api";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { Prisma } from "@prisma/client";
+import Table from "@/components/ui/Table";
+import OrderRow from "@/components/OrderRow";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
     book: true;
+    equipments: {
+      include: { books: true; owner: true; equipment: true };
+    };
+    customer: {
+      include: {
+        address: true;
+      };
+    };
+    location: true;
   };
 }>;
+
+const columnTitles = [
+  { title: "N°" },
+  { title: "Nombre" },
+  { title: "Retiro" },
+  { title: "Devolución" },
+  { title: "Estado" },
+  { title: "Total" },
+  { title: "Sucursal" },
+];
 
 const Admin: NextPage = () => {
   const [calendarValue, setCalendarValue] = useState();
@@ -32,8 +53,6 @@ const Admin: NextPage = () => {
     setOrders(orders);
   };
 
-  console.log(orders);
-
   return (
     <>
       <Head>
@@ -47,43 +66,56 @@ const Admin: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">CALENDARIO</h1>
-          <div className="pt-6">
-            <Calendar
-              locale="es-ES"
-              minDate={new Date()}
-              onClickDay={handleClickDay}
-              className="rounded-lg p-4"
-              defaultValue={new Date()}
-              tileClassName={({ date }: { date: Date }) => {
-                if (
-                  data.find(
-                    (order) =>
-                      dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
-                      data.find((order) =>
-                        dayjs(order.book.start_date).isSame(dayjs(date), "day")
-                      )
-                  )
-                ) {
-                  return "pickup-and-return";
-                }
-                if (
-                  data.find((order) =>
-                    dayjs(order.book.end_date).isSame(dayjs(date), "day")
-                  )
-                ) {
-                  return "return-day";
-                }
-                if (
-                  data.find((order) =>
-                    dayjs(order.book.start_date).isSame(dayjs(date), "day")
-                  )
-                ) {
-                  return "pickup-day";
-                }
+          <div className="grid grid-cols-12 gap-6 pt-6">
+            <div className="col-span-4">
+              <Calendar
+                locale="es-ES"
+                minDate={new Date()}
+                onClickDay={handleClickDay}
+                className="rounded-lg p-4"
+                defaultValue={new Date()}
+                tileClassName={({ date }: { date: Date }) => {
+                  if (
+                    data.find(
+                      (order) =>
+                        dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
+                        data.find((order) =>
+                          dayjs(order.book.start_date).isSame(
+                            dayjs(date),
+                            "day"
+                          )
+                        )
+                    )
+                  ) {
+                    return "pickup-and-return";
+                  }
+                  if (
+                    data.find((order) =>
+                      dayjs(order.book.end_date).isSame(dayjs(date), "day")
+                    )
+                  ) {
+                    return "return-day";
+                  }
+                  if (
+                    data.find((order) =>
+                      dayjs(order.book.start_date).isSame(dayjs(date), "day")
+                    )
+                  ) {
+                    return "pickup-day";
+                  }
 
-                return "";
-              }}
-            />
+                  return "";
+                }}
+              />
+            </div>
+            <div className="col-span-8">
+              <Table headTitles={columnTitles}>
+                {orders &&
+                  orders.map((order) => (
+                    <OrderRow key={order.id} order={order} calendarView />
+                  ))}
+              </Table>
+            </div>
           </div>
         </AdminLayout>
       </main>
