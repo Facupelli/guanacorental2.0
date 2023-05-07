@@ -54,3 +54,24 @@ export const isEquipmentAvailable = (
   }
   return true;
 };
+
+export const handleLocationChange = (
+  e: string,
+  setLocation: (location: { locationId: string; locationName: string }) => void,
+  toggleModal?: () => void
+) => {
+  const locationId = e.split("-")[0];
+  const locationName = e.split("-")[1];
+
+  console.log(locationId, locationName);
+  if (locationId && locationName) {
+    setLocation({ locationId, locationName });
+    localStorage.setItem(
+      "location",
+      JSON.stringify({ locationId, locationName })
+    );
+    if (toggleModal) {
+      toggleModal();
+    }
+  }
+};

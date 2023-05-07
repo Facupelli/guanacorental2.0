@@ -8,6 +8,7 @@ import { api } from "@/utils/api";
 
 import "@/styles/globals.css";
 import "../styles/reactcalendar.css";
+import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
 
 const panton = localFont({
   src: [
@@ -43,6 +44,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  useLoadLocationFromLocalStorage();
+
   return (
     <SessionProvider session={session}>
       <main className={panton.className}>

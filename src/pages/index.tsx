@@ -20,7 +20,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import Image from "next/image";
-import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
+import {
+  formatPrice,
+  handleLocationChange,
+  isEquipmentAvailable,
+} from "@/lib/utils";
 import { useBoundStore } from "@/zustand/store";
 import { Dispatch, SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
@@ -38,8 +42,6 @@ type Props = {
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
-
-  useLoadLocationFromLocalStorage();
 
   const location = useBoundStore((state) => state.location);
   const showLocationModal = useBoundStore((state) => state.showLocationModal);
@@ -59,19 +61,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       }
     );
-
-  const handleChange = (e: string) => {
-    const locationId = e.split("-")[0];
-    const locationName = e.split("-")[1];
-    if (locationId && locationName) {
-      setLocation({ locationId, locationName });
-      localStorage.setItem(
-        "location",
-        JSON.stringify({ locationId, locationName })
-      );
-      toggleModal();
-    }
-  };
 
   const handleLoadMore = () => {
     fetchNextPage();
@@ -99,7 +88,9 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         <SelectLocation
           locations={locations}
           placeholder="seleccionar"
-          onValueChange={(e) => handleChange(e)}
+          onValueChange={(e) =>
+            handleLocationChange(e, setLocation, toggleModal)
+          }
         />
       </DialogWithState>
 
@@ -164,21 +155,13 @@ const LeftBar = ({
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
 
-  const handleChange = (e: string) => {
-    const locationId = e.split("-")[0];
-    const locationName = e.split("-")[1];
-    if (locationId && locationName) {
-      setLocation({ locationId, locationName });
-    }
-  };
-
   return (
     <section className="col-span-3 flex h-[calc(100vh_-_148px)] flex-col gap-4 rounded bg-white p-4 shadow-sm">
       <SelectLocation
         locations={locations}
         placeholder="Elegir sucursal"
         defaultValue={`${location.id}-${location.name}`}
-        onValueChange={(e) => handleChange(e)}
+        onValueChange={(e) => handleLocationChange(e, setLocation)}
       />
 
       <SelectDateButton />
@@ -280,8 +263,6 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   };
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
-
-  console.log(equipment);
 
   return (
     <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
