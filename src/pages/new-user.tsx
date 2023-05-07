@@ -3,13 +3,7 @@ import Nav from "@/components/Nav";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { NextPage } from "next";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -20,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import { api } from "@/utils/api";
 import { useRouter } from "next/router";
 import { validationAddress } from "@/lib/validation";
+import DialogWithState from "@/components/DialogWithState";
 
 type NewUserFormData = {
   full_name: string;
@@ -327,23 +322,18 @@ type ImportanModalProps = {
 
 const ImportanModal = ({ showModal, setShowModal }: ImportanModalProps) => {
   return (
-    <Dialog open={showModal}>
-      <DialogContent className="">
-        <DialogHeader>
-          <DialogTitle>AVISO IMPORTANTE</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          Para poder alquilar equipos es necesario llenar este formulario de
-          alta de cliente. Una vez aprobado (puede demorar hasta 48hs) podras
-          realizar tus reservas a través de la web.
-        </div>
-        <DialogFooter>
-          <Button onClick={() => setShowModal(false)} type="submit">
-            OK
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DialogWithState isOpen={showModal} title="AVISO IMPORTANTE">
+      <div className="grid gap-4 py-4">
+        Para poder alquilar equipos es necesario llenar este formulario de alta
+        de cliente. Una vez aprobado (puede demorar hasta 48hs) podras realizar
+        tus reservas a través de la web.
+      </div>
+      <DialogFooter>
+        <Button onClick={() => setShowModal(false)} type="submit">
+          OK
+        </Button>
+      </DialogFooter>
+    </DialogWithState>
   );
 };
 
@@ -364,19 +354,17 @@ const SuccessModal = ({
   };
 
   return (
-    <Dialog open={showSuccessModal}>
-      <DialogContent className="">
-        <div className="grid gap-4 py-4">
-          El alta fue enviada correctamente. Puede demorar hasta 48hs para
-          aprobarla o denegarla. Te notificaremos via email.
-        </div>
-        <DialogFooter>
-          <Button onClick={handleNext} type="submit">
-            OK
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DialogWithState isOpen={showSuccessModal} title="">
+      <div className="grid gap-4 py-4">
+        El alta fue enviada correctamente. Puede demorar hasta 48hs para
+        aprobarla o denegarla. Te notificaremos via email.
+      </div>
+      <DialogFooter>
+        <Button onClick={handleNext} type="submit">
+          OK
+        </Button>
+      </DialogFooter>
+    </DialogWithState>
   );
 };
 

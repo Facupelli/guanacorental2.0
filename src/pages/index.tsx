@@ -8,12 +8,6 @@ import Nav from "@/components/Nav";
 
 import type { Category, Equipment, Location } from "@/types/models";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectGroup,
@@ -34,6 +28,7 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
 import { Label } from "@/components/ui/label";
+import DialogWithState from "@/components/DialogWithState";
 
 type Props = {
   locations: Location[];
@@ -43,10 +38,13 @@ type Props = {
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
-  const location = useBoundStore((state) => state.location);
-  const showLocationModal = useBoundStore((state) => state.showLocationModal);
 
   useLoadLocationFromLocalStorage();
+
+  const location = useBoundStore((state) => state.location);
+  const showLocationModal = useBoundStore((state) => state.showLocationModal);
+  const toggleModal = useBoundStore((state) => state.setToggleModal);
+  const setLocation = useBoundStore((state) => state.setLocation);
 
   const { data, fetchNextPage } =
     api.equipment.getAllEquipment.useInfiniteQuery(
@@ -61,6 +59,19 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       }
     );
+
+  const handleChange = (e: string) => {
+    const locationId = e.split("-")[0];
+    const locationName = e.split("-")[1];
+    if (locationId && locationName) {
+      setLocation({ locationId, locationName });
+      localStorage.setItem(
+        "location",
+        JSON.stringify({ locationId, locationName })
+      );
+      toggleModal();
+    }
+  };
 
   const handleLoadMore = () => {
     fetchNextPage();
@@ -78,7 +89,19 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         <link rel="icon" href="/logo-favicon.ico" />
       </Head>
 
-      <SelectLocationModal locations={locations} isOpen={showLocationModal} />
+      <DialogWithState
+        title="¿DONDE QUERÉS ALQUILAR?"
+        isOpen={showLocationModal}
+      >
+        <Label htmlFor="location" className="col-span-1">
+          Sucursal:
+        </Label>
+        <SelectLocation
+          locations={locations}
+          placeholder="seleccionar"
+          onValueChange={(e) => handleChange(e)}
+        />
+      </DialogWithState>
 
       <Cart />
 
@@ -111,50 +134,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         </div>
       </main>
     </>
-  );
-};
-
-const SelectLocationModal = ({
-  locations,
-  isOpen,
-}: {
-  locations: Location[];
-  isOpen: boolean;
-}) => {
-  const toggleModal = useBoundStore((state) => state.setToggleModal);
-  const setLocation = useBoundStore((state) => state.setLocation);
-
-  const handleChange = (e: string) => {
-    const locationId = e.split("-")[0];
-    const locationName = e.split("-")[1];
-    if (locationId && locationName) {
-      setLocation({ locationId, locationName });
-      localStorage.setItem(
-        "location",
-        JSON.stringify({ locationId, locationName })
-      );
-      toggleModal();
-    }
-  };
-
-  return (
-    <Dialog open={isOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>¿DONDE QUERÉS ALQUILAR?</DialogTitle>
-        </DialogHeader>
-        <div className="flex items-center gap-4 py-4">
-          <Label htmlFor="location" className="col-span-1">
-            Sucursal:
-          </Label>
-          <SelectLocation
-            locations={locations}
-            placeholder="seleccionar"
-            onValueChange={(e) => handleChange(e)}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 };
 
