@@ -127,10 +127,18 @@ const Admin: NextPage = () => {
             </div>
             <div className="col-span-8">
               <Table headTitles={columnTitles}>
-                {orders &&
+                {orders && orders.length === 0 ? (
+                  <tr>
+                    <td className="py-5" colSpan={12}>
+                      No hay pedidos para hoy.
+                    </td>
+                  </tr>
+                ) : (
+                  orders &&
                   orders.map((order) => (
                     <OrderRow key={order.id} order={order} calendarView />
-                  ))}
+                  ))
+                )}
               </Table>
             </div>
           </div>

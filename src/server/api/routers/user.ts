@@ -9,17 +9,26 @@ export const userRouter = createTRPCRouter({
       z.object({
         take: z.number(),
         skip: z.number(),
+        roleId: z.string().optional(),
       })
     )
     .query(async ({ input }) => {
-      const { take, skip } = input;
+      const { take, skip, roleId } = input;
 
       const users = await prisma.user.findMany({
+        where: {
+          role: {
+            some: {
+              id: roleId,
+            },
+          },
+        },
         take,
         skip,
         include: {
           role: true,
           address: true,
+          orders: true,
         },
       });
 

@@ -5,20 +5,36 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
-import { Users } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
+import { Role } from "@prisma/client";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { UseFormSetValue, useForm } from "react-hook-form";
 
 const AdminUsers: NextPage = () => {
+  const { watch, setValue } = useForm<{ roleId: string }>();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
+  const roleId = watch("roleId");
+
+  const roles = api.role.getAllRoles.useQuery();
   const { data } = api.user.getAllUsers.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
+    roleId,
   });
 
-  if (!data) return <div>404</div>;
+  if (!data || !roles.data) return <div>404</div>;
 
   const columns = [
     { title: "Alta" },
@@ -42,7 +58,11 @@ const AdminUsers: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
-          <div className="pt-6">
+          <div className="grid gap-6 pt-6">
+            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-2">
+              <Label className="whitespace-nowrap">Rol del cliente</Label>
+              <SelectRole roles={roles.data} setValue={setValue} />
+            </div>
             <Table headTitles={columns}>
               {data.users.map((user) => (
                 <tr key={user.id} className="text-sm">
@@ -61,6 +81,7 @@ const AdminUsers: NextPage = () => {
                   <td className="py-4">{user.address?.phone}</td>
                   <td className="py-4">{user.address?.dni_number}</td>
                   <td className="py-4">{user.address?.province}</td>
+                  <td className="py-4">{user.orders.length}</td>
                 </tr>
               ))}
             </Table>
@@ -75,6 +96,32 @@ const AdminUsers: NextPage = () => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const SelectRole = ({
+  roles,
+  setValue,
+}: {
+  roles: Role[];
+  setValue: UseFormSetValue<{ roleId: string }>;
+}) => {
+  return (
+    <Select onValueChange={(e) => setValue("roleId", e)}>
+      <SelectTrigger>
+        <SelectValue placeholder="seleccionar rol" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Sucursales</SelectLabel>
+          {roles.map((role) => (
+            <SelectItem value={role.id} key={role.id}>
+              {role.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
