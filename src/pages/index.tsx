@@ -46,7 +46,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const toggleModal = useBoundStore((state) => state.setToggleModal);
   const setLocation = useBoundStore((state) => state.setLocation);
 
-  const { data, fetchNextPage } =
+  const { data, fetchNextPage, hasNextPage } =
     api.equipment.getAllEquipment.useInfiniteQuery(
       {
         sort,
@@ -122,13 +122,22 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 <SelectOrder setSort={setSort} />
               </section>
               <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
-                {equipments?.map((equipment) => (
-                  <EquipmentCard key={equipment.id} equipment={equipment} />
-                ))}
+                {equipments?.length === 0 ? (
+                  <p>
+                    No se encontraron equipos disponibles para esta sucursal{" "}
+                    {":("}
+                  </p>
+                ) : (
+                  equipments?.map((equipment) => (
+                    <EquipmentCard key={equipment.id} equipment={equipment} />
+                  ))
+                )}
               </section>
-              <div className="flex justify-center py-6">
-                <Button onClick={handleLoadMore}>cargar más</Button>
-              </div>
+              {equipments && equipments.length > 0 && hasNextPage && (
+                <div className="flex justify-center py-6">
+                  <Button onClick={handleLoadMore}>cargar más</Button>
+                </div>
+              )}
             </div>
           </section>
         </div>
