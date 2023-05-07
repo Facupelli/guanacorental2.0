@@ -1,20 +1,22 @@
-import Head from "next/head";
-import Nav from "@/components/Nav";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Head from "next/head";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+
+import Nav from "@/components/Nav";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import DialogWithState from "@/components/DialogWithState";
+
+import { api } from "@/utils/api";
+import { validationAddress } from "@/lib/validation";
 
 import { type NextPage } from "next";
-import { DialogFooter } from "@/components/ui/dialog";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { useSession } from "next-auth/react";
-import { Loader2 } from "lucide-react";
-import { api } from "@/utils/api";
-import { useRouter } from "next/router";
-import { validationAddress } from "@/lib/validation";
-import DialogWithState from "@/components/DialogWithState";
 
 type NewUserFormData = {
   full_name: string;
@@ -315,27 +317,27 @@ const NewUserPage: NextPage = () => {
   );
 };
 
-type ImportanModalProps = {
-  showModal: boolean;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
-};
+// type ImportanModalProps = {
+//   showModal: boolean;
+//   setShowModal: Dispatch<SetStateAction<boolean>>;
+// };
 
-const ImportanModal = ({ showModal, setShowModal }: ImportanModalProps) => {
-  return (
-    <DialogWithState isOpen={showModal} title="AVISO IMPORTANTE">
-      <div className="grid gap-4 py-4">
-        Para poder alquilar equipos es necesario llenar este formulario de alta
-        de cliente. Una vez aprobado (puede demorar hasta 48hs) podras realizar
-        tus reservas a través de la web.
-      </div>
-      <DialogFooter>
-        <Button onClick={() => setShowModal(false)} type="submit">
-          OK
-        </Button>
-      </DialogFooter>
-    </DialogWithState>
-  );
-};
+// const ImportanModal = ({ showModal, setShowModal }: ImportanModalProps) => {
+//   return (
+//     <DialogWithState isOpen={showModal} title="AVISO IMPORTANTE">
+//       <div className="grid gap-4 py-4">
+//         Para poder alquilar equipos es necesario llenar este formulario de alta
+//         de cliente. Una vez aprobado (puede demorar hasta 48hs) podras realizar
+//         tus reservas a través de la web.
+//       </div>
+//       <DialogFooter>
+//         <Button onClick={() => setShowModal(false)} type="submit">
+//           OK
+//         </Button>
+//       </DialogFooter>
+//     </DialogWithState>
+//   );
+// };
 
 type SuccessModalProps = {
   showSuccessModal: boolean;

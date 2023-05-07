@@ -4,9 +4,10 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
 import { prisma } from "@/server/db";
 import Head from "next/head";
-import Nav from "@/components/Nav";
+import { useBoundStore } from "@/zustand/store";
+import { type Dispatch, type SetStateAction, useState } from "react";
 
-import type { Category, Equipment, Location } from "@/types/models";
+import Nav from "@/components/Nav";
 import {
   Select,
   SelectContent,
@@ -18,20 +19,21 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { api } from "@/utils/api";
-import {
-  formatPrice,
-  handleLocationChange,
-  isEquipmentAvailable,
-} from "@/lib/utils";
-import { useBoundStore } from "@/zustand/store";
-import { type Dispatch, type SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { Label } from "@/components/ui/label";
 import DialogWithState from "@/components/DialogWithState";
 import { ShoppingCart } from "lucide-react";
+
+import { api } from "@/utils/api";
+import {
+  formatPrice,
+  handleLocationChange,
+  isEquipmentAvailable,
+} from "@/lib/utils";
+
+import type { Category, Equipment, Location } from "@/types/models";
 
 type Props = {
   locations: Location[];
@@ -305,7 +307,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: { prisma, session: null },

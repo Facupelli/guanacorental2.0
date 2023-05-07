@@ -1,21 +1,24 @@
 import Head from "next/head";
 import Nav from "@/components/Nav";
 
-import { NextPage } from "next";
 import { useBoundStore } from "@/zustand/store";
+import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
+import { useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
-import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
-import type { Equipment, Location } from "@/types/models";
-import CartItemCounter from "@/components/CartItemCounter";
-import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
-import { useMemo, useState } from "react";
-import { X } from "lucide-react";
-import { api } from "@/utils/api";
-import { useSession } from "next-auth/react";
-import { type UseFormRegister, useForm } from "react-hook-form";
 import DialogWithState from "@/components/DialogWithState";
 import { DialogFooter } from "@/components/ui/dialog";
+import CartItemCounter from "@/components/CartItemCounter";
+import { X } from "lucide-react";
+
+import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { api } from "@/utils/api";
+
+import { type NextPage } from "next";
+import type { Equipment, Location } from "@/types/models";
+import { type UseFormRegister, useForm } from "react-hook-form";
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
@@ -39,7 +42,7 @@ const CartPage: NextPage = () => {
       return getTotalWorkingDays(datesInRange, pickupHour);
     }
     return undefined;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, pickupHour]);
 
   const cartTotal = useMemo(() => {
     const cartSum = cartItems.reduce(

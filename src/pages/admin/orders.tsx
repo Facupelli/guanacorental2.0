@@ -1,13 +1,11 @@
-import { type NextPage } from "next";
 import Head from "next/head";
+import { useState } from "react";
+import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
-import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
 import SelectLocation from "@/components/ui/SelectLocation";
-import { useBoundStore } from "@/zustand/store";
 import {
   Select,
   SelectContent,
@@ -19,10 +17,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
-import { useState } from "react";
-import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import OrderRow from "@/components/OrderRow";
+
+import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
+import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { handleAdminLocationChange } from "@/lib/utils";
+import { api } from "@/utils/api";
+
+import { type NextPage } from "next";
 
 const columns = [
   { title: "N°" },

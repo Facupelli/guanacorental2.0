@@ -1,20 +1,22 @@
-import { type NextPage } from "next";
 import Head from "next/head";
+import dayjs from "dayjs";
+import { useState } from "react";
+import Calendar from "react-calendar";
+import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Calendar from "react-calendar";
-import { api } from "@/utils/api";
-import dayjs from "dayjs";
-import { useState } from "react";
-import { type Prisma } from "@prisma/client";
 import Table from "@/components/ui/Table";
 import OrderRow from "@/components/OrderRow";
 import { Label } from "@/components/ui/label";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { SelectItem } from "@/components/ui/select";
+
+import { api } from "@/utils/api";
 import { handleAdminLocationChange } from "@/lib/utils";
-import { useBoundStore } from "@/zustand/store";
+
+import { type NextPage } from "next";
+import { type Prisma } from "@prisma/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {

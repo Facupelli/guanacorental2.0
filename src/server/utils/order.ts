@@ -16,14 +16,27 @@ type CartItem = {
     | undefined;
 };
 
+type Owner = {
+  id: string;
+  ownerId: string;
+  stock: number;
+  locationId: string;
+  ownerName?: string | undefined;
+};
+
 export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   // Ordena el arreglo de owners según la prioridad especificada
-  const sortByOwnerPriority = (owners: any[]) => {
+  const sortByOwnerPriority = (owners: Owner[]) => {
     const ownerPriority = ["Both", "Fede", "Oscar", "Sub"];
-    return owners.sort(
-      (a, b) =>
-        ownerPriority.indexOf(a.ownerName) - ownerPriority.indexOf(b.ownerName)
-    );
+    return owners.sort((a, b) => {
+      if (a.ownerName && b.ownerName) {
+        return (
+          ownerPriority.indexOf(a.ownerName) -
+          ownerPriority.indexOf(b.ownerName)
+        );
+      }
+      return 1;
+    });
   };
 
   const owners = sortByOwnerPriority(item.owner!);
@@ -95,7 +108,7 @@ export const calculateOwnerEarning = (
       newOrder.bookId
     );
 
-    for (let equipment of equipmentOnOwners) {
+    for (const equipment of equipmentOnOwners) {
       const equipmentPrice = equipment.equipment.price;
       const ownerName = equipment.owner.name;
       const quantity = equipment.books[0]?.quantity;

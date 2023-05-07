@@ -1,21 +1,22 @@
 import superjason from "superjson";
 import { prisma } from "@/server/db";
-import { type GetServerSideProps, type NextPage } from "next";
+import { useState } from "react";
 import Head from "next/head";
-import Nav from "@/components/Nav";
-import AdminLayout from "@/components/layout/AdminLayout";
-import { api } from "@/utils/api";
-import { useBoundStore } from "@/zustand/store";
-import { formatPrice } from "@/lib/utils";
-import { Switch } from "@/components/ui/switch";
+import {
+  type UseFieldArrayRemove,
+  type UseFormRegister,
+  type UseFormSetValue,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
-import type {
-  Equipment,
-  EquipmentOnOwner,
-  Location,
-  Owner,
-} from "@/types/models";
+
+import Nav from "@/components/Nav";
+import AdminLayout from "@/components/layout/AdminLayout";
+import { useBoundStore } from "@/zustand/store";
+
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,18 +37,21 @@ import {
 } from "@/components/ui/select";
 import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
-import { Plus, X } from "lucide-react";
-import {
-  type UseFieldArrayRemove,
-  type UseFormRegister,
-  type UseFormSetValue,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
-import { useState } from "react";
 import Table from "@/components/ui/Table";
+import { Plus, X } from "lucide-react";
+
+import { api } from "@/utils/api";
+import { formatPrice } from "@/lib/utils";
+
+import { type GetServerSideProps, type NextPage } from "next";
+import type {
+  Equipment,
+  EquipmentOnOwner,
+  Location,
+  Owner,
+} from "@/types/models";
 
 const tableTitles = [
   { title: "Nombre" },
@@ -162,8 +166,7 @@ const OwnerLocationStockModal = ({
     name: "owner",
   });
 
-  const { mutate, isLoading } =
-    api.equipment.createEquipmentOnOwner.useMutation();
+  const { mutate } = api.equipment.createEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: Form) => {
     const mutateData = {

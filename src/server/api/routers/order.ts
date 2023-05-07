@@ -8,7 +8,7 @@ import {
   getEquipmentOnOwnerIds,
 } from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
-import { Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
 
 type Query = {

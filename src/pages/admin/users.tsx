@@ -1,13 +1,11 @@
-import { type NextPage } from "next";
+import { type UseFormSetValue, useForm } from "react-hook-form";
 import Head from "next/head";
+import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
-import { useState } from "react";
-import { type Role } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -18,7 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { type UseFormSetValue, useForm } from "react-hook-form";
+
+import { api } from "@/utils/api";
+
+import { type Role } from "@prisma/client";
+import { type NextPage } from "next";
 
 const AdminUsers: NextPage = () => {
   const { watch, setValue } = useForm<{ roleId: string }>();

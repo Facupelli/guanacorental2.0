@@ -1,6 +1,11 @@
 import { useBoundStore } from "@/zustand/store";
 import { useEffect } from "react";
 
+type LocationData = {
+  locationName: string;
+  locationId: string;
+};
+
 let didLocationInit = false;
 
 export const useLoadLocationFromLocalStorage = () => {
@@ -15,8 +20,13 @@ export const useLoadLocationFromLocalStorage = () => {
       const location = localStorage.getItem("location");
 
       if (location) {
-        setPickupHour("09:00");
-        return setLocation(JSON.parse(location));
+        const parsedLocation: LocationData = JSON.parse(
+          location
+        ) as LocationData;
+        if (parsedLocation.locationId && parsedLocation.locationName) {
+          setPickupHour("09:00");
+          return setLocation(parsedLocation);
+        }
       }
 
       toggleModal();
