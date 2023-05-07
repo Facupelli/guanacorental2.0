@@ -4,8 +4,16 @@ import Head from "next/head";
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Calendar from "react-calendar";
+import { api } from "@/utils/api";
+import dayjs from "dayjs";
 
 const Admin: NextPage = () => {
+  const { data } = api.order.getCalendarOrders.useQuery();
+
+  if (!data) return <div>404</div>;
+
+  console.log(data);
+
   return (
     <>
       <Head>
@@ -24,6 +32,37 @@ const Admin: NextPage = () => {
               locale="es-ES"
               minDate={new Date()}
               className="rounded-lg p-4"
+              defaultValue={new Date()}
+              tileClassName={({ date }: { date: Date }) => {
+                if (
+                  data.find(
+                    (order) =>
+                      dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
+                      data.find((order) =>
+                        dayjs(order.book.start_date).isSame(dayjs(date), "day")
+                      )
+                  )
+                ) {
+                  return "pickup-and-return";
+                }
+                if (
+                  data.find((order) =>
+                    dayjs(order.book.end_date).isSame(dayjs(date), "day")
+                  )
+                ) {
+                  console.log("entre");
+                  return "return-day";
+                }
+                if (
+                  data.find((order) =>
+                    dayjs(order.book.start_date).isSame(dayjs(date), "day")
+                  )
+                ) {
+                  return "pickup-day";
+                }
+
+                return "";
+              }}
             />
           </div>
         </AdminLayout>

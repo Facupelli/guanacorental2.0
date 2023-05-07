@@ -41,6 +41,21 @@ type Query = {
 };
 
 export const orderRouter = createTRPCRouter({
+  getCalendarOrders: protectedProcedure.query(async () => {
+    const orders = await prisma.order.findMany({
+      where: {
+        book: {
+          start_date: { gte: new Date() },
+        },
+      },
+      include: {
+        book: true,
+      },
+    });
+
+    return orders;
+  }),
+
   getOrders: protectedProcedure
     .input(
       z.object({

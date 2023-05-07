@@ -1,5 +1,5 @@
 .react-calendar {
-  width: 350px;
+  width: 400px;
   max-width: 100%;
   background: white;
   /* border: 1px solid #a0a096; */
@@ -78,14 +78,14 @@
 }
 .react-calendar__tile {
   max-width: 100%;
-  padding: 10px 6.6667px;
+  padding: 15px;
   background: none;
   text-align: center;
   line-height: 20px;
 }
 .react-calendar__tile:disabled {
   background-color: #f0f0f0;
-  border-bottom: 3px solid #f0f0f0;
+  /* border-bottom: 3px solid #f0f0f0; */
 }
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
@@ -107,7 +107,7 @@
 }
 .react-calendar__tile--active {
   background: #1d1d1b;
-  border-bottom: 3px solid #1d1d1b;
+  /* border-bottom: 3px solid #1d1d1b; */
   /* line-height: 10px; */
   color: white;
 }
@@ -117,4 +117,20 @@
 }
 .react-calendar--selectRange .react-calendar__tile--hover {
   background-color: #e6e6e6;
+}
+
+.pickup-and-return {
+  border-bottom: 3px solid !important;
+  border-image: linear-gradient(to right, green 50%, red 50%) 2 !important;
+}
+
+.pickup-day {
+  border-bottom: 3px solid green !important;
+  /* padding: 1.2rem; */
+  /* background-color: green; */
+}
+
+.return-day {
+  border-bottom: 3px solid red !important;
+  /* padding: 1.2rem; */
 }
