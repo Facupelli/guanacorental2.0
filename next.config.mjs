@@ -19,7 +19,13 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "www.guanacorental.shop" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "www.guanacorental.shop" },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
   },
 };
 export default config;

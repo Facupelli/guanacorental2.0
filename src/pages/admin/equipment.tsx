@@ -2,6 +2,7 @@ import superjason from "superjson";
 import { prisma } from "@/server/db";
 import { useState } from "react";
 import Head from "next/head";
+import Image from "next/image";
 import {
   type UseFieldArrayRemove,
   type UseFormRegister,
@@ -40,7 +41,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import Table from "@/components/ui/Table";
-import { Plus, X } from "lucide-react";
+import { Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { formatPrice } from "@/lib/utils";
@@ -54,12 +55,10 @@ import type {
 } from "@/types/models";
 
 const tableTitles = [
-  { title: "Nombre" },
-  { title: "Brand" },
-  { title: "Model" },
-  { title: "Precio" },
-  { title: "Dueño, Sucursal y Stock" },
-  { title: "Disponible" },
+  { title: "" },
+  { title: "Nombre, Marca y Modelo" },
+  { title: "Imagen y Precio" },
+  { title: "Stock" },
 ];
 
 type Props = {
@@ -97,22 +96,69 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
               {data?.equipment.map((equipment) => (
                 <tr
                   key={equipment.id}
-                  className="border-b border-app-bg text-sm"
+                  className="center border-b border-app-bg text-sm"
                 >
-                  <td className="py-4">{equipment.name}</td>
-                  <td className="py-4">{equipment.brand}</td>
-                  <td className="py-4">{equipment.model}</td>
-                  <td className="py-4">{formatPrice(equipment.price)}</td>
                   <td className="py-4">
-                    <OwnerLocationStockModal
-                      owners={owners}
-                      owner={equipment.owner}
-                      equipment={equipment}
-                      locations={locations}
+                    {equipment.image && (
+                      <div className="relative h-14 w-14">
+                        <Image
+                          src={equipment.image}
+                          fill
+                          alt="equipment picture"
+                        />
+                      </div>
+                    )}
+                  </td>
+                  <td className="grid gap-1 py-4">
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="text"
+                        defaultValue={equipment.name}
+                        className="h-6"
+                      />
+                      <Input
+                        type="text"
+                        defaultValue={equipment.brand}
+                        className="h-6"
+                      />
+                    </div>
+                    <Input
+                      type="text"
+                      defaultValue={equipment.model}
+                      className="h-6"
                     />
                   </td>
                   <td className="py-4">
-                    <Switch defaultChecked={equipment.available} />
+                    <div className="grid gap-1">
+                      <Input
+                        type="text"
+                        defaultValue={formatPrice(equipment.price)}
+                        className="h-6"
+                      />
+                      <Input
+                        type="text"
+                        defaultValue={equipment.image as string}
+                        className="h-6"
+                      />
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="grid  gap-2 ">
+                      <OwnerLocationStockModal
+                        owners={owners}
+                        owner={equipment.owner}
+                        equipment={equipment}
+                        locations={locations}
+                      />
+                      <div className="flex h-6 items-center justify-center">
+                        <Switch defaultChecked={equipment.available} />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <Button className="h-12 px-2" title="actualizar">
+                      <RotateCw className="h-4 w-4" />
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -195,7 +241,7 @@ const OwnerLocationStockModal = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm" className="h-4 text-xs">
+        <Button size="sm" className="h-6 text-xs" variant="secondary">
           ver
         </Button>
       </DialogTrigger>
