@@ -1,8 +1,7 @@
 import superjason from "superjson";
 import { prisma } from "@/server/db";
-import { GetServerSideProps, type NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 import Head from "next/head";
-
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { api } from "@/utils/api";
@@ -39,9 +38,9 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 import {
-  UseFieldArrayRemove,
-  UseFormRegister,
-  UseFormSetValue,
+  type UseFieldArrayRemove,
+  type UseFormRegister,
+  type UseFormSetValue,
   useFieldArray,
   useForm,
 } from "react-hook-form";
@@ -156,9 +155,9 @@ const OwnerLocationStockModal = ({
     control,
     handleSubmit,
     setValue,
-    formState: { errors },
+    // formState: { errors },
   } = useForm<Form>();
-  const { fields, append, remove, move, swap } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "owner",
   });
@@ -175,7 +174,9 @@ const OwnerLocationStockModal = ({
     };
 
     mutate(mutateData, {
-      onSuccess: () => {},
+      onSuccess: (data) => {
+        console.log(data.message);
+      },
       onError: (err) => {
         console.error(err);
       },
@@ -341,7 +342,7 @@ const SelectOwner = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: { prisma, session: null },

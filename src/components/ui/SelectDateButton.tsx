@@ -1,5 +1,5 @@
 import Calendar from "react-calendar";
-import { Value } from "react-calendar/dist/cjs/shared/types";
+import { type Value } from "react-calendar/dist/cjs/shared/types";
 import {
   Dialog,
   DialogContent,
@@ -16,14 +16,13 @@ import SelectPickupHour from "./SelectPickupHour";
 import { useSession } from "next-auth/react";
 import { ROLES } from "@/lib/magic_strings";
 import dayjs from "dayjs";
-import { getDatesInRange } from "@/lib/dates";
 
 const SelectDateButton = () => {
   const { data: session } = useSession();
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  const endDate = useBoundStore((state) => state.startDate);
-  const startDate = useBoundStore((state) => state.endDate);
+  // const endDate = useBoundStore((state) => state.startDate);
+  // const startDate = useBoundStore((state) => state.endDate);
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
@@ -48,11 +47,11 @@ const SelectDateButton = () => {
     return false;
   };
 
-  const disableEquipmentBooked = ({ date }: { date: Date }) => {
-    if (startDate && endDate) {
-      const datesInRange = getDatesInRange(startDate, endDate);
-    }
-  };
+  // const disableEquipmentBooked = ({ date }: { date: Date }) => {
+  //   if (startDate && endDate) {
+  //     const datesInRange = getDatesInRange(startDate, endDate);
+  //   }
+  // };
 
   return (
     <Dialog>

@@ -7,7 +7,7 @@ import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
-import { Role } from "@prisma/client";
+import { type Role } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { UseFormSetValue, useForm } from "react-hook-form";
+import { type UseFormSetValue, useForm } from "react-hook-form";
 
 const AdminUsers: NextPage = () => {
   const { watch, setValue } = useForm<{ roleId: string }>();

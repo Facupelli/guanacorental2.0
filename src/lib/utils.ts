@@ -1,5 +1,5 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
-import { ClassValue, clsx } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
 
@@ -43,7 +43,7 @@ export const isEquipmentAvailable = (
     for (const owner of equipment.owner!) {
       for (const book of owner.books!) {
         if (
-          dayjs(dates.startDate).isBefore(book.book?.end_date!, "day") &&
+          dayjs(dates.startDate).isBefore(book.book?.end_date, "day") &&
           dayjs(dates.endDate).isAfter(book.book?.start_date, "day")
         ) {
           stockLeft -= book.quantity;

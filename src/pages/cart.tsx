@@ -1,22 +1,20 @@
 import Head from "next/head";
 import Nav from "@/components/Nav";
 
-import { Input } from "@/components/ui/input";
 import { NextPage } from "next";
 import { useBoundStore } from "@/zustand/store";
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
-import { Equipment, Location } from "@/types/models";
+import type { Equipment, Location } from "@/types/models";
 import CartItemCounter from "@/components/CartItemCounter";
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
-import { UseFormRegister, useForm } from "react-hook-form";
+import { type UseFormRegister, useForm } from "react-hook-form";
 import DialogWithState from "@/components/DialogWithState";
-import { TRPCClientError } from "@trpc/client";
 import { DialogFooter } from "@/components/ui/dialog";
 
 const CartPage: NextPage = () => {
@@ -84,7 +82,9 @@ const CartPage: NextPage = () => {
           cart,
         },
         {
-          onSuccess: (data) => {},
+          onSuccess: (data) => {
+            console.log(data);
+          },
           onError: (err) => {
             setErrorModal(true);
             setError(err.message);

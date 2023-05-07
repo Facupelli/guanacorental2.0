@@ -73,9 +73,9 @@ export type Order = {
   book: Book;
   bookId: string;
   location: Location;
-  locationId: String;
+  locationId: string;
   equipments: EquipmentOnOwner[];
-  status: String;
+  status: string;
   earnings: Earning[];
   subtotal: number;
   total: number;

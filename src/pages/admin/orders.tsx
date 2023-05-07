@@ -5,9 +5,7 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
-import { ADMIN_ORDERS_SORT, STATUS, statusClass } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { useBoundStore } from "@/zustand/store";
 import {
@@ -15,16 +13,14 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { UseFormSetValue, useForm } from "react-hook-form";
+import { type UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { Prisma } from "@prisma/client";
 import OrderRow from "@/components/OrderRow";
 
 const columns = [

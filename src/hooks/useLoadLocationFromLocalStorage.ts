@@ -1,4 +1,3 @@
-import { SCHEDULES } from "@/lib/magic_strings";
 import { useBoundStore } from "@/zustand/store";
 import { useEffect } from "react";
 
@@ -22,5 +21,5 @@ export const useLoadLocationFromLocalStorage = () => {
 
       toggleModal();
     }
-  }, []);
+  }, [setLocation, setPickupHour, toggleModal]);
 };

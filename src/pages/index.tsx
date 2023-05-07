@@ -1,5 +1,5 @@
 import superjason from "superjson";
-import { GetServerSideProps, type NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
 import { prisma } from "@/server/db";
@@ -19,18 +19,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
-import Image from "next/image";
 import {
   formatPrice,
   handleLocationChange,
   isEquipmentAvailable,
 } from "@/lib/utils";
 import { useBoundStore } from "@/zustand/store";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import Cart from "@/components/Cart";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import SelectLocation from "@/components/ui/SelectLocation";
-import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
 import { Label } from "@/components/ui/label";
 import DialogWithState from "@/components/DialogWithState";
 import { ShoppingCart } from "lucide-react";
@@ -63,8 +61,8 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       }
     );
 
-  const handleLoadMore = () => {
-    fetchNextPage();
+  const handleLoadMore = async () => {
+    await fetchNextPage();
   };
 
   const equipments = data?.pages.map((page) => page.equipments).flat();

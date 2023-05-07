@@ -2,9 +2,9 @@ import Head from "next/head";
 import Nav from "@/components/Nav";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { NextPage } from "next";
+import { type NextPage } from "next";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
@@ -53,7 +53,7 @@ const NewUserPage: NextPage = () => {
 
   const { isLoading, mutate } = api.user.createUserAddress.useMutation();
 
-  const [showModal, setShowModal] = useState(false);
+  const [, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const onSubmit = (data: NewUserFormData) => {
@@ -349,7 +349,7 @@ const SuccessModal = ({
   const router = useRouter();
 
   const handleNext = () => {
-    router.push("/");
+    void router.push("/");
     setShowSuccessModal(false);
   };
 

@@ -11,13 +11,6 @@ import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
 
-type SortPipe = {
-  // created_at?: string;
-  book?: {
-    start_date?: string;
-  };
-};
-
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationInput;
   where?: {

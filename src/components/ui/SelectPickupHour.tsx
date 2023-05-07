@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SCHEDULES } from "@/lib/magic_strings";
-import type { Location } from "@/types/models";
 import { useBoundStore } from "@/zustand/store";
 import dayjs from "dayjs";
 
@@ -16,8 +15,6 @@ const SelectPickupHour = () => {
   const setPickupHour = useBoundStore((state) => state.setPickupHour);
   const startDate = useBoundStore((state) => state.startDate);
   const location = useBoundStore((state) => state.location);
-
-  const disableHour = dayjs();
 
   const schedules = Object.keys(SCHEDULES[location.name]!);
 

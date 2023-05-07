@@ -7,7 +7,7 @@ import Calendar from "react-calendar";
 import { api } from "@/utils/api";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 import Table from "@/components/ui/Table";
 import OrderRow from "@/components/OrderRow";
 
@@ -37,7 +37,7 @@ const columnTitles = [
 ];
 
 const Admin: NextPage = () => {
-  const [calendarValue, setCalendarValue] = useState();
+  // const [calendarValue, setCalendarValue] = useState();
   const [orders, setOrders] = useState<Order[] | null>(null);
 
   const { data } = api.order.getCalendarOrders.useQuery();

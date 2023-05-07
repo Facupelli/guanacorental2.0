@@ -3,7 +3,7 @@ import { statusClass } from "@/lib/magic_strings";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useState } from "react";
-import { Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 
 type OrderRowProps = Prisma.OrderGetPayload<{
   include: {

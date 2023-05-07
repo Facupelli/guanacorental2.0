@@ -16,11 +16,11 @@ export const getDatesInRange = (startDate: Date, endDate: Date) => {
 export const getTotalWorkingDays = (dates: Date[], pickupHour: string) => {
   let weekDay = 0;
   let weekendDay = 0;
-  let datesToBook = dates.slice(0, -1);
+  const datesToBook = dates.slice(0, -1);
 
   if (!datesToBook[0]) return;
 
-  for (let day of datesToBook) {
+  for (const day of datesToBook) {
     const newDay = new Date(day).getDay();
 
     //si es sabado o domingo

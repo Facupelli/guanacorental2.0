@@ -7,10 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Form } from "@/pages/admin/equipment";
+import { type Form } from "@/pages/admin/equipment";
 import type { Location } from "@/types/models";
-import { ReactNode } from "react";
-import { UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { type ReactNode } from "react";
+import { type UseFormSetValue } from "react-hook-form";
 
 type SelectLocationProps = {
   locations: Location[];

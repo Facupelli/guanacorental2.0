@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, UserCog } from "lucide-react";
 import { ROLES } from "@/lib/magic_strings";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { useRouter } from "next/router";
 
 const Nav = () => {
@@ -47,7 +47,7 @@ const Nav = () => {
             <li className="cursor-pointer  text-white">
               <button
                 className="flex items-center gap-2"
-                onClick={() => router.push("/admin")}
+                onClick={() => void router.push("/admin")}
               >
                 ADMIN
                 <UserCog className="h-4 w-4" />
@@ -57,13 +57,13 @@ const Nav = () => {
 
           {session ? (
             <li className="text-white">
-              <button onClick={() => signOut()}>SALIR</button>
+              <button onClick={() => void signOut()}>SALIR</button>
             </li>
           ) : (
             <>
               <li>
                 <button
-                  onClick={async () => await signIn("google")}
+                  onClick={() => void signIn("google")}
                   className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
                 >
                   <div className="mr-2 flex items-center">
@@ -81,7 +81,7 @@ const Nav = () => {
               </li>
               <li>
                 <button
-                  onClick={() => signIn("facebook")}
+                  onClick={() => void signIn("facebook")}
                   className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
                 >
                   <p className="whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">

@@ -1,5 +1,5 @@
-import { Equipment, Location } from "@/types/models";
-import { create, StateCreator } from "zustand";
+import type { Equipment, Location } from "@/types/models";
+import { create, type StateCreator } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface LocationSlice {

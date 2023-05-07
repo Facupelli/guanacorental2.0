@@ -1,6 +1,6 @@
 import { useBoundStore } from "@/zustand/store";
 import { Button } from "./ui/button";
-import { Equipment } from "@/types/models";
+import { type Equipment } from "@/types/models";
 import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/router";
 import SelectDateButton from "./ui/SelectDateButton";
@@ -28,7 +28,7 @@ const Cart = () => {
   );
 
   const handleGoToCartPage = () => {
-    router.push("/cart");
+    void router.push("/cart");
     closeCartModal();
   };
   return (
