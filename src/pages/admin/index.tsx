@@ -6,13 +6,33 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import Calendar from "react-calendar";
 import { api } from "@/utils/api";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { Prisma } from "@prisma/client";
+
+type Order = Prisma.OrderGetPayload<{
+  include: {
+    book: true;
+  };
+}>;
 
 const Admin: NextPage = () => {
+  const [calendarValue, setCalendarValue] = useState();
+  const [orders, setOrders] = useState<Order[] | null>(null);
+
   const { data } = api.order.getCalendarOrders.useQuery();
 
   if (!data) return <div>404</div>;
 
-  console.log(data);
+  const handleClickDay = (day: Date) => {
+    const orders = data.filter(
+      (order) =>
+        dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
+        dayjs(order.book.end_date).isSame(dayjs(day), "day")
+    );
+    setOrders(orders);
+  };
+
+  console.log(orders);
 
   return (
     <>
@@ -31,6 +51,7 @@ const Admin: NextPage = () => {
             <Calendar
               locale="es-ES"
               minDate={new Date()}
+              onClickDay={handleClickDay}
               className="rounded-lg p-4"
               defaultValue={new Date()}
               tileClassName={({ date }: { date: Date }) => {
@@ -50,7 +71,6 @@ const Admin: NextPage = () => {
                     dayjs(order.book.end_date).isSame(dayjs(date), "day")
                   )
                 ) {
-                  console.log("entre");
                   return "return-day";
                 }
                 if (
