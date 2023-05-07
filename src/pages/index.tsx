@@ -33,6 +33,7 @@ import SelectLocation from "@/components/ui/SelectLocation";
 import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
 import { Label } from "@/components/ui/label";
 import DialogWithState from "@/components/DialogWithState";
+import { ShoppingCart } from "lucide-react";
 
 type Props = {
   locations: Location[];
@@ -262,6 +263,8 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
     if (cartItems.length === 0) openCartModal();
   };
 
+  console.log(equipment);
+
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
   return (
@@ -282,11 +285,11 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
         <p>{equipment.model}</p>
       </div>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end text-sm">
         <p className={`${available ? "text-green-500" : "text-red-500"}`}>
           {available ? "Disponible" : "Reservado"}
         </p>
-        <Button size="sm" variant="darklink">
+        <Button size="sm" variant="darklink" className="text-xs">
           ver más
         </Button>
       </div>
@@ -299,7 +302,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
           className="font-bold"
           onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
         >
-          {isAlreadyInCart ? "Agregado" : "Agregar"}
+          {isAlreadyInCart ? "Agregado" : <ShoppingCart className="h-5 w-5" />}
         </Button>
       </div>
     </article>

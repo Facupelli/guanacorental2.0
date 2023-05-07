@@ -6,7 +6,7 @@ import { NextPage } from "next";
 import { useBoundStore } from "@/zustand/store";
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import { Equipment, Location } from "@/types/models";
 import CartItemCounter from "@/components/CartItemCounter";
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
@@ -126,7 +126,11 @@ const CartPage: NextPage = () => {
               <p className="col-span-2">Cantidad</p>
               <p className="col-span-2">Precio</p>
             </div>
-            <ItemsList items={cartItems} />
+            <ItemsList
+              items={cartItems}
+              startDate={startDate}
+              endDate={endDate}
+            />
           </section>
           <RightBar
             location={location}
@@ -135,6 +139,7 @@ const CartPage: NextPage = () => {
             register={register}
             handleBookOrder={handleBookOrder}
             isLoading={isLoading}
+            cart={cartItems}
           />
         </section>
       </main>
@@ -144,13 +149,19 @@ const CartPage: NextPage = () => {
 
 type ItemsListProps = {
   items: Equipment[];
+  startDate: Date | null;
+  endDate: Date | null;
 };
-
-const ItemsList = ({ items }: ItemsListProps) => {
+const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
   return (
     <div className="grid gap-8">
       {items?.map((item) => (
-        <Item key={item.id} item={item} />
+        <Item
+          key={item.id}
+          item={item}
+          startDate={startDate}
+          endDate={endDate}
+        />
       ))}
     </div>
   );
@@ -158,10 +169,14 @@ const ItemsList = ({ items }: ItemsListProps) => {
 
 type ItemProps = {
   item: Equipment;
+  startDate: Date | null;
+  endDate: Date | null;
 };
 
-const Item = ({ item }: ItemProps) => {
+const Item = ({ item, endDate, startDate }: ItemProps) => {
   const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
+
+  const available = isEquipmentAvailable(item, { startDate, endDate });
 
   return (
     <div className="grid grid-cols-12 items-center">
@@ -180,6 +195,9 @@ const Item = ({ item }: ItemProps) => {
       <button onClick={() => deleteFromCart(item.id)}>
         <X className="col-span-1 h-4 w-4" />
       </button>
+      <p className={`text-sm ${available ? "text-green-500" : "text-red-500"}`}>
+        {available ? "Disponible" : "Reservado"}
+      </p>
     </div>
   );
 };
@@ -191,6 +209,7 @@ type RightBarProps = {
   register: UseFormRegister<{ message: string }>;
   handleBookOrder: () => void;
   isLoading: boolean;
+  cart: Equipment[];
 };
 
 const RightBar = ({
@@ -200,9 +219,14 @@ const RightBar = ({
   register,
   handleBookOrder,
   isLoading,
+  cart,
 }: RightBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
+
+  const areAllItemsAvailable = cart.every((item) =>
+    isEquipmentAvailable(item, { startDate, endDate })
+  );
 
   return (
     <section className="col-span-4 rounded-md bg-white p-4">
@@ -253,7 +277,9 @@ const RightBar = ({
 
         <div className="grid gap-2">
           <Button
-            disabled={!startDate || !endDate || isLoading}
+            disabled={
+              !startDate || !endDate || isLoading || !areAllItemsAvailable
+            }
             onClick={handleBookOrder}
           >
             {!startDate || !endDate

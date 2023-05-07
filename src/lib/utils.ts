@@ -34,10 +34,11 @@ export const isEquipmentAvailable = (
     // Verificar si el stock es suficiente
     const stock = checkStock(equipment.owner!, equipment.quantity);
     if (!stock) {
+      console.log("aca");
       return false;
     }
 
-    let available = true;
+    let stockLeft = stock;
 
     // Verificar si el equipo está disponible para las fechas solicitadas
     for (const owner of equipment.owner!) {
@@ -46,11 +47,13 @@ export const isEquipmentAvailable = (
           dayjs(dates.startDate).isBefore(book.book?.end_date!, "day") &&
           dayjs(dates.endDate).isAfter(book.book?.start_date, "day")
         ) {
-          available = false;
+          console.log("BOOK.QUANTITY", book.quantity);
+          stockLeft -= book.quantity;
+          // available = false;
         }
       }
     }
-    return available;
+    return stockLeft - equipment.quantity <= 0 ? false : true;
   }
   return true;
 };
