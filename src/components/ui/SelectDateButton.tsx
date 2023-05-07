@@ -33,13 +33,15 @@ const SelectDateButton = () => {
   };
 
   const disableWeekend = ({ date }: { date: Date }) => {
-    if (session?.user.role.map((role) => role.name).includes(ROLES.ADMIN)) {
-      if (dayjs(date).day() !== 5 && dayjs().hour() > 19) {
-        return true;
-      }
+    if (dayjs(date).day() === 6 || dayjs(date).day() === 0) {
+      return true;
     }
 
-    if (dayjs(date).day() === 6 || dayjs(date).day() === 0) {
+    if (
+      session?.user.role.map((role) => role.name).includes(ROLES.ADMIN) &&
+      dayjs().day() === 5 &&
+      dayjs().hour() < 19
+    ) {
       return true;
     }
 
