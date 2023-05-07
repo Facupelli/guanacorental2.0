@@ -147,30 +147,33 @@ const OrderRow = ({ order }: { order: OrderRowProps }) => {
 
   return (
     <>
-      <tr key={order.id} className="text-sm">
-        <td className="py-4">{order.number}</td>
-        <td className="py-4">{order.customer.name}</td>
-        <td className="py-4">{order.customer.address?.phone}</td>
-        <td className="py-4">
+      <tr
+        key={order.id}
+        className="border-t border-app-bg text-sm first:border-none"
+      >
+        <td className="py-5">{order.number}</td>
+        <td className="py-5">{order.customer.name}</td>
+        <td className="py-5">{order.customer.address?.phone}</td>
+        <td className="py-5">
           {new Date(order.book.start_date).toLocaleDateString()} -{" "}
           {order.book.pickup_hour}hs
         </td>
-        <td className="py-4">
+        <td className="py-5">
           {new Date(order.book.end_date).toLocaleDateString()}
         </td>
-        <td className="py-4 text-xs font-bold">
+        <td className="py-5 text-xs font-bold">
           <span className={statusClass[order.status]}>
             {order.status ?? "-"}
           </span>
         </td>
-        <td className="py-4">{formatPrice(order.total)}</td>
-        <td className="py-4">
+        <td className="py-5">{formatPrice(order.total)}</td>
+        <td className="py-5">
           <Button className="h-5 text-xs" size="sm">
             Generar
           </Button>
         </td>
-        <td className="py-4">{order.location.name}</td>
-        <td className="py-4">
+        <td className="py-5">{order.location.name}</td>
+        <td className="py-5">
           <Button
             variant="ghost"
             className="h-6 p-2"
