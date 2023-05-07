@@ -14,6 +14,37 @@ type WherePipe = {
 };
 
 export const equipmentRouter = createTRPCRouter({
+  putEquipment: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        brand: z.string(),
+        model: z.string(),
+        image: z.string(),
+        price: z.number(),
+        equipmentId: z.string(),
+        available: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { name, brand, model, image, price, equipmentId, available } =
+        input;
+
+      await prisma.equipment.update({
+        where: { id: equipmentId },
+        data: {
+          price,
+          image,
+          name,
+          brand,
+          model,
+          available: available === "on" ? true : false,
+        },
+      });
+
+      return { message: "success" };
+    }),
+
   createEquipmentOnOwner: protectedProcedure
     .input(
       z.object({

@@ -123,6 +123,16 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   );
 };
 
+type EquipmentForm = {
+  name: string;
+  brand: string;
+  model: string;
+  image: string;
+  price: number;
+  equipmentId: string;
+  available: string;
+};
+
 const EquipmentRow = ({
   equipment,
   owners,
@@ -132,12 +142,25 @@ const EquipmentRow = ({
   owners: Owner[];
   locations: Location[];
 }) => {
-  const { register, getValues } = useForm<Equipment>();
+  const { register, getValues } = useForm<EquipmentForm>();
+  const ctx = api.useContext();
+
+  const { mutate, isLoading } = api.equipment.putEquipment.useMutation();
 
   const handleUpdate = () => {
     const data = getValues();
 
-    console.log(data);
+    mutate(
+      { ...data, equipmentId: equipment.id },
+      {
+        onSuccess: () => {
+          void ctx.equipment.adminGetEquipment.invalidate();
+        },
+        onError: (err) => {
+          console.log(err.message);
+        },
+      }
+    );
   };
 
   return (
@@ -182,7 +205,7 @@ const EquipmentRow = ({
             type="text"
             defaultValue={equipment.price}
             className="h-6"
-            {...register("price")}
+            {...register("price", { valueAsNumber: true })}
           />
           <Input
             type="text"
@@ -215,6 +238,7 @@ const EquipmentRow = ({
           title="actualizar"
           type="button"
           onClick={handleUpdate}
+          disabled={isLoading}
         >
           <RotateCw className="h-4 w-4" />
         </Button>
