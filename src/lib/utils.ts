@@ -34,7 +34,6 @@ export const isEquipmentAvailable = (
     // Verificar si el stock es suficiente
     const stock = checkStock(equipment.owner!, equipment.quantity);
     if (!stock) {
-      console.log("aca");
       return false;
     }
 
@@ -52,7 +51,6 @@ export const isEquipmentAvailable = (
         }
       }
     }
-    console.log("ACA", stockLeft, equipment.quantity);
     return stockLeft - equipment.quantity < 0 ? false : true;
   }
   return true;
@@ -66,7 +64,6 @@ export const handleLocationChange = (
   const locationId = e.split("-")[0];
   const locationName = e.split("-")[1];
 
-  console.log(locationId, locationName);
   if (locationId && locationName) {
     setLocation({ locationId, locationName });
     localStorage.setItem(

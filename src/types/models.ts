@@ -64,3 +64,30 @@ export type BookOnEquipment = {
   quantity: number;
   created_at: Date;
 };
+
+export type Order = {
+  id: string;
+  number: number;
+  // customer:User;
+  customerId: string;
+  book: Book;
+  bookId: string;
+  location: Location;
+  locationId: String;
+  equipments: EquipmentOnOwner[];
+  status: String;
+  earnings: Earning[];
+  subtotal: number;
+  total: number;
+  message?: string;
+
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Earning = {
+  id: string;
+  total: number;
+  order: Order;
+  orderId: string;
+};

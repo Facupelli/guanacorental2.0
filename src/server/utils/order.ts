@@ -1,3 +1,6 @@
+import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { Prisma } from "@prisma/client";
+
 type CartItem = {
   id?: string;
   quantity: number;
@@ -41,4 +44,75 @@ export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   }
 
   return result;
+};
+
+type NewOrder = Prisma.OrderGetPayload<{
+  include: {
+    book: true;
+    equipments: {
+      include: { books: true; owner: true; equipment: true };
+    };
+  };
+}>;
+
+type EquipmentOwner = Prisma.EquipmentOnOwnerGetPayload<{
+  include: {
+    books: true;
+    owner: true;
+    equipment: true;
+  };
+}>;
+
+export const calculateOwnerEarning = (
+  newOrder: NewOrder,
+  startDate: Date,
+  endDate: Date
+) => {
+  let federicoEarnings = 0;
+  let oscarEarnings = 0;
+  let subEarnings = 0;
+
+  const datesInRange = getDatesInRange(startDate, endDate);
+  if (newOrder.book.pickup_hour) {
+    const workingDays = getTotalWorkingDays(
+      datesInRange,
+      newOrder.book.pickup_hour
+    );
+
+    const equipmentOnOwners = newOrder.equipments.map(
+      (item: EquipmentOwner) => ({
+        ...item,
+        books: item.books?.filter((book) => book.bookId === newOrder.bookId),
+      })
+    );
+
+    for (let equipment of equipmentOnOwners) {
+      const equipmentPrice = equipment.equipment.price;
+      const ownerName = equipment.owner.name;
+      const quantity = equipment.books[0]?.quantity;
+
+      if (workingDays && quantity) {
+        const total = workingDays * equipmentPrice * quantity;
+
+        if (ownerName === "Federico") {
+          federicoEarnings += total;
+        } else if (ownerName === "Oscar") {
+          oscarEarnings += total;
+        } else if (ownerName === "Sub") {
+          subEarnings += total * 0.7;
+          federicoEarnings += total * 0.15;
+          oscarEarnings += total * 0.15;
+        } else {
+          federicoEarnings += total / 2;
+          oscarEarnings += total / 2;
+        }
+      }
+    }
+
+    return {
+      oscarEarnings,
+      federicoEarnings,
+      subEarnings,
+    };
+  }
 };

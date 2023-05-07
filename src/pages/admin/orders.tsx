@@ -75,6 +75,8 @@ const AdminOrders: NextPage = () => {
     [STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
   };
 
+  console.log(data.orders);
+
   return (
     <>
       <Head>

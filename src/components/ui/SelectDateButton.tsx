@@ -55,7 +55,7 @@ const SelectDateButton = () => {
   };
 
   return (
-    <Dialog onOpenChange={() => console.log("change")}>
+    <Dialog>
       <DialogTrigger asChild>
         <Button size="sm">
           <CalendarDays className="mr-2 h-4 w-4" /> Seleccionar Fecha

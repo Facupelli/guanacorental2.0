@@ -263,8 +263,6 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
     if (cartItems.length === 0) openCartModal();
   };
 
-  console.log(equipment);
-
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
   return (

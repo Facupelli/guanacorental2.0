@@ -3,11 +3,15 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
-import { getEquipmentOnOwnerIds } from "@/server/utils/order";
+import {
+  calculateOwnerEarning,
+  getEquipmentOnOwnerIds,
+} from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
-import { Prisma } from "@prisma/client";
-import { Equipment } from "@/types/models";
+import { Prisma, EquipmentOnOwner } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
+import { getTotalWorkingDays } from "@/lib/dates";
+import { getDatesInRange } from "@/lib/dates";
 
 type SortPipe = {
   // created_at?: string;
@@ -31,6 +35,10 @@ type Query = {
     };
     location: boolean;
     book: boolean;
+    equipments: {
+      include: { books: boolean };
+    };
+    earnings: boolean;
   };
 };
 
@@ -56,6 +64,10 @@ export const orderRouter = createTRPCRouter({
           },
           location: true,
           book: true,
+          equipments: {
+            include: { books: true },
+          },
+          earnings: true,
         },
       };
 
@@ -153,7 +165,7 @@ export const orderRouter = createTRPCRouter({
 
         return {
           ...equipment,
-          quanitty: item.quantity,
+          quantity: item.quantity,
         };
       });
 
@@ -220,8 +232,10 @@ export const orderRouter = createTRPCRouter({
       }));
 
       //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
+      let newOrder;
+
       try {
-        const newOrder = await prisma.order.create({
+        newOrder = await prisma.order.create({
           data: {
             customer: { connect: { id: customerId } },
             equipments: { connect: equipmentsIds },
@@ -232,9 +246,13 @@ export const orderRouter = createTRPCRouter({
             message,
             status: STATUS.PENDING,
           },
+          include: {
+            book: true,
+            equipments: {
+              include: { books: true, owner: true, equipment: true },
+            },
+          },
         });
-
-        return newOrder;
       } catch (err) {
         await prisma.bookOnEquipment.deleteMany({
           where: {
@@ -251,5 +269,20 @@ export const orderRouter = createTRPCRouter({
           message: "Create Order failed, please try again later",
         });
       }
+
+      //CALCULATE AND CREATE EARNINGS FOR EACH OWNER
+
+      const earnings = calculateOwnerEarning(newOrder, startDate, endDate);
+
+      await prisma.earning.create({
+        data: {
+          oscar: earnings?.oscarEarnings ?? 0,
+          federico: earnings?.federicoEarnings ?? 0,
+          sub: earnings?.subEarnings ?? 0,
+          order: { connect: { id: newOrder.id } },
+        },
+      });
+
+      return { newOrder, earnings };
     }),
 });

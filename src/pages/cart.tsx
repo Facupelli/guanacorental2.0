@@ -84,7 +84,7 @@ const CartPage: NextPage = () => {
           cart,
         },
         {
-          onSuccess: () => {},
+          onSuccess: (data) => {},
           onError: (err) => {
             setErrorModal(true);
             setError(err.message);
