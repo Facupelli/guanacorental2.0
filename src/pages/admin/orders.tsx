@@ -49,16 +49,14 @@ const AdminOrders: NextPage = () => {
 
   const locations = api.location.getAllLocations.useQuery();
   const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
-  const { data } = api.order.getOrders.useQuery({
+  const { data, isLoading } = api.order.getOrders.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     location: location.id,
     sort,
   });
 
-  if (!data || !locations.data) return <div>404</div>;
-
-  const filteredOrers = data.orders.map((order) => ({
+  const filteredOrers = data?.orders.map((order) => ({
     ...order,
     equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
   }));
@@ -79,25 +77,44 @@ const AdminOrders: NextPage = () => {
           <div className="grid gap-6 pt-6">
             <div className="flex w-2/3 items-center gap-6 rounded-md bg-white p-4">
               <Label>Sucursal:</Label>
-              <SelectLocation
-                locations={locations.data}
-                placeholder="elegir"
-                defaultValue={`${location.id}-${location.name}`}
-                onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
-              >
-                <SelectItem value="all-all">Todos</SelectItem>
-              </SelectLocation>
+              {locations?.data && (
+                <SelectLocation
+                  locations={locations.data}
+                  placeholder="elegir"
+                  defaultValue={`${location.id}-${location.name}`}
+                  onValueChange={(e) =>
+                    handleAdminLocationChange(e, setLocation)
+                  }
+                >
+                  <SelectItem value="all-all">Todos</SelectItem>
+                </SelectLocation>
+              )}
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
               <SelectSortOrders setValue={setValue} />
             </div>
             <Table headTitles={columns}>
-              {filteredOrers.map((order) => (
-                <OrderRow key={order.id} order={order} />
-              ))}
+              {filteredOrers?.length === 0 ? (
+                <tr>
+                  <td colSpan={12} className="py-5">
+                    Actualmente no hay pedidos
+                  </td>
+                </tr>
+              ) : (
+                filteredOrers?.map((order) => (
+                  <OrderRow key={order.id} order={order} />
+                ))
+              )}
+              {isLoading && (
+                <tr>
+                  <td colSpan={12} className="py-5">
+                    Cargando...
+                  </td>
+                </tr>
+              )}
             </Table>
           </div>
           <Pagination
-            totalCount={data.totalCount}
+            totalCount={data?.totalCount ?? 0}
             currentPage={currentPage}
             pageSize={pageSize}
             onPageChange={(page) => setCurrentPage(page as number)}

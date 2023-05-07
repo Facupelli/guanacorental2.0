@@ -50,19 +50,19 @@ const Admin: NextPage = () => {
   const [orders, setOrders] = useState<Order[] | null>(null);
 
   const locations = api.location.getAllLocations.useQuery();
-  const { data } = api.order.getCalendarOrders.useQuery({
+  const { data, isLoading } = api.order.getCalendarOrders.useQuery({
     location: location.id,
   });
 
-  if (!data || !locations.data) return <div>404</div>;
-
   const handleClickDay = (day: Date) => {
-    const orders = data.filter(
-      (order) =>
-        dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
-        dayjs(order.book.end_date).isSame(dayjs(day), "day")
-    );
-    setOrders(orders);
+    if (data) {
+      const orders = data.filter(
+        (order) =>
+          dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
+          dayjs(order.book.end_date).isSame(dayjs(day), "day")
+      );
+      setOrders(orders);
+    }
   };
 
   return (
@@ -81,14 +81,18 @@ const Admin: NextPage = () => {
           <div className="grid gap-6 pt-6">
             <div className="col-span-12 flex w-1/3 items-center gap-2 rounded-md bg-white p-2">
               <Label>Sucursal:</Label>
-              <SelectLocation
-                locations={locations.data}
-                placeholder="elegir"
-                defaultValue={`${location.id}-${location.name}`}
-                onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
-              >
-                <SelectItem value="all-all">Todos</SelectItem>
-              </SelectLocation>
+              {locations?.data && (
+                <SelectLocation
+                  locations={locations.data}
+                  placeholder="elegir"
+                  defaultValue={`${location.id}-${location.name}`}
+                  onValueChange={(e) =>
+                    handleAdminLocationChange(e, setLocation)
+                  }
+                >
+                  <SelectItem value="all-all">Todos</SelectItem>
+                </SelectLocation>
+              )}
             </div>
             <div className="flex gap-6">
               <Calendar
@@ -99,7 +103,7 @@ const Admin: NextPage = () => {
                 defaultValue={new Date()}
                 tileClassName={({ date }: { date: Date }) => {
                   if (
-                    data.find(
+                    data?.find(
                       (order) =>
                         dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
                         data.find((order) =>
@@ -113,14 +117,14 @@ const Admin: NextPage = () => {
                     return "pickup-and-return";
                   }
                   if (
-                    data.find((order) =>
+                    data?.find((order) =>
                       dayjs(order.book.end_date).isSame(dayjs(date), "day")
                     )
                   ) {
                     return "return-day";
                   }
                   if (
-                    data.find((order) =>
+                    data?.find((order) =>
                       dayjs(order.book.start_date).isSame(dayjs(date), "day")
                     )
                   ) {
@@ -161,6 +165,13 @@ const Admin: NextPage = () => {
                   orders.map((order) => (
                     <OrderRow key={order.id} order={order} calendarView />
                   ))
+                )}
+                {isLoading && (
+                  <tr>
+                    <td className="py-5" colSpan={12}>
+                      Cargando...
+                    </td>
+                  </tr>
                 )}
               </Table>
             </div>

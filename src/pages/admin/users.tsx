@@ -30,13 +30,11 @@ const AdminUsers: NextPage = () => {
   const roleId = watch("roleId");
 
   const roles = api.role.getAllRoles.useQuery();
-  const { data } = api.user.getAllUsers.useQuery({
+  const { data, isLoading } = api.user.getAllUsers.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     roleId,
   });
-
-  if (!data || !roles.data) return <div>404</div>;
 
   const columns = [
     { title: "Alta" },
@@ -63,33 +61,50 @@ const AdminUsers: NextPage = () => {
           <div className="grid gap-6 pt-6">
             <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-2">
               <Label className="whitespace-nowrap">Rol del cliente</Label>
-              <SelectRole roles={roles.data} setValue={setValue} />
+              {roles.data && (
+                <SelectRole roles={roles.data} setValue={setValue} />
+              )}
             </div>
             <Table headTitles={columns}>
-              {data.users.map((user) => (
-                <tr key={user.id} className="text-sm">
-                  <td className="py-4 ">
-                    {user.address?.created_at &&
-                      new Date(user.address?.created_at).toLocaleDateString(
-                        "es-AR",
-                        {
-                          year: "numeric",
-                          day: "numeric",
-                          month: "short",
-                        }
-                      )}
+              {data?.users.length === 0 ? (
+                <tr>
+                  <td className="py-5" colSpan={12}>
+                    No hay usuarios
                   </td>
-                  <td className="py-4">{user.name}</td>
-                  <td className="py-4">{user.address?.phone}</td>
-                  <td className="py-4">{user.address?.dni_number}</td>
-                  <td className="py-4">{user.address?.province}</td>
-                  <td className="py-4">{user.orders.length}</td>
                 </tr>
-              ))}
+              ) : (
+                data?.users.map((user) => (
+                  <tr key={user.id} className="text-sm">
+                    <td className="py-4 ">
+                      {user.address?.created_at &&
+                        new Date(user.address?.created_at).toLocaleDateString(
+                          "es-AR",
+                          {
+                            year: "numeric",
+                            day: "numeric",
+                            month: "short",
+                          }
+                        )}
+                    </td>
+                    <td className="py-4">{user.name}</td>
+                    <td className="py-4">{user.address?.phone}</td>
+                    <td className="py-4">{user.address?.dni_number}</td>
+                    <td className="py-4">{user.address?.province}</td>
+                    <td className="py-4">{user.orders.length}</td>
+                  </tr>
+                ))
+              )}
+              {isLoading && (
+                <tr>
+                  <td className="py-5" colSpan={12}>
+                    Cargando...
+                  </td>
+                </tr>
+              )}
             </Table>
 
             <Pagination
-              totalCount={data.totalCount}
+              totalCount={data?.totalCount ?? 0}
               currentPage={currentPage}
               pageSize={pageSize}
               onPageChange={(page) => setCurrentPage(page as number)}

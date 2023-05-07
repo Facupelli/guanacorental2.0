@@ -73,13 +73,11 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
 
   const location = useBoundStore((state) => state.location);
 
-  const { data } = api.equipment.adminGetEquipment.useQuery({
+  const { data, isLoading } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     locationId: location.id,
   });
-
-  if (!data) return <div>404</div>;
 
   return (
     <>
@@ -118,10 +116,17 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                   </td>
                 </tr>
               ))}
+              {isLoading && (
+                <tr>
+                  <td className="py-5" colSpan={12}>
+                    Cargando...
+                  </td>
+                </tr>
+              )}
             </Table>
 
             <Pagination
-              totalCount={data.totalCount}
+              totalCount={data?.totalCount ?? 0}
               currentPage={currentPage}
               pageSize={pageSize}
               onPageChange={(page) => setCurrentPage(page as number)}

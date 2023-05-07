@@ -49,7 +49,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const toggleModal = useBoundStore((state) => state.setToggleModal);
   const setLocation = useBoundStore((state) => state.setLocation);
 
-  const { data, fetchNextPage, hasNextPage } =
+  const { data, fetchNextPage, hasNextPage, isLoading } =
     api.equipment.getAllEquipment.useInfiniteQuery(
       {
         sort,
@@ -68,8 +68,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   };
 
   const equipments = data?.pages.map((page) => page.equipments).flat();
-
-  if (!data) return <div>404</div>;
 
   return (
     <>
@@ -114,6 +112,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 <SelectOrder setSort={setSort} />
               </section>
               <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
+                {isLoading && <div>Cargando...</div>}
                 {equipments?.length === 0 ? (
                   <p>
                     No se encontraron equipos disponibles para esta sucursal{" "}
