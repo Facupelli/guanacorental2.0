@@ -225,7 +225,7 @@ const RightBar = ({
         )}
 
         <SelectDateButton />
-        <Button>Continuar Alquilando</Button>
+        <Button variant="secondary">Continuar Alquilando</Button>
 
         <textarea
           placeholder="Algo que nos quieras decir?"

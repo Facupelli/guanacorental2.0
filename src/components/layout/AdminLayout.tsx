@@ -62,7 +62,7 @@ const adminRoutes = [
 
 const AdminNav = () => {
   return (
-    <nav className="h-screen w-[180px] bg-brand-primary/90">
+    <nav className="h-screen w-[180px] bg-primary/90">
       <ul className="grid gap-2 p-4">
         {adminRoutes.map((route, i) => (
           <li key={i} className="">

@@ -19,7 +19,7 @@ const Nav = () => {
 
   return (
     <header>
-      <nav className="fixed z-30 w-full bg-brand-primary px-6 ">
+      <nav className="fixed z-30 w-full bg-primary px-6 ">
         <ul className="flex h-[70px] items-center gap-6">
           <li>
             <Link href="/">

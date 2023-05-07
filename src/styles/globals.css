@@ -4,10 +4,6 @@
 
 @layer base {
   :root {
-    --brand-primary: 60 3.4% 11.4%;
-
-    --brand-secondary: 22 73% 47%;
-
     --app-bg: 0 0% 92.9%;
 
     --background: 0 0% 100%;
@@ -25,11 +21,11 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 60 4% 11%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 30 40% 96%;
+    --secondary-foreground: 22 73% 47%;
 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
