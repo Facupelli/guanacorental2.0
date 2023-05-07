@@ -94,73 +94,12 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
           <div className="pt-6">
             <Table headTitles={tableTitles}>
               {data?.equipment.map((equipment) => (
-                <tr
+                <EquipmentRow
                   key={equipment.id}
-                  className="center border-b border-app-bg text-sm"
-                >
-                  <td className="py-4">
-                    {equipment.image && (
-                      <div className="relative h-14 w-14">
-                        <Image
-                          src={equipment.image}
-                          fill
-                          alt="equipment picture"
-                        />
-                      </div>
-                    )}
-                  </td>
-                  <td className="grid gap-1 py-4">
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="text"
-                        defaultValue={equipment.name}
-                        className="h-6"
-                      />
-                      <Input
-                        type="text"
-                        defaultValue={equipment.brand}
-                        className="h-6"
-                      />
-                    </div>
-                    <Input
-                      type="text"
-                      defaultValue={equipment.model}
-                      className="h-6"
-                    />
-                  </td>
-                  <td className="py-4">
-                    <div className="grid gap-1">
-                      <Input
-                        type="text"
-                        defaultValue={formatPrice(equipment.price)}
-                        className="h-6"
-                      />
-                      <Input
-                        type="text"
-                        defaultValue={equipment.image as string}
-                        className="h-6"
-                      />
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <div className="grid  gap-2 ">
-                      <OwnerLocationStockModal
-                        owners={owners}
-                        owner={equipment.owner}
-                        equipment={equipment}
-                        locations={locations}
-                      />
-                      <div className="flex h-6 items-center justify-center">
-                        <Switch defaultChecked={equipment.available} />
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <Button className="h-12 px-2" title="actualizar">
-                      <RotateCw className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
+                  equipment={equipment}
+                  owners={owners}
+                  locations={locations}
+                />
               ))}
               {isLoading && (
                 <tr>
@@ -184,10 +123,110 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   );
 };
 
+const EquipmentRow = ({
+  equipment,
+  owners,
+  locations,
+}: {
+  equipment: Equipment;
+  owners: Owner[];
+  locations: Location[];
+}) => {
+  const { register, getValues } = useForm<Equipment>();
+
+  const handleUpdate = () => {
+    const data = getValues();
+
+    console.log(data);
+  };
+
+  return (
+    <tr key={equipment.id} className="center border-b border-app-bg text-sm">
+      <td className="py- w-14">
+        {equipment.image && (
+          <div className="relative h-14 w-14">
+            <Image
+              src={equipment.image}
+              fill
+              style={{ objectFit: "cover" }}
+              alt="equipment picture"
+            />
+          </div>
+        )}
+      </td>
+      <td className="grid gap-1 py-4">
+        <div className="flex items-center gap-1">
+          <Input
+            type="text"
+            defaultValue={equipment.name}
+            className="h-6"
+            {...register("name")}
+          />
+          <Input
+            type="text"
+            defaultValue={equipment.brand}
+            className="h-6"
+            {...register("brand")}
+          />
+        </div>
+        <Input
+          type="text"
+          defaultValue={equipment.model}
+          className="h-6"
+          {...register("model")}
+        />
+      </td>
+      <td className="py-4">
+        <div className="grid gap-1">
+          <Input
+            type="text"
+            defaultValue={equipment.price}
+            className="h-6"
+            {...register("price")}
+          />
+          <Input
+            type="text"
+            defaultValue={equipment.image as string}
+            className="h-6"
+            {...register("image")}
+          />
+        </div>
+      </td>
+      <td className="py-4">
+        <div className="grid  gap-2 ">
+          <OwnerLocationStockModal
+            owners={owners}
+            owner={equipment.owner}
+            equipment={equipment}
+            locations={locations}
+          />
+          <div className="flex h-6 items-center justify-center">
+            <Switch
+              defaultChecked={equipment.available}
+              title="habilitado"
+              {...register("available")}
+            />
+          </div>
+        </div>
+      </td>
+      <td className="py-4">
+        <Button
+          className="h-12 px-2"
+          title="actualizar"
+          type="button"
+          onClick={handleUpdate}
+        >
+          <RotateCw className="h-4 w-4" />
+        </Button>
+      </td>
+    </tr>
+  );
+};
+
 type OwnerLocationStockProps = {
   equipment: Equipment;
   locations: Location[];
-  owner: EquipmentOnOwner[];
+  owner: EquipmentOnOwner[] | undefined;
   owners: Owner[];
 };
 
@@ -260,7 +299,7 @@ const OwnerLocationStockModal = ({
             <Label className="col-span-2">Stock</Label>
           </div>
           <div>
-            {owner.map((owner) => (
+            {owner?.map((owner) => (
               <div
                 key={owner.id}
                 className="grid grid-cols-7 items-center gap-2"
