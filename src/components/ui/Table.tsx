@@ -5,10 +5,6 @@ type HeadTitles = {
   width?: number;
 };
 
-type Data = {
-  [key: string]: any;
-};
-
 type Props = {
   headTitles: HeadTitles[];
   children: ReactNode;

@@ -10,12 +10,18 @@ export const SORT_TYPES = {
   ASC: "asc",
 };
 
-export const SCHEDULES = {
-  SAN_JUAN: {
+interface Schedules {
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+
+export const SCHEDULES: Schedules = {
+  "San Juan": {
     "09:00": "09:00",
     "20:00": "20:00",
   },
-  MENDOZA: {
+  Mendoza: {
     "09:00": "20:00",
     "20:30": "20:30",
   },

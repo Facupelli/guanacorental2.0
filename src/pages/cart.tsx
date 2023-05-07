@@ -207,9 +207,7 @@ const RightBar = ({
   return (
     <section className="col-span-4 rounded-md bg-white p-4">
       <div className="grid gap-6">
-        {!startDate || !endDate ? (
-          <SelectDateButton />
-        ) : (
+        {startDate && endDate && (
           <div className="grid w-full gap-2">
             <div className="flex w-full justify-between ">
               <p className="font-semibold">Retiro:</p>
@@ -225,6 +223,8 @@ const RightBar = ({
             </div>
           </div>
         )}
+
+        <SelectDateButton />
         <Button>Continuar Alquilando</Button>
 
         <textarea
@@ -247,7 +247,7 @@ const RightBar = ({
           <div className="flex items-center justify-between font-semibold">
             <p>Total:</p>
             {!startDate || !endDate ? (
-              <p className="flex justify-center">
+              <p className="flex justify-center text-red-400">
                 Selecciona una fecha para alquilar!
               </p>
             ) : (

@@ -10,20 +10,34 @@ import {
 import { SCHEDULES } from "@/lib/magic_strings";
 import type { Location } from "@/types/models";
 import { useBoundStore } from "@/zustand/store";
+import dayjs from "dayjs";
 
 const SelectPickupHour = () => {
   const setPickupHour = useBoundStore((state) => state.setPickupHour);
+  const startDate = useBoundStore((state) => state.startDate);
+  const location = useBoundStore((state) => state.location);
+
+  const disableHour = dayjs();
+
+  const schedules = Object.keys(SCHEDULES[location.name]!);
 
   return (
-    <Select onValueChange={(e) => setPickupHour(e)}>
+    <Select
+      onValueChange={(e) => setPickupHour(e)}
+      disabled={dayjs(startDate).day() !== 5 || !startDate}
+      defaultValue="09:00"
+    >
       <SelectTrigger>
         <SelectValue placeholder="seleccionar hora de retiro" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>horarios:</SelectLabel>
-          <SelectItem value="09:00">{SCHEDULES.SAN_JUAN["09:00"]}</SelectItem>
-          <SelectItem value="20:00">{SCHEDULES.SAN_JUAN["20:00"]}</SelectItem>
+          {schedules.map((hour) => (
+            <SelectItem value={hour} key={hour}>
+              {hour}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

@@ -31,14 +31,14 @@ export const getTotalWorkingDays = (dates: Date[], pickupHour: string) => {
       if (
         new Date(day).getTime() === new Date(datesToBook[0]).getTime() &&
         newDay === 5 &&
-        pickupHour === SCHEDULES.SAN_JUAN["09:00"]
+        pickupHour === SCHEDULES["San Juan"]!["09:00"]
       ) {
         weekDay += 0.5;
       } else if (
         new Date(day).getTime() === new Date(datesToBook[0]).getTime() &&
         newDay === 5 &&
-        (pickupHour === SCHEDULES.SAN_JUAN["20:00"] ||
-          pickupHour === SCHEDULES.MENDOZA["20:30"])
+        (pickupHour === SCHEDULES["San Juan"]!["20:00"] ||
+          pickupHour === SCHEDULES["Mendoza"]!["20:30"])
       ) {
         weekDay += 0;
       }
