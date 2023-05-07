@@ -246,13 +246,8 @@ const RightBar = ({
           </div>
           <div className="flex items-center justify-between font-semibold">
             <p>Total:</p>
-            {!startDate || !endDate ? (
-              <p className="flex justify-center text-red-400">
-                Selecciona una fecha para alquilar!
-              </p>
-            ) : (
-              <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
-            )}
+
+            <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
           </div>
         </div>
 
@@ -261,7 +256,9 @@ const RightBar = ({
             disabled={!startDate || !endDate || isLoading}
             onClick={handleBookOrder}
           >
-            Agendar Pedido
+            {!startDate || !endDate
+              ? "Selecciona una fecha para alquilar!"
+              : "Agendar Pedido"}
           </Button>
         </div>
       </div>
