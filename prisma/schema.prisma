@@ -118,11 +118,18 @@ model Category {
   equipments              Equipment[]
 }
 
+// model Schedule {
+//   id            String      @default(cuid()) @id
+//   hour          String
+//   locations     Location[]
+// }
+
 model Location {
   id            String      @default(cuid()) @id
   name          String
   equipments    EquipmentOnOwner[]
   orders        Order[]
+  // schedules     Schedule[]
 }
 
 model OrderStatus {

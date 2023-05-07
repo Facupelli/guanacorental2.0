@@ -171,7 +171,8 @@ const OwnerLocationStockModal = ({
     name: "owner",
   });
 
-  const { mutate } = api.equipment.createEquipmentOnOwner.useMutation();
+  const { mutate, isLoading } =
+    api.equipment.createEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: Form) => {
     const mutateData = {
@@ -260,7 +261,9 @@ const OwnerLocationStockModal = ({
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button type="submit">Actualizar</Button>
+            <Button type="submit" disabled={isLoading}>
+              Actualizar
+            </Button>
           </div>
         </form>
       </DialogContent>

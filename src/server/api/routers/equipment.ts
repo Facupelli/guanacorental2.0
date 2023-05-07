@@ -30,20 +30,23 @@ export const equipmentRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { owner } = input;
 
-      await prisma.$transaction(
-        owner.map((owner) => {
-          return prisma.equipmentOnOwner.create({
-            data: {
-              equipmentId: owner.equipmentId,
-              ownerId: owner.ownerId,
-              locationId: owner.locationId,
-              stock: owner.stock,
-            },
-          });
-        })
-      );
+      if (owner[0]) {
+        await prisma.$transaction(
+          owner.map((owner) => {
+            return prisma.equipmentOnOwner.create({
+              data: {
+                equipmentId: owner.equipmentId,
+                ownerId: owner.ownerId,
+                locationId: owner.locationId,
+                stock: owner.stock,
+              },
+            });
+          })
+        );
 
-      return { message: "success" };
+        return { message: "success" };
+      }
+      return { message: "owner missing" };
     }),
 
   adminGetEquipment: protectedProcedure
