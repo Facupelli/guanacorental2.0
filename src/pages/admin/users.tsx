@@ -6,9 +6,17 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { api } from "@/utils/api";
 import Table from "@/components/ui/Table";
 import { Users } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
+import { useState } from "react";
 
 const AdminUsers: NextPage = () => {
-  const { data } = api.user.getAllUsers.useQuery({ take: 10, skip: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const { data } = api.user.getAllUsers.useQuery({
+    take: pageSize,
+    skip: (currentPage - 1) * pageSize,
+  });
 
   if (!data) return <div>404</div>;
 
@@ -56,6 +64,13 @@ const AdminUsers: NextPage = () => {
                 </tr>
               ))}
             </Table>
+
+            <Pagination
+              totalCount={data.totalCount}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={(page) => setCurrentPage(page as number)}
+            />
           </div>
         </AdminLayout>
       </main>

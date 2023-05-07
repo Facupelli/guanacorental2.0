@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { UseFormSetValue, useForm } from "react-hook-form";
+import Pagination from "@/components/ui/Pagination";
+import { useState } from "react";
 
 interface StatusStyles {
   [status: string]: string;
@@ -40,6 +42,9 @@ const columns = [
 ];
 
 const AdminOrders: NextPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   const { setValue, watch } = useForm<{ sort: string }>();
 
   const setLocation = useBoundStore((state) => state.setLocation);
@@ -48,8 +53,8 @@ const AdminOrders: NextPage = () => {
   const locations = api.location.getAllLocations.useQuery();
   const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
   const { data } = api.order.getOrders.useQuery({
-    take: 10,
-    skip: 0,
+    take: pageSize,
+    skip: (currentPage - 1) * pageSize,
     location: location.id,
     sort,
   });
@@ -131,6 +136,12 @@ const AdminOrders: NextPage = () => {
               ))}
             </Table>
           </div>
+          <Pagination
+            totalCount={data.totalCount}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            onPageChange={(page) => setCurrentPage(page as number)}
+          />
         </AdminLayout>
       </main>
     </>
