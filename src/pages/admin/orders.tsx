@@ -24,6 +24,8 @@ import { Label } from "@/components/ui/label";
 import { UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
 import { useState } from "react";
+import { getOrderEquipmentOnOwners } from "@/server/utils/order";
+import { Prisma } from "@prisma/client";
 
 interface StatusStyles {
   [status: string]: string;
@@ -69,13 +71,10 @@ const AdminOrders: NextPage = () => {
 
   if (!data || !locations.data) return <div>404</div>;
 
-  const statusClass: StatusStyles = {
-    [STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
-    [STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
-    [STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
-  };
-
-  console.log(data.orders);
+  const filteredOrers = data.orders.map((order) => ({
+    ...order,
+    equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
+  }));
 
   return (
     <>
@@ -105,36 +104,8 @@ const AdminOrders: NextPage = () => {
               <SelectSortOrders setValue={setValue} />
             </div>
             <Table headTitles={columns}>
-              {data.orders.map((order) => (
-                <tr key={order.id} className="text-sm">
-                  <td className="py-4">{order.number}</td>
-                  <td className="py-4">{order.customer.name}</td>
-                  <td className="py-4">{order.customer.address?.phone}</td>
-                  <td className="py-4">
-                    {new Date(order.book.start_date).toLocaleDateString()} -{" "}
-                    {order.book.pickup_hour}hs
-                  </td>
-                  <td className="py-4">
-                    {new Date(order.book.end_date).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 text-xs font-bold">
-                    <span className={statusClass[order.status]}>
-                      {order.status ?? "-"}
-                    </span>
-                  </td>
-                  <td className="py-4">{formatPrice(order.total)}</td>
-                  <td className="py-4">
-                    <Button className="h-5 text-xs" size="sm">
-                      Generar
-                    </Button>
-                  </td>
-                  <td className="py-4">{order.location.name}</td>
-                  <td className="py-4">
-                    <Button variant="ghost" className="h-6 p-2" size="sm">
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
+              {filteredOrers.map((order) => (
+                <OrderRow key={order.id} order={order} />
               ))}
             </Table>
           </div>
@@ -146,6 +117,90 @@ const AdminOrders: NextPage = () => {
           />
         </AdminLayout>
       </main>
+    </>
+  );
+};
+
+type OrderRowProps = Prisma.OrderGetPayload<{
+  include: {
+    book: true;
+    equipments: {
+      include: { books: true; owner: true; equipment: true };
+    };
+    customer: {
+      include: {
+        address: true;
+      };
+    };
+    location: true;
+  };
+}>;
+
+const OrderRow = ({ order }: { order: OrderRowProps }) => {
+  const [showMore, setShowMore] = useState(false);
+
+  const statusClass: StatusStyles = {
+    [STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
+    [STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
+    [STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+  };
+
+  return (
+    <>
+      <tr key={order.id} className="text-sm">
+        <td className="py-4">{order.number}</td>
+        <td className="py-4">{order.customer.name}</td>
+        <td className="py-4">{order.customer.address?.phone}</td>
+        <td className="py-4">
+          {new Date(order.book.start_date).toLocaleDateString()} -{" "}
+          {order.book.pickup_hour}hs
+        </td>
+        <td className="py-4">
+          {new Date(order.book.end_date).toLocaleDateString()}
+        </td>
+        <td className="py-4 text-xs font-bold">
+          <span className={statusClass[order.status]}>
+            {order.status ?? "-"}
+          </span>
+        </td>
+        <td className="py-4">{formatPrice(order.total)}</td>
+        <td className="py-4">
+          <Button className="h-5 text-xs" size="sm">
+            Generar
+          </Button>
+        </td>
+        <td className="py-4">{order.location.name}</td>
+        <td className="py-4">
+          <Button
+            variant="ghost"
+            className="h-6 p-2"
+            size="sm"
+            onClick={() => setShowMore((prev) => !prev)}
+          >
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </td>
+      </tr>
+      {showMore &&
+        order.equipments.map((ownerEquipment) => (
+          <tr key={ownerEquipment.id} className="text-sm">
+            <td colSpan={3} className=" gap-1 py-1">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold">{ownerEquipment.equipment.name}</p>
+                <p className="font-semibold">
+                  {ownerEquipment.equipment.brand}
+                </p>
+                <p>{ownerEquipment.equipment.model}</p>
+              </div>
+            </td>
+            <td className="py-1">
+              x
+              {ownerEquipment.books.reduce((acc, curr) => {
+                return acc + curr.quantity;
+              }, 0)}
+            </td>
+          </tr>
+        ))}
     </>
   );
 };

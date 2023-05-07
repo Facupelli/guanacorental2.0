@@ -8,10 +8,8 @@ import {
   getEquipmentOnOwnerIds,
 } from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
-import { Prisma, EquipmentOnOwner } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
-import { getTotalWorkingDays } from "@/lib/dates";
-import { getDatesInRange } from "@/lib/dates";
 
 type SortPipe = {
   // created_at?: string;
@@ -36,7 +34,7 @@ type Query = {
     location: boolean;
     book: boolean;
     equipments: {
-      include: { books: boolean };
+      include: { books: boolean; equipment: true; owner: true };
     };
     earnings: boolean;
   };
@@ -65,7 +63,7 @@ export const orderRouter = createTRPCRouter({
           location: true,
           book: true,
           equipments: {
-            include: { books: true },
+            include: { books: true, equipment: true, owner: true },
           },
           earnings: true,
         },

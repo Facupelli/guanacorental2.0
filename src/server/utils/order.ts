@@ -63,6 +63,17 @@ type EquipmentOwner = Prisma.EquipmentOnOwnerGetPayload<{
   };
 }>;
 
+export const getOrderEquipmentOnOwners = (
+  equipments: EquipmentOwner[],
+  bookId: string
+) => {
+  const equipmentOnOwners = equipments.map((item: EquipmentOwner) => ({
+    ...item,
+    books: item.books?.filter((book) => book.bookId === bookId),
+  }));
+  return equipmentOnOwners;
+};
+
 export const calculateOwnerEarning = (
   newOrder: NewOrder,
   startDate: Date,
@@ -79,11 +90,9 @@ export const calculateOwnerEarning = (
       newOrder.book.pickup_hour
     );
 
-    const equipmentOnOwners = newOrder.equipments.map(
-      (item: EquipmentOwner) => ({
-        ...item,
-        books: item.books?.filter((book) => book.bookId === newOrder.bookId),
-      })
+    const equipmentOnOwners = getOrderEquipmentOnOwners(
+      newOrder.equipments,
+      newOrder.bookId
     );
 
     for (let equipment of equipmentOnOwners) {
