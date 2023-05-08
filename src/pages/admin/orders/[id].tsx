@@ -1,7 +1,9 @@
 import superjason from "superjson";
+import { useForm } from "react-hook-form";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -11,18 +13,19 @@ import Head from "next/head";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
+import { Button } from "@/components/ui/button";
+import DialogWithState from "@/components/DialogWithState";
+import { Input } from "@/components/ui/input";
+import { DialogFooter } from "@/components/ui/dialog";
+import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
 
+import useDebounce from "@/hooks/useDebounce";
+
 import { type Prisma, type Role } from "@prisma/client";
-import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import DialogWithState from "@/components/DialogWithState";
-import { Input } from "@/components/ui/input";
-import { DialogFooter } from "@/components/ui/dialog";
 
 type Props = {
   user: {
@@ -73,7 +76,12 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
                 }}
               />
 
-              <EquipmentsBooked equipments={order.equipments} />
+              <EquipmentsBooked
+                equipments={order.equipments}
+                orderLocation={order.locationId}
+                bookId={order.bookId}
+                orderId={order.id}
+              />
 
               <OrderInfo
                 info={{
@@ -149,17 +157,35 @@ const CustomerInfo = ({ order, customer }: CustomerInfo) => {
   );
 };
 
-type Equipment = Prisma.EquipmentOnOwnerGetPayload<{
+type EquipmentOwner = Prisma.EquipmentOnOwnerGetPayload<{
   include: { books: true; equipment: true; owner: true };
 }>;
 
 type EquipmentsBookedProps = {
-  equipments: Equipment[];
+  equipments: EquipmentOwner[];
+  orderLocation: string;
+  bookId: string;
+  orderId: string;
 };
 
-const EquipmentsBooked = ({ equipments }: EquipmentsBookedProps) => {
+const EquipmentsBooked = ({
+  equipments,
+  orderLocation,
+  bookId,
+  orderId,
+}: EquipmentsBookedProps) => {
   const [editMode, setEditMode] = useState(false);
   const [addEquipment, setAddEquipment] = useState(false);
+
+  const { register, watch } = useForm<{ search: string }>();
+
+  const search = useDebounce(watch("search"), 500);
+
+  const { data } = api.equipment.getAllEquipment.useQuery({
+    limit: 5,
+    search,
+    location: orderLocation,
+  });
 
   return (
     <>
@@ -168,10 +194,33 @@ const EquipmentsBooked = ({ equipments }: EquipmentsBookedProps) => {
         setOpen={setAddEquipment}
         title="Argegar equipo al pedido"
       >
-        <Input placeholder="buscar equipo" type="search" />
+        <Input
+          placeholder="buscar equipo"
+          type="search"
+          {...register("search")}
+        />
 
-        <DialogFooter>
-          <Button size="sm">Agregar</Button>
+        <div className="grid gap-2">
+          {data?.equipments.map((equipment) => (
+            <AddEquipment
+              key={equipment.id}
+              equipment={equipment}
+              bookId={bookId}
+              orderId={orderId}
+            />
+          ))}
+        </div>
+
+        <DialogFooter className="pt-4">
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditMode(false);
+              setAddEquipment(false);
+            }}
+          >
+            Aceptar
+          </Button>
         </DialogFooter>
       </DialogWithState>
 
@@ -243,6 +292,67 @@ const EquipmentsBooked = ({ equipments }: EquipmentsBookedProps) => {
         )}
       </section>
     </>
+  );
+};
+
+type Equipment = Prisma.EquipmentGetPayload<{
+  include: {
+    owner: {
+      include: {
+        owner: true;
+        location: true;
+        books: { include: { book: true } };
+      };
+    };
+  };
+}>;
+
+type AddEquipmentProps = {
+  equipment: Equipment;
+  bookId: string;
+  orderId: string;
+};
+
+const AddEquipment = ({ equipment, bookId, orderId }: AddEquipmentProps) => {
+  const { register, getValues } = useForm<{ quantity: number }>();
+
+  const { mutate } = api.order.addEquipmentToOrder.useMutation();
+
+  const handleAddEquipment = () => {
+    const data = getValues();
+
+    const cart = {
+      id: equipment.id,
+      quantity: data.quantity,
+      price: equipment.price,
+      owner: equipment.owner?.map((owner) => ({
+        id: owner.id,
+        ownerId: owner.ownerId,
+        onwerName: owner.owner?.name,
+        stock: owner.stock,
+        locationId: owner.locationId,
+      })),
+    };
+
+    mutate({
+      bookId,
+      orderId,
+      cart: [cart],
+    });
+  };
+
+  return (
+    <div key={equipment.id} className="flex items-center gap-4">
+      <p>
+        {equipment.name} {equipment.brand} {equipment.model}
+      </p>
+      <Input
+        type="text"
+        className="ml-auto w-[40px]"
+        {...register("quantity", { valueAsNumber: true })}
+      />
+      <Plus className="h-4 w-4 cursor-pointer" onClick={handleAddEquipment} />
+    </div>
   );
 };
 

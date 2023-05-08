@@ -12,7 +12,7 @@ import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
 
 type Query = {
-  orderBy?: Prisma.OrderOrderByWithRelationInput;
+  orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
   where?: {
     locationId?: string;
   };
@@ -34,6 +34,134 @@ type Query = {
 };
 
 export const orderRouter = createTRPCRouter({
+  addEquipmentToOrder: protectedProcedure
+    .input(
+      z.object({
+        bookId: z.string(),
+        orderId: z.string(),
+        cart: z.array(
+          z.object({
+            id: z.string(),
+            quantity: z.number(),
+            price: z.number(),
+            owner: z
+              .array(
+                z.object({
+                  id: z.string(),
+                  ownerId: z.string(),
+                  ownerName: z.string().optional(),
+                  stock: z.number(),
+                  locationId: z.string(),
+                })
+              )
+              .optional(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { orderId, cart, bookId } = input;
+
+      const equipmentIds = cart.map((item) => item.id);
+
+      //GET UPDATED CART WITH MOST RECENT BOOKS
+      const equipments = await prisma.equipment.findMany({
+        where: { id: { in: equipmentIds } },
+        include: {
+          owner: {
+            include: {
+              owner: true,
+              location: true,
+              books: { include: { book: true } },
+            },
+          },
+        },
+      });
+
+      const updatedCart = cart.map((item) => {
+        const equipment = equipments.find(
+          (equipment) => equipment.id === item.id
+        );
+
+        if (!equipment) {
+          throw new Error("Equipment id not found");
+        }
+
+        return {
+          ...equipment,
+          quantity: item.quantity,
+        };
+      });
+
+      //CHECK ALL EQUIPMENT AVAILABILITY
+      const book = await prisma.book.findUnique({ where: { id: bookId } });
+
+      if (!book) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order book not found",
+        });
+      }
+
+      if (
+        !updatedCart.every((item) =>
+          isEquipmentAvailable(item, {
+            startDate: book.start_date,
+            endDate: book.end_date,
+          })
+        )
+      ) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Some equipment is not available",
+        });
+      }
+
+      //CHOOSE THE EQUIPMENT TO BOOK
+
+      const equipmentOnOwnerIds = updatedCart
+        .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
+        .flat();
+
+      //CREATE BOOK TO THOSE EQUIPMENTS
+      try {
+        await prisma.$transaction(
+          equipmentOnOwnerIds.map((item) =>
+            prisma.bookOnEquipment.create({
+              data: {
+                book: { connect: { id: bookId } },
+                equipment: { connect: { id: item.id } },
+                quantity: item.quantity,
+              },
+            })
+          )
+        );
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Create BookOnEquipment failed",
+        });
+      }
+
+      const equipmentsIds = equipmentOnOwnerIds.map((item) => ({
+        id: item.id,
+      }));
+
+      //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
+      let newOrder;
+
+      //CAMBIAR EL TOTAL
+
+      newOrder = await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          equipments: { connect: equipmentsIds },
+        },
+      });
+
+      return newOrder;
+    }),
+
   getOrderById: protectedProcedure
     .input(z.object({ orderId: z.string() }))
     .query(async ({ input }) => {
