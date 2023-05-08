@@ -3,6 +3,18 @@ import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
 
+export const orderTableColumns = [
+  { title: "N°" },
+  { title: "Nombre" },
+  { title: "Celular" },
+  { title: "Retiro" },
+  { title: "Devolución" },
+  { title: "Estado" },
+  { title: "Total" },
+  { title: "Remito" },
+  { title: "Sucursal" },
+];
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

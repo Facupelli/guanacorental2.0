@@ -1,4 +1,5 @@
 import { type UseFormSetValue, useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import { useState } from "react";
 
@@ -22,7 +23,17 @@ import { api } from "@/utils/api";
 import { type Role } from "@prisma/client";
 import { type NextPage } from "next";
 
+const columns = [
+  { title: "Alta" },
+  { title: "Nombre" },
+  { title: "Teléfono" },
+  { title: "DNI" },
+  { title: "Provincia" },
+  { title: "Pedidos" },
+];
+
 const AdminUsers: NextPage = () => {
+  const router = useRouter();
   const { watch, setValue } = useForm<{ roleId: string }>();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -36,14 +47,9 @@ const AdminUsers: NextPage = () => {
     roleId,
   });
 
-  const columns = [
-    { title: "Alta" },
-    { title: "Nombre" },
-    { title: "Teléfono" },
-    { title: "DNI" },
-    { title: "Provincia" },
-    { title: "Pedidos" },
-  ];
+  const handleClickUser = (userId: string) => {
+    void router.push(`/admin/users/${userId}`);
+  };
 
   return (
     <>
@@ -59,7 +65,7 @@ const AdminUsers: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
           <div className="grid gap-6 pt-6">
-            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-2">
+            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
               <Label className="whitespace-nowrap">Rol del cliente</Label>
               {roles.data && (
                 <SelectRole roles={roles.data} setValue={setValue} />
@@ -74,7 +80,11 @@ const AdminUsers: NextPage = () => {
                 </tr>
               ) : (
                 data?.users.map((user) => (
-                  <tr key={user.id} className="text-sm">
+                  <tr
+                    key={user.id}
+                    className="cursor-pointer text-sm"
+                    onClick={() => handleClickUser(user.id)}
+                  >
                     <td className="py-4 ">
                       {user.address?.created_at &&
                         new Date(user.address?.created_at).toLocaleDateString(

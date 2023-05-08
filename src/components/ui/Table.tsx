@@ -17,7 +17,7 @@ const Table = ({ headTitles, children }: Props) => {
         <thead>
           <tr className="border-b border-gray-300 text-sm">
             {headTitles.map((head) => (
-              <th key={head.title} className="pb-2 text-left font-bold">
+              <th key={head.title} className="pb-2 text-left font-bold ">
                 {head.title}
               </th>
             ))}

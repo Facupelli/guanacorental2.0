@@ -21,22 +21,10 @@ import OrderRow from "@/components/OrderRow";
 
 import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { handleAdminLocationChange } from "@/lib/utils";
+import { handleAdminLocationChange, orderTableColumns } from "@/lib/utils";
 import { api } from "@/utils/api";
 
 import { type NextPage } from "next";
-
-const columns = [
-  { title: "N°" },
-  { title: "Nombre" },
-  { title: "Celular" },
-  { title: "Retiro" },
-  { title: "Devolución" },
-  { title: "Estado" },
-  { title: "Total" },
-  { title: "Remito" },
-  { title: "Sucursal" },
-];
 
 const AdminOrders: NextPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,7 +80,7 @@ const AdminOrders: NextPage = () => {
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
               <SelectSortOrders setValue={setValue} />
             </div>
-            <Table headTitles={columns}>
+            <Table headTitles={orderTableColumns}>
               {filteredOrers?.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="py-5">

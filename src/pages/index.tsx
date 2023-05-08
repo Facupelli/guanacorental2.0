@@ -4,6 +4,8 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
 import { prisma } from "@/server/db";
 import Head from "next/head";
+import Image from "next/image";
+
 import { useBoundStore } from "@/zustand/store";
 import { type Dispatch, type SetStateAction, useState } from "react";
 
@@ -24,7 +26,7 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { Label } from "@/components/ui/label";
 import DialogWithState from "@/components/DialogWithState";
-import { ShoppingCart } from "lucide-react";
+import { SearchIcon, ShoppingCart } from "lucide-react";
 
 import { api } from "@/utils/api";
 import {
@@ -108,7 +110,16 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
             />
             <div className="col-span-9 flex flex-col gap-4">
               <section className="flex gap-4 rounded-sm bg-white p-4 shadow-sm">
-                <Input type="search" placeholder="Buscar equipos" />
+                <div className="flex w-full items-center">
+                  <Input
+                    type="search"
+                    placeholder="Buscar equipos por nombre, marca o modelo"
+                    className="rounded-br-none rounded-tr-none"
+                  />
+                  <div className="h-10 rounded-br-md rounded-tr-md bg-primary px-3">
+                    <SearchIcon className="h-10 w-6 text-primary-foreground" />
+                  </div>
+                </div>
                 <SelectOrder setSort={setSort} />
               </section>
               <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
@@ -266,14 +277,16 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
 
   return (
     <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
-      {/* <div className="relative h-[200px] w-auto">
-        <Image
-          src={equipment.image}
-          alt={`${equipment.name} ${equipment.brand} equipment picture`}
-          fill
-          style={{ objectFit: "contain" }}
-        />
-      </div> */}
+      {equipment.image && (
+        <div className="relative h-[200px] w-auto">
+          <Image
+            src={equipment.image}
+            alt={`${equipment.name} ${equipment.brand} equipment picture`}
+            fill
+            style={{ objectFit: "contain" }}
+          />
+        </div>
+      )}
 
       <div>
         <p className="font-bold">

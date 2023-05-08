@@ -2,8 +2,69 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { validationAddress } from "@/lib/validation";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
+  editUser: protectedProcedure
+    .input(z.object({ userId: z.string(), name: z.string() }))
+    .mutation(async ({ input }) => {
+      const { userId, name } = input;
+
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          name,
+        },
+      });
+
+      return { message: "success" };
+    }),
+
+  getUserById: protectedProcedure
+    .input(z.object({ userId: z.string(), take: z.number(), skip: z.number() }))
+    .query(async ({ input }) => {
+      const { userId, take, skip } = input;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          orders: {
+            take,
+            skip,
+            include: {
+              book: true,
+              equipments: {
+                include: { books: true, owner: true, equipment: true },
+              },
+              customer: {
+                include: {
+                  address: true,
+                },
+              },
+              location: true,
+            },
+          },
+          address: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User not found",
+        });
+      }
+      const totalUserOrders = await prisma.order.count({
+        where: {
+          customerId: user.id,
+        },
+      });
+
+      return { user, totalUserOrders };
+    }),
+
   getAllUsers: protectedProcedure
     .input(
       z.object({
