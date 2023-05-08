@@ -10,6 +10,7 @@ import {
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
+import { updateEarnings } from "@/server/utils/updateOrder";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -89,37 +90,9 @@ export const orderRouter = createTRPCRouter({
         },
       });
 
-      const earnings = calculateOwnerEarning(
-        newOrder,
-        newOrder.book.start_date,
-        newOrder.book.end_date
-      );
+      await updateEarnings(newOrder, orderId, earningId);
 
-      await prisma.earning.update({
-        where: { id: earningId },
-        data: {
-          oscar: earnings?.oscarEarnings ?? 0,
-          federico: earnings?.federicoEarnings ?? 0,
-          sub: earnings?.subEarnings ?? 0,
-          order: { connect: { id: newOrder.id } },
-        },
-      });
-
-      await prisma.order.update({
-        where: { id: orderId },
-        data: {
-          subtotal:
-            (earnings?.federicoEarnings ?? 0) +
-            (earnings?.oscarEarnings ?? 0) +
-            (earnings?.subEarnings ?? 0),
-          total:
-            (earnings?.federicoEarnings ?? 0) +
-            (earnings?.oscarEarnings ?? 0) +
-            (earnings?.subEarnings ?? 0),
-        },
-      });
-
-      return { message: "success", bookOnEquipment, bookId, ownerEquipment };
+      return { message: "success" };
     }),
 
   addEquipmentToOrder: protectedProcedure
@@ -237,35 +210,7 @@ export const orderRouter = createTRPCRouter({
 
       //CAMBIAR EL TOTAL
 
-      const earnings = calculateOwnerEarning(
-        newOrder,
-        newOrder.book.start_date,
-        newOrder.book.end_date
-      );
-
-      await prisma.earning.update({
-        where: { id: earningId },
-        data: {
-          oscar: earnings?.oscarEarnings ?? 0,
-          federico: earnings?.federicoEarnings ?? 0,
-          sub: earnings?.subEarnings ?? 0,
-          order: { connect: { id: newOrder.id } },
-        },
-      });
-
-      await prisma.order.update({
-        where: { id: orderId },
-        data: {
-          subtotal:
-            (earnings?.federicoEarnings ?? 0) +
-            (earnings?.oscarEarnings ?? 0) +
-            (earnings?.subEarnings ?? 0),
-          total:
-            (earnings?.federicoEarnings ?? 0) +
-            (earnings?.oscarEarnings ?? 0) +
-            (earnings?.subEarnings ?? 0),
-        },
-      });
+      await updateEarnings(newOrder, orderId, earningId);
 
       return newOrder;
     }),
