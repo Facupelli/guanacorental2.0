@@ -10,7 +10,11 @@ import {
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
-import { updateEarnings } from "@/server/utils/updateOrder";
+import {
+  calcualteAndCreateEarnings,
+  getUpdatedCart,
+  updateEarnings,
+} from "@/server/utils/updateOrder";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -350,36 +354,9 @@ export const orderRouter = createTRPCRouter({
         total,
       } = input;
 
-      const equipmentIds = cart.map((item) => item.id);
-
       //GET UPDATED CART WITH MOST RECENT BOOKS
-      const equipments = await prisma.equipment.findMany({
-        where: { id: { in: equipmentIds } },
-        include: {
-          owner: {
-            include: {
-              owner: true,
-              location: true,
-              books: { include: { book: true } },
-            },
-          },
-        },
-      });
 
-      const updatedCart = cart.map((item) => {
-        const equipment = equipments.find(
-          (equipment) => equipment.id === item.id
-        );
-
-        if (!equipment) {
-          throw new Error("Equipment id not found");
-        }
-
-        return {
-          ...equipment,
-          quantity: item.quantity,
-        };
-      });
+      const updatedCart = await getUpdatedCart(cart);
 
       //CHECK ALL EQUIPMENT AVAILABILITY
       if (
@@ -484,16 +461,7 @@ export const orderRouter = createTRPCRouter({
 
       //CALCULATE AND CREATE EARNINGS FOR EACH OWNER
 
-      const earnings = calculateOwnerEarning(newOrder, startDate, endDate);
-
-      await prisma.earning.create({
-        data: {
-          oscar: earnings?.oscarEarnings ?? 0,
-          federico: earnings?.federicoEarnings ?? 0,
-          sub: earnings?.subEarnings ?? 0,
-          order: { connect: { id: newOrder.id } },
-        },
-      });
+      const earnings = await calcualteAndCreateEarnings(newOrder);
 
       return { newOrder, earnings };
     }),
