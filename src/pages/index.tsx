@@ -36,6 +36,8 @@ import {
 } from "@/lib/utils";
 
 import type { Category, Equipment, Location } from "@/types/models";
+import { useForm } from "react-hook-form";
+import useDebounce from "@/hooks/useDebounce";
 
 type Props = {
   locations: Location[];
@@ -45,6 +47,10 @@ type Props = {
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
+
+  const { register, watch } = useForm<{ search: string }>();
+
+  const search = useDebounce(watch("search"), 500);
 
   const location = useBoundStore((state) => state.location);
   const showLocationModal = useBoundStore((state) => state.showLocationModal);
@@ -57,7 +63,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         sort,
         category,
         location: location.id ?? "Mendoza",
-
+        search,
         limit: 20,
       },
       {
@@ -116,6 +122,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                     type="search"
                     placeholder="Buscar equipos por nombre, marca o modelo"
                     className="rounded-br-none rounded-tr-none"
+                    {...register("search")}
                   />
                   <div className="h-10 rounded-br-md rounded-tr-md bg-primary px-3">
                     <SearchIcon className="h-10 w-6 text-primary-foreground" />
