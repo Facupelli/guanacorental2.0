@@ -245,9 +245,7 @@ const OrderInfo = ({ info }: OrderInfoProps) => {
           <p className="text-xs text-primary/60">Mensaje</p>
           <p>{info.message}</p>
         </div>
-      </div>
 
-      <div className="grid gap-2">
         <div className="grid gap-1">
           <p className="text-xs text-primary/60">Subtotal</p>
           <p>{formatPrice(info?.subtotal)}</p>

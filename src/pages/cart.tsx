@@ -19,6 +19,7 @@ import { api } from "@/utils/api";
 import { type NextPage } from "next";
 import type { Equipment, Location } from "@/types/models";
 import { type UseFormRegister, useForm } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
@@ -254,9 +255,8 @@ const RightBar = ({
         <SelectDateButton />
         <Button variant="secondary">Continuar Alquilando</Button>
 
-        <textarea
+        <Textarea
           placeholder="Algo que nos quieras decir?"
-          className="rounded-md border border-input p-2 text-sm"
           {...register("message")}
         />
 
