@@ -2,8 +2,9 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { statusClass } from "@/lib/magic_strings";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { type Prisma } from "@prisma/client";
+import { useRouter } from "next/router";
 
 type OrderRowProps = Prisma.OrderGetPayload<{
   include: {
@@ -27,13 +28,25 @@ const OrderRow = ({
   order: OrderRowProps;
   calendarView?: boolean;
 }) => {
+  const router = useRouter();
   const [showMore, setShowMore] = useState(false);
+
+  const handleShowMore = (e: SyntheticEvent) => {
+    e.stopPropagation();
+
+    setShowMore((prev) => !prev);
+  };
+
+  const handleClickOrder = (orderId: string) => {
+    void router.push(`/admin/orders/${orderId}`);
+  };
 
   return (
     <>
       <tr
         key={order.id}
-        className="border-t border-app-bg text-sm first:border-none"
+        className="cursor-pointer border-t border-app-bg text-sm first:border-none"
+        onClick={() => handleClickOrder(order.id)}
       >
         <td className="py-5">{order.number}</td>
         <td className="py-5">{order.customer.name}</td>
@@ -66,7 +79,7 @@ const OrderRow = ({
             variant="ghost"
             className="h-6 p-2"
             size="sm"
-            onClick={() => setShowMore((prev) => !prev)}
+            onClick={(e) => handleShowMore(e)}
           >
             {showMore ? (
               <ChevronUp className="h-4 w-4" />

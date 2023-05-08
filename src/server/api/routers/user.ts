@@ -56,6 +56,7 @@ export const userRouter = createTRPCRouter({
           message: "User not found",
         });
       }
+
       const totalUserOrders = await prisma.order.count({
         where: {
           customerId: user.id,

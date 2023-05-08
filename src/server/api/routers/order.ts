@@ -34,6 +34,36 @@ type Query = {
 };
 
 export const orderRouter = createTRPCRouter({
+  getOrderById: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
+    .query(async ({ input }) => {
+      const { orderId } = input;
+
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          customer: {
+            include: { address: true },
+          },
+          location: true,
+          book: true,
+          equipments: {
+            include: { books: true, equipment: true, owner: true },
+          },
+          earnings: true,
+        },
+      });
+
+      if (!order) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order not found",
+        });
+      }
+
+      return order;
+    }),
+
   getCalendarOrders: protectedProcedure
     .input(z.object({ location: z.string() }))
     .query(async ({ input }) => {

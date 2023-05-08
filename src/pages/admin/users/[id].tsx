@@ -16,11 +16,11 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import OrderRow from "@/components/OrderRow";
 import Pagination from "@/components/ui/Pagination";
 import Table from "@/components/ui/Table";
+import { Input } from "@/components/ui/input";
+import { CheckSquare, EditIcon } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { orderTableColumns } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { CheckSquare, EditIcon } from "lucide-react";
 
 type UserForm = {
   name: string;
