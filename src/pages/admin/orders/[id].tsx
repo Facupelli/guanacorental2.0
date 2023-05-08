@@ -25,13 +25,22 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 
 import useDebounce from "@/hooks/useDebounce";
 
-import {
-  BookOnEquipment,
-  EquipmentOnOwner,
-  Owner,
-  type Prisma,
-  type Role,
-} from "@prisma/client";
+import { type Prisma, type Role } from "@prisma/client";
+import Table from "@/components/ui/Table";
+
+type Order = Prisma.OrderGetPayload<{
+  include: {
+    customer: {
+      include: { address: true };
+    };
+    location: true;
+    book: true;
+    equipments: {
+      include: { books: true; equipment: true; owner: true };
+    };
+    earnings: true;
+  };
+}>;
 
 type Props = {
   user: {
@@ -83,13 +92,7 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
               />
 
               {order.earnings[0] && (
-                <EquipmentsBooked
-                  equipments={order.equipments}
-                  orderLocation={order.locationId}
-                  bookId={order.bookId}
-                  orderId={order.id}
-                  earningId={order.earnings[0]?.id}
-                />
+                <EquipmentsBooked equipments={order.equipments} order={order} />
               )}
 
               <OrderInfo
@@ -99,6 +102,7 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
                   message: order.message,
                   total: order.total,
                   subtotal: order.subtotal,
+                  workingDays: order.book.working_days,
                 }}
               />
 
@@ -172,19 +176,10 @@ type EquipmentOwner = Prisma.EquipmentOnOwnerGetPayload<{
 
 type EquipmentsBookedProps = {
   equipments: EquipmentOwner[];
-  orderLocation: string;
-  bookId: string;
-  orderId: string;
-  earningId: string;
+  order: Order;
 };
 
-const EquipmentsBooked = ({
-  equipments,
-  orderLocation,
-  bookId,
-  orderId,
-  earningId,
-}: EquipmentsBookedProps) => {
+const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
   const [editMode, setEditMode] = useState(false);
   const [addEquipment, setAddEquipment] = useState(false);
 
@@ -195,7 +190,7 @@ const EquipmentsBooked = ({
   const { data } = api.equipment.getAllEquipment.useQuery({
     limit: 5,
     search,
-    location: orderLocation,
+    location: order.locationId,
   });
 
   const { mutate } = api.order.removeEquipmentFromOrder.useMutation();
@@ -204,18 +199,20 @@ const EquipmentsBooked = ({
     bookId: string,
     ownerEquipment: EquipmentOwner
   ) => {
-    const data = {
-      orderId,
-      bookId,
-      earningId,
-      ownerEquipment: {
-        id: ownerEquipment.id,
-        quantity: ownerEquipment.equipment.quantity,
-        price: ownerEquipment.equipment.price,
-      },
-    };
+    if (order.earnings[0]?.id) {
+      const data = {
+        orderId: order.id,
+        bookId,
+        earningId: order.earnings[0].id,
+        ownerEquipment: {
+          id: ownerEquipment.id,
+          quantity: ownerEquipment.equipment.quantity,
+          price: ownerEquipment.equipment.price,
+        },
+      };
 
-    mutate(data);
+      mutate(data);
+    }
   };
 
   return (
@@ -236,9 +233,9 @@ const EquipmentsBooked = ({
             <AddEquipment
               key={equipment.id}
               equipment={equipment}
-              bookId={bookId}
-              orderId={orderId}
-              earningId={earningId}
+              bookId={order.bookId}
+              orderId={order.id}
+              earningId={order.earnings[0]?.id ?? ""}
             />
           ))}
         </div>
@@ -274,20 +271,32 @@ const EquipmentsBooked = ({
           </div>
         </div>
 
-        <div className="grid gap-4">
-          {equipments.map((ownerEquipment) => (
-            <div key={ownerEquipment.id} className="flex gap-4">
-              {ownerEquipment.equipment.image && (
-                <div className="relative h-12 w-12">
-                  <Image
-                    src={ownerEquipment.equipment.image}
-                    alt="equipment picture"
-                    fill
-                  />
-                </div>
-              )}
-              <div className="flex items-baseline gap-4">
-                <div className="grid min-w-[300px]">
+        <div className="grid gap-3">
+          <div className="grid grid-cols-9 text-sm text-primary/60">
+            <div className="col-span-1" />
+            <p className="col-span-3">Equipo</p>
+            <p className="col-span-1">Cantidad</p>
+            <p className="col-span-1">Precio</p>
+            <p className="col-span-2">Precio * Días de renta</p>
+          </div>
+
+          <div className="grid gap-4">
+            {equipments.map((ownerEquipment) => (
+              <div
+                key={ownerEquipment.id}
+                className="grid grid-cols-9 items-center"
+              >
+                {ownerEquipment.equipment.image && (
+                  <div className="relative col-span-1 h-12 w-12">
+                    <Image
+                      src={ownerEquipment.equipment.image}
+                      alt="equipment picture"
+                      fill
+                    />
+                  </div>
+                )}
+
+                <div className="col-span-3 grid min-w-[300px]">
                   <div className="flex gap-2">
                     <p>{ownerEquipment.equipment.name}</p>
                     <p>{ownerEquipment.equipment.brand}</p>
@@ -304,26 +313,41 @@ const EquipmentsBooked = ({
                   }, 0)}
                 </p>
 
+                <p className="text-sm">
+                  {formatPrice(ownerEquipment.equipment.price)}
+                </p>
+                <p className="text-sm">
+                  {formatPrice(
+                    ownerEquipment.equipment.price *
+                      ownerEquipment.books.reduce((acc, curr) => {
+                        return acc + curr.quantity;
+                      }, 0) *
+                      order.book.working_days
+                  )}
+                </p>
+
                 {editMode && (
                   <Button
                     variant="secondary"
-                    className="bg-transparent"
+                    className="col-span-1 bg-transparent"
                     onClick={() =>
-                      handleDeleteEquipment(bookId, ownerEquipment)
+                      handleDeleteEquipment(order.bookId, ownerEquipment)
                     }
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
         {editMode && (
           <Button
             onClick={() => setAddEquipment(true)}
             className="flex w-1/4 gap-2"
             size="sm"
+            variant="secondary"
           >
             Agregar equipos <Plus className="h-4 w-4" />
           </Button>
@@ -408,6 +432,7 @@ type OrderInfoProps = {
     subtotal: number;
     total: number;
     message: string | null;
+    workingDays: number;
   };
 };
 
@@ -438,7 +463,10 @@ const OrderInfo = ({ info }: OrderInfoProps) => {
           </p>
         </div>
 
-        <div />
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Días de renta</p>
+          <p>{info.workingDays}</p>
+        </div>
 
         <div className="col-span-3 grid gap-1">
           <p className="text-xs text-primary/60">Mensaje</p>

@@ -72,7 +72,7 @@ const CartPage: NextPage = () => {
       })),
     }));
 
-    if (startDate && endDate && session?.user) {
+    if (startDate && endDate && session?.user && workingDays) {
       mutate(
         {
           startDate,
@@ -84,6 +84,7 @@ const CartPage: NextPage = () => {
           total: cartTotal,
           message,
           cart,
+          workingDays,
         },
         {
           onSuccess: (data) => {

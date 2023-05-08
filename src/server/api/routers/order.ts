@@ -111,36 +111,8 @@ export const orderRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { orderId, cart, bookId, earningId } = input;
 
-      const equipmentIds = cart.map((item) => item.id);
-
       //GET UPDATED CART WITH MOST RECENT BOOKS
-      const equipments = await prisma.equipment.findMany({
-        where: { id: { in: equipmentIds } },
-        include: {
-          owner: {
-            include: {
-              owner: true,
-              location: true,
-              books: { include: { book: true } },
-            },
-          },
-        },
-      });
-
-      const updatedCart = cart.map((item) => {
-        const equipment = equipments.find(
-          (equipment) => equipment.id === item.id
-        );
-
-        if (!equipment) {
-          throw new Error("Equipment id not found");
-        }
-
-        return {
-          ...equipment,
-          quantity: item.quantity,
-        };
-      });
+      const updatedCart = await getUpdatedCart(cart);
 
       //CHECK ALL EQUIPMENT AVAILABILITY
       const book = await prisma.book.findUnique({ where: { id: bookId } });
@@ -332,6 +304,7 @@ export const orderRouter = createTRPCRouter({
       z.object({
         startDate: z.date(),
         endDate: z.date(),
+        workingDays: z.number(),
         pickupHour: z.string(),
         message: z.string(),
         customerId: z.string(),
@@ -352,6 +325,7 @@ export const orderRouter = createTRPCRouter({
         cart,
         subtotal,
         total,
+        workingDays,
       } = input;
 
       //GET UPDATED CART WITH MOST RECENT BOOKS
@@ -376,6 +350,7 @@ export const orderRouter = createTRPCRouter({
           start_date: startDate,
           end_date: endDate,
           pickup_hour: pickupHour,
+          working_days: workingDays,
         },
       });
 
