@@ -1,4 +1,5 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
+import { type Role } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
@@ -97,4 +98,11 @@ export const handleAdminLocationChange = (
   if (locationId && locationName) {
     setLocation({ locationId, locationName });
   }
+};
+
+export const getIsAdmin = (roles: Role[]) => {
+  if (roles.map((role) => role.name).includes("Admin")) {
+    return true;
+  }
+  return false;
 };

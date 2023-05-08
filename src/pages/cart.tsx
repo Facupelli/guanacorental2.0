@@ -106,7 +106,11 @@ const CartPage: NextPage = () => {
         <link rel="icon" href="/logo-favicon.ico" />
       </Head>
 
-      <DialogWithState title="Ocurrió un error" isOpen={showErrorModal}>
+      <DialogWithState
+        title="Ocurrió un error"
+        isOpen={showErrorModal}
+        setOpen={setErrorModal}
+      >
         <p>{error}</p>
         <DialogFooter>
           <Button

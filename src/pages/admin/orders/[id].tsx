@@ -1,5 +1,6 @@
 import superjason from "superjson";
-import { Session, getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
@@ -7,16 +8,21 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
 import { authOptions } from "@/server/auth";
 import Head from "next/head";
-import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 
 import { api } from "@/utils/api";
-import Image from "next/image";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { formatPrice } from "@/lib/utils";
-import { Earning, Prisma, type Role } from "@prisma/client";
+import { formatPrice, getIsAdmin } from "@/lib/utils";
+
+import { type Prisma, type Role } from "@prisma/client";
+import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import DialogWithState from "@/components/DialogWithState";
+import { Input } from "@/components/ui/input";
+import { DialogFooter } from "@/components/ui/dialog";
 
 type Props = {
   user: {
@@ -26,7 +32,7 @@ type Props = {
   };
 };
 
-const AdminUserDetail: NextPage<Props> = ({ user }: Props) => {
+const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
   const router = useRouter();
 
   const { data, isLoading } = api.order.getOrderById.useQuery({
@@ -40,16 +46,7 @@ const AdminUserDetail: NextPage<Props> = ({ user }: Props) => {
     equipments: getOrderEquipmentOnOwners(data.equipments, data.bookId),
   };
 
-  const getIsAdmin = (roles: Role[]) => {
-    if (roles.map((role) => role.name).includes("Admin")) {
-      return true;
-    }
-    return false;
-  };
-
   const isAdmin = getIsAdmin(user.role);
-
-  console.log(order);
 
   return (
     <>
@@ -161,44 +158,91 @@ type EquipmentsBookedProps = {
 };
 
 const EquipmentsBooked = ({ equipments }: EquipmentsBookedProps) => {
+  const [editMode, setEditMode] = useState(false);
+  const [addEquipment, setAddEquipment] = useState(false);
+
   return (
-    <section className="grid gap-6 rounded-md border border-app-bg p-4">
-      <h2 className="text-lg font-semibold">Equipos alquilados</h2>
+    <>
+      <DialogWithState
+        isOpen={addEquipment}
+        setOpen={setAddEquipment}
+        title="Argegar equipo al pedido"
+      >
+        <Input placeholder="buscar equipo" type="search" />
 
-      <div className="grid gap-4">
-        {equipments.map((ownerEquipment) => (
-          <div key={ownerEquipment.id} className="flex gap-4">
-            {ownerEquipment.equipment.image && (
-              <div className="relative h-12 w-12">
-                <Image
-                  src={ownerEquipment.equipment.image}
-                  alt="equipment picture"
-                  fill
-                />
-              </div>
+        <DialogFooter>
+          <Button size="sm">Agregar</Button>
+        </DialogFooter>
+      </DialogWithState>
+
+      <section className="grid gap-6 rounded-md border border-app-bg p-4">
+        <div className="flex">
+          <h2 className="text-lg font-semibold">Equipos alquilados</h2>
+          <div className="ml-auto">
+            {editMode ? (
+              <CheckSquare
+                className="h-5 w-5 cursor-pointer text-green-400"
+                onClick={() => setEditMode(false)}
+              />
+            ) : (
+              <EditIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => setEditMode(true)}
+              />
             )}
-            <div className="flex items-baseline gap-4">
-              <div className="grid min-w-[300px]">
-                <div className="flex gap-2">
-                  <p>{ownerEquipment.equipment.name}</p>
-                  <p>{ownerEquipment.equipment.brand}</p>
-                </div>
-                <p className="text-sm text-primary/70">
-                  {ownerEquipment.equipment.model}
-                </p>
-              </div>
-
-              <p className="pl-6 font-semibold">
-                x
-                {ownerEquipment.books.reduce((acc, curr) => {
-                  return acc + curr.quantity;
-                }, 0)}
-              </p>
-            </div>
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+
+        <div className="grid gap-4">
+          {equipments.map((ownerEquipment) => (
+            <div key={ownerEquipment.id} className="flex gap-4">
+              {ownerEquipment.equipment.image && (
+                <div className="relative h-12 w-12">
+                  <Image
+                    src={ownerEquipment.equipment.image}
+                    alt="equipment picture"
+                    fill
+                  />
+                </div>
+              )}
+              <div className="flex items-baseline gap-4">
+                <div className="grid min-w-[300px]">
+                  <div className="flex gap-2">
+                    <p>{ownerEquipment.equipment.name}</p>
+                    <p>{ownerEquipment.equipment.brand}</p>
+                  </div>
+                  <p className="text-sm text-primary/70">
+                    {ownerEquipment.equipment.model}
+                  </p>
+                </div>
+
+                <p className="pl-6 font-semibold">
+                  x
+                  {ownerEquipment.books.reduce((acc, curr) => {
+                    return acc + curr.quantity;
+                  }, 0)}
+                </p>
+
+                {editMode && (
+                  <Button variant="secondary" className="bg-transparent">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        {editMode && (
+          <Button
+            onClick={() => setAddEquipment(true)}
+            className="flex w-1/4 gap-2"
+            size="sm"
+          >
+            Agregar equipos <Plus className="h-4 w-4" />
+          </Button>
+        )}
+      </section>
+    </>
   );
 };
 
@@ -322,4 +366,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default AdminUserDetail;
+export default AdminOrderDetail;

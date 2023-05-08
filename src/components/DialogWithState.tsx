@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type Dispatch, type SetStateAction, type ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,11 +10,12 @@ type Props = {
   children: ReactNode;
   isOpen: boolean;
   title: string;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const DialogWithState = ({ children, isOpen, title }: Props) => {
+const DialogWithState = ({ children, isOpen, title, setOpen }: Props) => {
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

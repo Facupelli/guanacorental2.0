@@ -82,6 +82,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       <DialogWithState
         title="¿DONDE QUERÉS ALQUILAR?"
         isOpen={showLocationModal}
+        setOpen={toggleModal}
       >
         <Label htmlFor="location" className="col-span-1">
           Sucursal:
