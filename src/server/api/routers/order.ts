@@ -63,10 +63,11 @@ export const orderRouter = createTRPCRouter({
         }),
         bookId: z.string(),
         orderId: z.string(),
+        earningId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      const { ownerEquipment, bookId, orderId } = input;
+      const { ownerEquipment, bookId, orderId, earningId } = input;
 
       const bookOnEquipment = await prisma.bookOnEquipment.deleteMany({
         where: {
@@ -75,10 +76,46 @@ export const orderRouter = createTRPCRouter({
         },
       });
 
-      await prisma.order.update({
+      const newOrder = await prisma.order.update({
         where: { id: orderId },
         data: {
           equipments: { disconnect: { id: ownerEquipment.id } },
+        },
+        include: {
+          book: true,
+          equipments: {
+            include: { books: true, owner: true, equipment: true },
+          },
+        },
+      });
+
+      const earnings = calculateOwnerEarning(
+        newOrder,
+        newOrder.book.start_date,
+        newOrder.book.end_date
+      );
+
+      await prisma.earning.update({
+        where: { id: earningId },
+        data: {
+          oscar: earnings?.oscarEarnings ?? 0,
+          federico: earnings?.federicoEarnings ?? 0,
+          sub: earnings?.subEarnings ?? 0,
+          order: { connect: { id: newOrder.id } },
+        },
+      });
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          subtotal:
+            (earnings?.federicoEarnings ?? 0) +
+            (earnings?.oscarEarnings ?? 0) +
+            (earnings?.subEarnings ?? 0),
+          total:
+            (earnings?.federicoEarnings ?? 0) +
+            (earnings?.oscarEarnings ?? 0) +
+            (earnings?.subEarnings ?? 0),
         },
       });
 
@@ -91,10 +128,11 @@ export const orderRouter = createTRPCRouter({
         bookId: z.string(),
         orderId: z.string(),
         cart: cartValidation,
+        earningId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      const { orderId, cart, bookId } = input;
+      const { orderId, cart, bookId, earningId } = input;
 
       const equipmentIds = cart.map((item) => item.id);
 
@@ -181,15 +219,51 @@ export const orderRouter = createTRPCRouter({
         id: item.id,
       }));
 
-      //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
+      //UPDATE ORDER WITH THE EQUIPMENONBOOKS IDS
       let newOrder;
-
-      //CAMBIAR EL TOTAL
 
       newOrder = await prisma.order.update({
         where: { id: orderId },
         data: {
           equipments: { connect: equipmentsIds },
+        },
+        include: {
+          book: true,
+          equipments: {
+            include: { books: true, owner: true, equipment: true },
+          },
+        },
+      });
+
+      //CAMBIAR EL TOTAL
+
+      const earnings = calculateOwnerEarning(
+        newOrder,
+        newOrder.book.start_date,
+        newOrder.book.end_date
+      );
+
+      await prisma.earning.update({
+        where: { id: earningId },
+        data: {
+          oscar: earnings?.oscarEarnings ?? 0,
+          federico: earnings?.federicoEarnings ?? 0,
+          sub: earnings?.subEarnings ?? 0,
+          order: { connect: { id: newOrder.id } },
+        },
+      });
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          subtotal:
+            (earnings?.federicoEarnings ?? 0) +
+            (earnings?.oscarEarnings ?? 0) +
+            (earnings?.subEarnings ?? 0),
+          total:
+            (earnings?.federicoEarnings ?? 0) +
+            (earnings?.oscarEarnings ?? 0) +
+            (earnings?.subEarnings ?? 0),
         },
       });
 

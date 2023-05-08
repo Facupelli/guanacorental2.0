@@ -82,12 +82,15 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
                 }}
               />
 
-              <EquipmentsBooked
-                equipments={order.equipments}
-                orderLocation={order.locationId}
-                bookId={order.bookId}
-                orderId={order.id}
-              />
+              {order.earnings[0] && (
+                <EquipmentsBooked
+                  equipments={order.equipments}
+                  orderLocation={order.locationId}
+                  bookId={order.bookId}
+                  orderId={order.id}
+                  earningId={order.earnings[0]?.id}
+                />
+              )}
 
               <OrderInfo
                 info={{
@@ -172,6 +175,7 @@ type EquipmentsBookedProps = {
   orderLocation: string;
   bookId: string;
   orderId: string;
+  earningId: string;
 };
 
 const EquipmentsBooked = ({
@@ -179,6 +183,7 @@ const EquipmentsBooked = ({
   orderLocation,
   bookId,
   orderId,
+  earningId,
 }: EquipmentsBookedProps) => {
   const [editMode, setEditMode] = useState(false);
   const [addEquipment, setAddEquipment] = useState(false);
@@ -202,6 +207,7 @@ const EquipmentsBooked = ({
     const data = {
       orderId,
       bookId,
+      earningId,
       ownerEquipment: {
         id: ownerEquipment.id,
         quantity: ownerEquipment.equipment.quantity,
@@ -232,6 +238,7 @@ const EquipmentsBooked = ({
               equipment={equipment}
               bookId={bookId}
               orderId={orderId}
+              earningId={earningId}
             />
           ))}
         </div>
@@ -298,13 +305,14 @@ const EquipmentsBooked = ({
                 </p>
 
                 {editMode && (
-                  <Button variant="secondary" className="bg-transparent">
-                    <Trash2
-                      className="h-4 w-4"
-                      onClick={() =>
-                        handleDeleteEquipment(bookId, ownerEquipment)
-                      }
-                    />
+                  <Button
+                    variant="secondary"
+                    className="bg-transparent"
+                    onClick={() =>
+                      handleDeleteEquipment(bookId, ownerEquipment)
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>
@@ -341,9 +349,15 @@ type AddEquipmentProps = {
   equipment: Equipment;
   bookId: string;
   orderId: string;
+  earningId: string;
 };
 
-const AddEquipment = ({ equipment, bookId, orderId }: AddEquipmentProps) => {
+const AddEquipment = ({
+  equipment,
+  bookId,
+  orderId,
+  earningId,
+}: AddEquipmentProps) => {
   const { register, getValues } = useForm<{ quantity: number }>();
 
   const { mutate } = api.order.addEquipmentToOrder.useMutation();
@@ -367,6 +381,7 @@ const AddEquipment = ({ equipment, bookId, orderId }: AddEquipmentProps) => {
     mutate({
       bookId,
       orderId,
+      earningId,
       cart: [cart],
     });
   };
