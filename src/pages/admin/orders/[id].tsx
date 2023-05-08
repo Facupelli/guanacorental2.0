@@ -25,7 +25,13 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 
 import useDebounce from "@/hooks/useDebounce";
 
-import { type Prisma, type Role } from "@prisma/client";
+import {
+  BookOnEquipment,
+  EquipmentOnOwner,
+  Owner,
+  type Prisma,
+  type Role,
+} from "@prisma/client";
 
 type Props = {
   user: {
@@ -187,6 +193,25 @@ const EquipmentsBooked = ({
     location: orderLocation,
   });
 
+  const { mutate } = api.order.removeEquipmentFromOrder.useMutation();
+
+  const handleDeleteEquipment = (
+    bookId: string,
+    ownerEquipment: EquipmentOwner
+  ) => {
+    const data = {
+      orderId,
+      bookId,
+      ownerEquipment: {
+        id: ownerEquipment.id,
+        quantity: ownerEquipment.equipment.quantity,
+        price: ownerEquipment.equipment.price,
+      },
+    };
+
+    mutate(data);
+  };
+
   return (
     <>
       <DialogWithState
@@ -274,7 +299,12 @@ const EquipmentsBooked = ({
 
                 {editMode && (
                   <Button variant="secondary" className="bg-transparent">
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2
+                      className="h-4 w-4"
+                      onClick={() =>
+                        handleDeleteEquipment(bookId, ownerEquipment)
+                      }
+                    />
                   </Button>
                 )}
               </div>

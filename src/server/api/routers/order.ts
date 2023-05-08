@@ -33,30 +33,64 @@ type Query = {
   };
 };
 
+const cartValidation = z.array(
+  z.object({
+    id: z.string(),
+    quantity: z.number(),
+    price: z.number(),
+    owner: z
+      .array(
+        z.object({
+          id: z.string(),
+          ownerId: z.string(),
+          ownerName: z.string().optional(),
+          stock: z.number(),
+          locationId: z.string(),
+        })
+      )
+      .optional(),
+  })
+);
+
 export const orderRouter = createTRPCRouter({
+  removeEquipmentFromOrder: protectedProcedure
+    .input(
+      z.object({
+        ownerEquipment: z.object({
+          id: z.string(),
+          quantity: z.number(),
+          price: z.number(),
+        }),
+        bookId: z.string(),
+        orderId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { ownerEquipment, bookId, orderId } = input;
+
+      const bookOnEquipment = await prisma.bookOnEquipment.deleteMany({
+        where: {
+          bookId,
+          equipmentId: ownerEquipment.id,
+        },
+      });
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          equipments: { disconnect: { id: ownerEquipment.id } },
+        },
+      });
+
+      return { message: "success", bookOnEquipment, bookId, ownerEquipment };
+    }),
+
   addEquipmentToOrder: protectedProcedure
     .input(
       z.object({
         bookId: z.string(),
         orderId: z.string(),
-        cart: z.array(
-          z.object({
-            id: z.string(),
-            quantity: z.number(),
-            price: z.number(),
-            owner: z
-              .array(
-                z.object({
-                  id: z.string(),
-                  ownerId: z.string(),
-                  ownerName: z.string().optional(),
-                  stock: z.number(),
-                  locationId: z.string(),
-                })
-              )
-              .optional(),
-          })
-        ),
+        cart: cartValidation,
       })
     )
     .mutation(async ({ input }) => {
@@ -281,24 +315,7 @@ export const orderRouter = createTRPCRouter({
         locationId: z.string(),
         subtotal: z.number(),
         total: z.number(),
-        cart: z.array(
-          z.object({
-            id: z.string(),
-            quantity: z.number(),
-            price: z.number(),
-            owner: z
-              .array(
-                z.object({
-                  id: z.string(),
-                  ownerId: z.string(),
-                  ownerName: z.string().optional(),
-                  stock: z.number(),
-                  locationId: z.string(),
-                })
-              )
-              .optional(),
-          })
-        ),
+        cart: cartValidation,
       })
     )
     .mutation(async ({ input }) => {
