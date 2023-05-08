@@ -16,7 +16,7 @@ import { api } from "@/utils/api";
 import Image from "next/image";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { formatPrice } from "@/lib/utils";
-import { type Role } from "@prisma/client";
+import { Earning, Prisma, type Role } from "@prisma/client";
 
 type Props = {
   user: {
@@ -66,149 +66,228 @@ const AdminUserDetail: NextPage<Props> = ({ user }: Props) => {
           <h1 className="text-lg font-bold">PEDIDO DETALLE</h1>
           <div className="grid gap-6 pt-6">
             <div className="grid gap-6 rounded-md bg-white p-6">
-              <section className="grid gap-6 rounded-md border border-app-bg p-4">
-                <div>
-                  <h2 className="text-xl font-bold">#{data?.number}</h2>
-                  <p className="text-sm text-primary/60">
-                    {data?.created_at.toLocaleDateString("es-AR", {
-                      year: "numeric",
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </p>
-                </div>
+              <CustomerInfo
+                order={{ number: order.number, createdAt: order.created_at }}
+                customer={{
+                  name: order.customer.name,
+                  email: order.customer.email,
+                  phone: order.customer.address?.phone,
+                  dniNumber: order.customer.address?.dni_number,
+                }}
+              />
 
-                <div className="grid grid-cols-4">
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Cliente</p>
-                    <p>{data?.customer.name}</p>
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Email</p>
-                    <p>{data?.customer.email}</p>
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Teléfono</p>
-                    <p>{data?.customer.address?.phone}</p>
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">DNI</p>
-                    <p>{data?.customer.address?.dni_number}</p>
-                  </div>
-                </div>
-              </section>
+              <EquipmentsBooked equipments={order.equipments} />
 
-              <section className="grid gap-6 rounded-md border border-app-bg p-4">
-                <h2 className="text-lg font-semibold">Equipos alquilados</h2>
-
-                <div className="grid gap-4">
-                  {order.equipments.map((ownerEquipment) => (
-                    <div key={ownerEquipment.id} className="flex gap-4">
-                      {ownerEquipment.equipment.image && (
-                        <div className="relative h-12 w-12">
-                          <Image
-                            src={ownerEquipment.equipment.image}
-                            alt="equipment picture"
-                            fill
-                          />
-                        </div>
-                      )}
-                      <div className="flex items-baseline gap-4">
-                        <div className="grid min-w-[300px]">
-                          <div className="flex gap-2">
-                            <p>{ownerEquipment.equipment.name}</p>
-                            <p>{ownerEquipment.equipment.brand}</p>
-                          </div>
-                          <p className="text-sm text-primary/70">
-                            {ownerEquipment.equipment.model}
-                          </p>
-                        </div>
-
-                        <p className="pl-6 font-semibold">
-                          x
-                          {ownerEquipment.books.reduce((acc, curr) => {
-                            return acc + curr.quantity;
-                          }, 0)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="grid gap-6 rounded-md border border-app-bg p-4">
-                <h2 className="text-lg font-semibold">
-                  Información del pedido
-                </h2>
-
-                <div className="grid grid-cols-3 gap-y-4">
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Retiro</p>
-                    <p>
-                      {data?.book.start_date.toLocaleDateString("es-AR", {
-                        year: "numeric",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
-                  </div>
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Devolución</p>
-                    <p>
-                      {data?.book.end_date.toLocaleDateString("es-AR", {
-                        year: "numeric",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
-                  </div>
-
-                  <div />
-
-                  <div className="col-span-3 grid gap-1">
-                    <p className="text-xs text-primary/60">Mensaje</p>
-                    <p>{data?.message}</p>
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Subtotal</p>
-                    <p>{formatPrice(data?.subtotal)}</p>
-                  </div>
-
-                  <div className="grid gap-1">
-                    <p className="text-xs text-primary/60">Total</p>
-                    <p className="font-bold">{formatPrice(data?.total)}</p>
-                  </div>
-                </div>
-              </section>
+              <OrderInfo
+                info={{
+                  startDate: order.book.start_date,
+                  endDate: order.book.end_date,
+                  message: order.message,
+                  total: order.total,
+                  subtotal: order.subtotal,
+                }}
+              />
 
               {isAdmin && (
-                <section className="grid gap-6 rounded-md border border-app-bg p-4">
-                  <h2 className="text-lg font-semibold">Ganancias</h2>
-
-                  <div className="grid max-w-[50%] grid-cols-3">
-                    <div className="grid gap-1">
-                      <p className="text-xs text-primary/60">Federico</p>
-                      <p>{formatPrice(data?.earnings[0]?.federico ?? 0)}</p>
-                    </div>
-                    <div className="grid gap-1">
-                      <p className="text-xs text-primary/60">Oscar</p>
-                      <p>{formatPrice(data?.earnings[0]?.oscar ?? 0)}</p>
-                    </div>
-                    <div className="grid gap-1">
-                      <p className="text-xs text-primary/60">Subalquiler</p>
-                      <p>{formatPrice(data?.earnings[0]?.sub ?? 0)}</p>
-                    </div>
-                  </div>
-                </section>
+                <EarningsInfo
+                  oscar={order.earnings[0]?.oscar ?? 0}
+                  federico={order.earnings[0]?.federico ?? 0}
+                  sub={order.earnings[0]?.sub ?? 0}
+                />
               )}
             </div>
           </div>
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+type CustomerInfo = {
+  order: {
+    number: number;
+    createdAt: Date;
+  };
+  customer: {
+    name: string | null;
+    email: string | null;
+    phone: string | undefined;
+    dniNumber: string | undefined;
+  };
+};
+
+const CustomerInfo = ({ order, customer }: CustomerInfo) => {
+  return (
+    <section className="grid gap-6 rounded-md border border-app-bg p-4">
+      <div>
+        <h2 className="text-xl font-bold">#{order?.number}</h2>
+        <p className="text-sm text-primary/60">
+          {order.createdAt.toLocaleDateString("es-AR", {
+            year: "numeric",
+            day: "numeric",
+            month: "short",
+          })}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-4">
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Cliente</p>
+          <p>{customer?.name}</p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Email</p>
+          <p>{customer?.email}</p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Teléfono</p>
+          <p>{customer?.phone}</p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">DNI</p>
+          <p>{customer?.dniNumber}</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+type Equipment = Prisma.EquipmentOnOwnerGetPayload<{
+  include: { books: true; equipment: true; owner: true };
+}>;
+
+type EquipmentsBookedProps = {
+  equipments: Equipment[];
+};
+
+const EquipmentsBooked = ({ equipments }: EquipmentsBookedProps) => {
+  return (
+    <section className="grid gap-6 rounded-md border border-app-bg p-4">
+      <h2 className="text-lg font-semibold">Equipos alquilados</h2>
+
+      <div className="grid gap-4">
+        {equipments.map((ownerEquipment) => (
+          <div key={ownerEquipment.id} className="flex gap-4">
+            {ownerEquipment.equipment.image && (
+              <div className="relative h-12 w-12">
+                <Image
+                  src={ownerEquipment.equipment.image}
+                  alt="equipment picture"
+                  fill
+                />
+              </div>
+            )}
+            <div className="flex items-baseline gap-4">
+              <div className="grid min-w-[300px]">
+                <div className="flex gap-2">
+                  <p>{ownerEquipment.equipment.name}</p>
+                  <p>{ownerEquipment.equipment.brand}</p>
+                </div>
+                <p className="text-sm text-primary/70">
+                  {ownerEquipment.equipment.model}
+                </p>
+              </div>
+
+              <p className="pl-6 font-semibold">
+                x
+                {ownerEquipment.books.reduce((acc, curr) => {
+                  return acc + curr.quantity;
+                }, 0)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+type OrderInfoProps = {
+  info: {
+    startDate: Date;
+    endDate: Date;
+    subtotal: number;
+    total: number;
+    message: string | null;
+  };
+};
+
+const OrderInfo = ({ info }: OrderInfoProps) => {
+  return (
+    <section className="grid gap-6 rounded-md border border-app-bg p-4">
+      <h2 className="text-lg font-semibold">Información del pedido</h2>
+
+      <div className="grid grid-cols-3 gap-y-4">
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Retiro</p>
+          <p>
+            {info.startDate.toLocaleDateString("es-AR", {
+              year: "numeric",
+              day: "numeric",
+              month: "short",
+            })}
+          </p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Devolución</p>
+          <p>
+            {info.endDate.toLocaleDateString("es-AR", {
+              year: "numeric",
+              day: "numeric",
+              month: "short",
+            })}
+          </p>
+        </div>
+
+        <div />
+
+        <div className="col-span-3 grid gap-1">
+          <p className="text-xs text-primary/60">Mensaje</p>
+          <p>{info.message}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Subtotal</p>
+          <p>{formatPrice(info?.subtotal)}</p>
+        </div>
+
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Total</p>
+          <p className="font-bold">{formatPrice(info?.total)}</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+type EarningsInfoProps = {
+  oscar: number;
+  federico: number;
+  sub: number;
+};
+
+const EarningsInfo = ({ oscar, federico, sub }: EarningsInfoProps) => {
+  return (
+    <section className="grid gap-6 rounded-md border border-app-bg p-4">
+      <h2 className="text-lg font-semibold">Ganancias</h2>
+
+      <div className="grid max-w-[50%] grid-cols-3">
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Federico</p>
+          <p>{formatPrice(federico)}</p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Oscar</p>
+          <p>{formatPrice(oscar)}</p>
+        </div>
+        <div className="grid gap-1">
+          <p className="text-xs text-primary/60">Subalquiler</p>
+          <p>{formatPrice(sub)}</p>
+        </div>
+      </div>
+    </section>
   );
 };
 
