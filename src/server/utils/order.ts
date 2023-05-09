@@ -1,4 +1,6 @@
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { DISCOUNT_TYPES } from "@/lib/magic_strings";
+import { calculateTotalWithDiscount } from "@/lib/utils";
 import { type Prisma } from "@prisma/client";
 
 type CartItem = {
@@ -65,6 +67,15 @@ type NewOrder = Prisma.OrderGetPayload<{
     equipments: {
       include: { books: true; owner: true; equipment: true };
     };
+    discount: {
+      include: {
+        rule: {
+          include: {
+            type: true;
+          };
+        };
+      };
+    };
   };
 }>;
 
@@ -87,49 +98,58 @@ export const getOrderEquipmentOnOwners = (
   return equipmentOnOwners;
 };
 
-export const calculateOwnerEarning = (
-  newOrder: NewOrder,
-  startDate: Date,
-  endDate: Date
-) => {
+export const calculateOwnerEarning = (newOrder: NewOrder) => {
+  const { book, equipments, bookId, discount } = newOrder;
+  const { start_date, end_date, pickup_hour } = book;
+
+  const datesInRange = getDatesInRange(start_date, end_date);
+  if (!pickup_hour) return null;
+  const workingDays = getTotalWorkingDays(datesInRange, pickup_hour);
+  if (!workingDays) return null;
+
   let federicoEarnings = 0;
   let oscarEarnings = 0;
   let subEarnings = 0;
+  let total = 0;
+  let subtotal = 0;
 
-  const datesInRange = getDatesInRange(startDate, endDate);
-  if (newOrder.book.pickup_hour) {
-    const workingDays = getTotalWorkingDays(
-      datesInRange,
-      newOrder.book.pickup_hour
-    );
+  const equipmentOnOwners = getOrderEquipmentOnOwners(equipments, bookId);
 
-    const equipmentOnOwners = getOrderEquipmentOnOwners(
-      newOrder.equipments,
-      newOrder.bookId
-    );
+  for (const equipment of equipmentOnOwners) {
+    const equipmentPrice = equipment.equipment.price;
+    const ownerName = equipment.owner.name;
+    const quantity = equipment.books[0]?.quantity;
 
-    for (const equipment of equipmentOnOwners) {
-      const ownerName = equipment.owner.name;
-      const total = newOrder.total;
+    if (quantity) {
+      let price = workingDays * equipmentPrice * quantity;
+      subtotal += price;
+
+      if (discount) {
+        const discountValue = price * (discount.rule.value / 100);
+        price -= discountValue;
+      }
+      total += price;
 
       if (ownerName === "Federico") {
-        federicoEarnings += total;
+        federicoEarnings += price;
       } else if (ownerName === "Oscar") {
-        oscarEarnings += total;
+        oscarEarnings += price;
       } else if (ownerName === "Sub") {
-        subEarnings += total * 0.7;
-        federicoEarnings += total * 0.15;
-        oscarEarnings += total * 0.15;
+        subEarnings += price * 0.7;
+        federicoEarnings += price * 0.15;
+        oscarEarnings += price * 0.15;
       } else {
-        federicoEarnings += total / 2;
-        oscarEarnings += total / 2;
+        federicoEarnings += price / 2;
+        oscarEarnings += price / 2;
       }
     }
-
-    return {
-      oscarEarnings,
-      federicoEarnings,
-      subEarnings,
-    };
   }
+
+  return {
+    subtotal,
+    total,
+    oscarEarnings,
+    federicoEarnings,
+    subEarnings,
+  };
 };

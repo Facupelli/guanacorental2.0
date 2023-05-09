@@ -2,7 +2,13 @@ import Head from "next/head";
 import Nav from "@/components/Nav";
 
 import { useBoundStore } from "@/zustand/store";
-import { formatPrice, getIsAdmin, isEquipmentAvailable } from "@/lib/utils";
+import {
+  calcaulateCartTotal,
+  calculateTotalWithDiscount,
+  formatPrice,
+  getIsAdmin,
+  isEquipmentAvailable,
+} from "@/lib/utils";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
@@ -65,33 +71,13 @@ const CartPage: NextPage = () => {
     return undefined;
   }, [startDate, endDate, pickupHour]);
 
-  const calcaulateCartTotal = (
-    cartItems: Equipment[],
-    workingDays: number | undefined
-  ) => {
-    const cartSum = cartItems.reduce(
-      (acc, curr) => acc + curr.price * curr.quantity,
-      0
-    );
-    if (workingDays) {
-      return workingDays * cartSum;
-    }
-    return 0;
-  };
-
   const subtotal = calcaulateCartTotal(cartItems, workingDays);
 
   const cartTotal = useMemo(() => {
     if (workingDays) {
       const total = subtotal;
       if (discount) {
-        if (discount.typeName === DISCOUNT_TYPES.FIXED) {
-          return total - discount.value;
-        }
-
-        if (discount.typeName === DISCOUNT_TYPES.PERCENTAGE) {
-          return total - total * (discount.value / 100);
-        }
+        return calculateTotalWithDiscount(total, discount);
       }
 
       return total;

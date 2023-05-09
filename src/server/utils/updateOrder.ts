@@ -8,6 +8,15 @@ type NewOrder = Prisma.OrderGetPayload<{
     equipments: {
       include: { books: true; owner: true; equipment: true };
     };
+    discount: {
+      include: {
+        rule: {
+          include: {
+            type: true;
+          };
+        };
+      };
+    };
   };
 }>;
 
@@ -59,11 +68,7 @@ export const getUpdatedCart = async (cart: Cart) => {
 };
 
 export const calcualteAndCreateEarnings = async (newOrder: NewOrder) => {
-  const earnings = calculateOwnerEarning(
-    newOrder,
-    newOrder.book.start_date,
-    newOrder.book.end_date
-  );
+  const earnings = calculateOwnerEarning(newOrder);
 
   await prisma.earning.create({
     data: {
@@ -82,11 +87,7 @@ export const updateEarnings = async (
   orderId: string,
   earningId: string
 ) => {
-  const earnings = calculateOwnerEarning(
-    newOrder,
-    newOrder.book.start_date,
-    newOrder.book.end_date
-  );
+  const earnings = calculateOwnerEarning(newOrder);
 
   await prisma.earning.update({
     where: { id: earningId },
@@ -101,14 +102,8 @@ export const updateEarnings = async (
   await prisma.order.update({
     where: { id: orderId },
     data: {
-      subtotal:
-        (earnings?.federicoEarnings ?? 0) +
-        (earnings?.oscarEarnings ?? 0) +
-        (earnings?.subEarnings ?? 0),
-      total:
-        (earnings?.federicoEarnings ?? 0) +
-        (earnings?.oscarEarnings ?? 0) +
-        (earnings?.subEarnings ?? 0),
+      subtotal: earnings?.subtotal,
+      total: earnings?.total,
     },
   });
 };

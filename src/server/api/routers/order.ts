@@ -66,6 +66,7 @@ export const orderRouter = createTRPCRouter({
         bookId: z.string(),
         orderId: z.string(),
         earningId: z.string(),
+        discountId: z.string().nullish(),
       })
     )
     .mutation(async ({ input }) => {
@@ -88,6 +89,15 @@ export const orderRouter = createTRPCRouter({
           equipments: {
             include: { books: true, owner: true, equipment: true },
           },
+          discount: {
+            include: {
+              rule: {
+                include: {
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -103,6 +113,7 @@ export const orderRouter = createTRPCRouter({
         orderId: z.string(),
         cart: cartValidation,
         earningId: z.string(),
+        discountId: z.string().nullish(),
       })
     )
     .mutation(async ({ input }) => {
@@ -178,10 +189,19 @@ export const orderRouter = createTRPCRouter({
           equipments: {
             include: { books: true, owner: true, equipment: true },
           },
+          discount: {
+            include: {
+              rule: {
+                include: {
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
 
-      //CAMBIAR EL TOTAL
+      //UPDATE EARNINGS ACCORDING TO NEW EQUIPMENT
 
       await updateEarnings(newOrder, orderId, earningId);
 
@@ -445,6 +465,15 @@ export const orderRouter = createTRPCRouter({
             book: true,
             equipments: {
               include: { books: true, owner: true, equipment: true },
+            },
+            discount: {
+              include: {
+                rule: {
+                  include: {
+                    type: true,
+                  },
+                },
+              },
             },
           },
         });

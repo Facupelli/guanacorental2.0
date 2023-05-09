@@ -3,6 +3,7 @@ import { type Role } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
+import { DISCOUNT_TYPES } from "./magic_strings";
 
 export const orderTableColumns = [
   { title: "N°" },
@@ -105,4 +106,39 @@ export const getIsAdmin = (roles: Role[]) => {
     return true;
   }
   return false;
+};
+
+export const calcaulateCartTotal = (
+  cartItems: Equipment[],
+  workingDays: number | undefined
+) => {
+  const cartSum = cartItems.reduce(
+    (acc, curr) => acc + curr.price * curr.quantity,
+    0
+  );
+  if (workingDays) {
+    return workingDays * cartSum;
+  }
+  return 0;
+};
+
+type Discount = {
+  value: number;
+  typeName: string;
+  code: string;
+};
+
+export const calculateTotalWithDiscount = (
+  total: number,
+  discount: Discount
+) => {
+  if (discount.typeName === DISCOUNT_TYPES.FIXED) {
+    return total - discount.value;
+  }
+
+  if (discount.typeName === DISCOUNT_TYPES.PERCENTAGE) {
+    return total - total * (discount.value / 100);
+  }
+
+  return total;
 };

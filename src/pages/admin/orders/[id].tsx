@@ -251,6 +251,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
               bookId={order.bookId}
               orderId={order.id}
               earningId={order.earnings[0]?.id ?? ""}
+              discountId={order.discount_id}
             />
           ))}
         </div>
@@ -389,6 +390,7 @@ type AddEquipmentProps = {
   bookId: string;
   orderId: string;
   earningId: string;
+  discountId: string | null;
 };
 
 const AddEquipment = ({
@@ -396,6 +398,7 @@ const AddEquipment = ({
   bookId,
   orderId,
   earningId,
+  discountId,
 }: AddEquipmentProps) => {
   const { register, getValues } = useForm<{ quantity: number }>();
 
@@ -421,6 +424,7 @@ const AddEquipment = ({
       bookId,
       orderId,
       earningId,
+      discountId,
       cart: [cart],
     });
   };
