@@ -14,12 +14,13 @@ export const discountRouter = createTRPCRouter({
       z.object({
         code: z.string(),
         endsAt: z.date().nullish(),
-        startsAt: z.date(),
-        locationIds: z.array(z.string()),
+        startsAt: z.date().nullish(),
         usageLimit: z.number().nullish(),
+        locationIds: z.array(z.string()),
         typeId: z.string(),
         value: z.number(),
         description: z.string().nullish(),
+        minTotal: z.number().nullish(),
       })
     )
     .mutation(async ({ input }) => {
@@ -32,6 +33,7 @@ export const discountRouter = createTRPCRouter({
         typeId,
         value,
         description,
+        minTotal,
       } = input;
 
       const location = locationIds.map((id) => ({ id }));
@@ -54,6 +56,7 @@ export const discountRouter = createTRPCRouter({
           usage_count: 0,
           usage_limit: usageLimit,
           rule: { connect: { id: rule.id } },
+          min_total: minTotal,
         },
       });
 
@@ -72,13 +75,17 @@ export const discountRouter = createTRPCRouter({
       },
     });
 
-    return discounts;
+    const types = await prisma.discountType.findMany();
+
+    return { discounts, types };
   }),
 
   getValidDiscountByCode: protectedProcedure
-    .input(z.object({ code: z.string(), location: z.string() }))
+    .input(
+      z.object({ code: z.string(), location: z.string(), total: z.number() })
+    )
     .mutation(async ({ input }) => {
-      const { code, location } = input;
+      const { code, location, total } = input;
 
       const discount = await prisma.discount.findUnique({
         where: { code },
@@ -105,6 +112,13 @@ export const discountRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "El cupón no es aplicabale a esta sucursal",
+        });
+      }
+
+      if (discount.min_total && total <= discount.min_total) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `El cupón tiene un mínimo de ${discount.min_total}`,
         });
       }
 

@@ -257,6 +257,7 @@ model Discount {
   usage_count       Int
   usage_limit       Int?
   orders            Order[]
+  min_total         Int?
   
   created_at        DateTime            @default(now())
 }

@@ -2,20 +2,37 @@ import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { type NextPage } from "next";
+import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
+import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Table from "@/components/ui/Table";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import DialogWithState from "@/components/DialogWithState";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 import { api } from "@/utils/api";
 import { COUPON_STATUS, DISCOUNT_TYPES, STATUS } from "@/lib/magic_strings";
 
-import { type Prisma } from "@prisma/client";
+import { type DiscountType, type Prisma } from "@prisma/client";
+import { formatPrice } from "@/lib/utils";
 
 const columnNames = [
   { title: "Código" },
   { title: "Tipo" },
   { title: "Valor" },
+  { title: "Mínimo" },
   { title: "Sucursal" },
   { title: "Status" },
   { title: "Empieza" },
@@ -24,10 +41,46 @@ const columnNames = [
   { title: "Límite" },
 ];
 
-const AdminDiscounts: NextPage = () => {
-  const router = useRouter();
+type DiscountForm = {
+  code: string;
+  endsAt?: Date | null;
+  startsAt?: Date | null;
+  locationIds: string[];
+  usageLimit: number;
+  typeId: string;
+  value: number;
+  description?: string;
+  minTotal?: number;
+};
 
+const AdminDiscounts: NextPage = () => {
+  const { register, handleSubmit, setValue } = useForm<DiscountForm>();
+  const [showModal, setShowModal] = useState(false);
+
+  const ctx = api.useContext();
+  const locations = api.location.getAllLocations.useQuery();
   const { data } = api.discount.getAllDiscounts.useQuery();
+  const { mutate } = api.discount.createDiscount.useMutation();
+
+  const onSubmit = (data: DiscountForm) => {
+    mutate(
+      {
+        ...data,
+        endsAt: data.endsAt ?? null,
+        startsAt: data.startsAt ?? null,
+        usageLimit: data.usageLimit > 0 ? data.usageLimit : null,
+      },
+      {
+        onSuccess: (data) => {
+          ctx.discount.getAllDiscounts.invalidate();
+          setShowModal(false);
+        },
+        onError: (err) => {
+          console.log(err);
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -37,15 +90,109 @@ const AdminDiscounts: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <DialogWithState
+        setOpen={setShowModal}
+        isOpen={showModal}
+        title="Crear Descuento"
+      >
+        <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <Label id="code">Código</Label>
+            <Input type="text" {...register("code")} required />
+          </div>
+
+          <div className="grid grid-cols-2 gap-10">
+            <div>
+              <Label id="starts">Empieza</Label>
+              <Input
+                type="date"
+                {...register("startsAt", { valueAsDate: true })}
+              />
+            </div>
+
+            <div>
+              <Label id="ens">Termina</Label>
+              <Input
+                type="date"
+                {...register("endsAt", { valueAsDate: true })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label id="limit">Límite</Label>
+            <Input
+              type="text"
+              {...register("usageLimit", { valueAsNumber: true })}
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Sucursales:</Label>
+            <div className="grid grid-cols-3">
+              {locations.data &&
+                locations.data.map((location) => (
+                  <div className="flex items-center gap-4" key={location.id}>
+                    <Input
+                      className="h-5 w-5"
+                      type="checkbox"
+                      id={location.name}
+                      value={location.id}
+                      {...register("locationIds", { required: true })}
+                    />
+                    <Label htmlFor={location.name}>{location.name}</Label>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {data && (
+            <div>
+              <Label id="limit">Tipo</Label>
+              <SelectDiscountType types={data?.types} setValue={setValue} />
+            </div>
+          )}
+
+          <div>
+            <Label id="value">Valor</Label>
+            <Input
+              type="text"
+              {...register("value", { valueAsNumber: true })}
+              required
+            />
+          </div>
+
+          <div>
+            <Label id="value">Mínimo de la orden</Label>
+            <Input
+              type="text"
+              {...register("minTotal", { valueAsNumber: true })}
+              required
+            />
+          </div>
+
+          <div className="grid pt-4">
+            <Button type="submit">Crear</Button>
+          </div>
+        </form>
+      </DialogWithState>
+
       <Nav />
 
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">DESCUENTOS</h1>
           <div className="grid gap-6 pt-6">
+            <div className="flex">
+              <div className="ml-auto">
+                <Button onClick={() => setShowModal(true)} size="sm">
+                  Crear descuento
+                </Button>
+              </div>
+            </div>
             <Table headTitles={columnNames}>
               {data &&
-                data.map((discount) => (
+                data.discounts.map((discount) => (
                   <DiscountRow key={discount.id} discount={discount} />
                 ))}
             </Table>
@@ -53,6 +200,32 @@ const AdminDiscounts: NextPage = () => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const SelectDiscountType = ({
+  types,
+  setValue,
+}: {
+  types: DiscountType[];
+  setValue: UseFormSetValue<DiscountForm>;
+}) => {
+  return (
+    <Select onValueChange={(e) => setValue("typeId", e)}>
+      <SelectTrigger>
+        <SelectValue placeholder="selecionar tipo" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Tipo de descuento</SelectLabel>
+          {types.map((type) => (
+            <SelectItem value={type.id} key={type.id}>
+              {type.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
@@ -109,6 +282,9 @@ const DiscountRow = ({ discount }: DiscountItemProps) => {
         {discount.rule.type.name === DISCOUNT_TYPES.FIXED && "$"}
         {discount.rule.value}{" "}
         {discount.rule.type.name === DISCOUNT_TYPES.PERCENTAGE && "%"}
+      </td>
+      <td className="py-3">
+        {discount.min_total && formatPrice(discount.min_total)}
       </td>
       <td className="flex py-3">
         <p>{discount.location.map((location) => location.name).join(", ")}</p>

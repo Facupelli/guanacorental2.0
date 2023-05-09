@@ -339,6 +339,7 @@ const RightBar = ({
                 location={location}
                 setDiscount={setDiscount}
                 discount={discount}
+                total={cartTotal}
               />
             </div>
           </div>
@@ -387,16 +388,22 @@ type AddCouponProps = {
   location: Location;
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
   discount: Discount | null;
+  total: number;
 };
 
-const AddCoupon = ({ location, setDiscount, discount }: AddCouponProps) => {
+const AddCoupon = ({
+  location,
+  setDiscount,
+  discount,
+  total,
+}: AddCouponProps) => {
   const { register, getValues } = useForm<{ code: string }>();
   const { mutate } = api.discount.getValidDiscountByCode.useMutation();
 
   const handleApplyDiscount = () => {
     const code = getValues("code");
     mutate(
-      { code, location: location.id },
+      { code, location: location.id, total },
       {
         onSuccess: (data) => {
           console.log(data);
