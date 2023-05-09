@@ -101,7 +101,7 @@ const DiscountRow = ({ discount }: DiscountItemProps) => {
   return (
     <tr className="text-sm">
       <td className="py-2">
-        <p className="w-fit rounded-2xl bg-secondary-foreground/20 px-3 py-1">
+        <p className="w-fit rounded-2xl bg-secondary-foreground/10 px-3 py-1">
           {discount.code}
         </p>
       </td>
