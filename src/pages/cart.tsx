@@ -397,6 +397,8 @@ const AddCoupon = ({
   discount,
   total,
 }: AddCouponProps) => {
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [error, setError] = useState("");
   const { register, getValues } = useForm<{ code: string }>();
   const { mutate } = api.discount.getValidDiscountByCode.useMutation();
 
@@ -412,41 +414,53 @@ const AddCoupon = ({
             typeName: data.rule.type.name,
             code: data.code,
           });
+          setError("");
         },
         onError: (err) => {
           console.log(err.message);
+          setError(err.message);
+          setShowErrorModal(true);
         },
       }
     );
   };
 
   return (
-    <Accordion type="single" collapsible>
-      <AccordionItem value="item-1" className="border-none">
-        <AccordionTrigger className=" font-semibold">
-          Ingresar cupón de descuento
-        </AccordionTrigger>
-        <AccordionContent>
-          <div className="flex gap-4 p-2">
-            <Input
-              type="text"
-              className="h-8"
-              {...register("code")}
-              disabled={!!discount}
-            />
-            <Button
-              disabled={!!discount}
-              type="button"
-              className="h-8"
-              variant={discount ? "secondary" : "default"}
-              onClick={handleApplyDiscount}
-            >
-              {discount ? "Aplicado" : "Aplicar"}
-            </Button>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <>
+      <DialogWithState
+        isOpen={showErrorModal}
+        setOpen={setShowErrorModal}
+        title="ERROR"
+      >
+        {error}
+      </DialogWithState>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1" className="border-none">
+          <AccordionTrigger className=" font-semibold">
+            Ingresar cupón de descuento
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex gap-4 p-2">
+              <Input
+                type="text"
+                className="h-8"
+                {...register("code")}
+                disabled={!!discount}
+              />
+              <Button
+                disabled={!!discount}
+                type="button"
+                className="h-8"
+                variant={discount ? "secondary" : "default"}
+                onClick={handleApplyDiscount}
+              >
+                {discount ? "Aplicado" : "Aplicar"}
+              </Button>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </>
   );
 };
 

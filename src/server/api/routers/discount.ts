@@ -118,7 +118,7 @@ export const discountRouter = createTRPCRouter({
       if (discount.min_total && total <= discount.min_total) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `El cupón tiene un mínimo de ${discount.min_total}`,
+          message: `El cupón tiene un mínimo de $${discount.min_total}`,
         });
       }
 
