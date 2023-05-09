@@ -442,6 +442,21 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
+      // IF DISCOUNT UPDATE DISCOUNT
+      let discountModel;
+      if (discount) {
+        discountModel = await prisma.discount.update({
+          where: {
+            code: discount.code,
+          },
+          data: {
+            usage_count: {
+              increment: 1,
+            },
+          },
+        });
+      }
+
       const equipmentsIds = equipmentOnOwnerIds.map((item) => ({
         id: item.id,
       }));
@@ -460,6 +475,7 @@ export const orderRouter = createTRPCRouter({
             subtotal,
             message,
             status: STATUS.PENDING,
+            discount: { connect: { id: discountModel?.id } },
           },
           include: {
             book: true,
@@ -491,22 +507,6 @@ export const orderRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Create Order failed, please try again later",
-        });
-      }
-
-      // IF DISCOUNT UPDATE DISCOUNT
-
-      if (discount) {
-        await prisma.discount.update({
-          where: {
-            code: discount.code,
-          },
-          data: {
-            usage_count: {
-              increment: 1,
-            },
-            orders: { connect: { id: newOrder.id } },
-          },
         });
       }
 
