@@ -124,6 +124,7 @@ model Location {
   name          String
   equipments    EquipmentOnOwner[]
   orders        Order[]
+  discounts     Discount[]
   // schedules     Schedule[]
 }
 
@@ -236,3 +237,35 @@ model Earning {
   orderId         String
 }
 
+model DiscountType {
+  id              String                @default(cuid()) @id
+  name            String
+  discounts       DiscountRule[]
+}
+
+model Discount {
+  id                String                @default(cuid()) @id
+  code              String
+  rule              DiscountRule    @relation(fields: [rule_id], references: [id])
+  rule_id           String          @unique
+  ends_at           DateTime?
+  starts_at         DateTime?
+  is_disabled       Boolean
+  location          Location[]
+  usage_count       Int
+  usage_limit       Int?
+  
+  created_at        DateTime            @default(now())
+}
+
+
+model DiscountRule {
+  id                String                @default(cuid()) @id
+  discount          Discount?
+  type              DiscountType        @relation(fields: [type_id], references: [id])
+  type_id           String
+  value             Int
+  description       String?
+
+  created_at        DateTime  @default(now())
+}

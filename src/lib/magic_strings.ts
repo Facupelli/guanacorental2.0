@@ -4,6 +4,11 @@ export const ROLES = {
   EMPLOYEE: "Employee",
 };
 
+export const DISCOUNT_TYPES = {
+  FIXED: "Fixed",
+  PERCENTAGE: "Percentage",
+};
+
 export const SORT_TYPES = {
   DEFAULT: "default",
   DESC: "desc",
