@@ -26,7 +26,6 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import { type Prisma, type Role } from "@prisma/client";
-import Table from "@/components/ui/Table";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -39,6 +38,11 @@ type Order = Prisma.OrderGetPayload<{
       include: { books: true; equipment: true; owner: true };
     };
     earnings: true;
+    discount: {
+      include: {
+        rule: true;
+      };
+    };
   };
 }>;
 
@@ -112,6 +116,7 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
                     total: order.total,
                     subtotal: order.subtotal,
                     workingDays: order.book.working_days,
+                    discount: order.discount,
                   }}
                 />
 
@@ -435,6 +440,12 @@ const AddEquipment = ({
   );
 };
 
+type Discount = Prisma.DiscountGetPayload<{
+  include: {
+    rule: true;
+  };
+}>;
+
 type OrderInfoProps = {
   info: {
     startDate: Date;
@@ -443,6 +454,7 @@ type OrderInfoProps = {
     total: number;
     message: string | null;
     workingDays: number;
+    discount: Discount | null;
   };
 };
 
@@ -481,6 +493,16 @@ const OrderInfo = ({ info }: OrderInfoProps) => {
         <div className="col-span-3 grid gap-1">
           <p className="text-xs text-primary/60">Mensaje</p>
           <p>{info.message}</p>
+        </div>
+
+        <div className="col-span-1 grid gap-1">
+          <p className="text-xs text-primary/60">Código</p>
+          <p>{info.discount?.code}</p>
+        </div>
+
+        <div className="col-span-2 grid gap-1">
+          <p className="text-xs text-primary/60">Descuento</p>
+          <p>{info.discount?.rule.value}</p>
         </div>
 
         <div className="grid gap-1">

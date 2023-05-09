@@ -1,17 +1,16 @@
+import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { type NextPage } from "next";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
+import Table from "@/components/ui/Table";
 
-import { type NextPage } from "next";
 import { api } from "@/utils/api";
 import { COUPON_STATUS, DISCOUNT_TYPES, STATUS } from "@/lib/magic_strings";
-import { Prisma } from "@prisma/client";
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import Table from "@/components/ui/Table";
-import dayjs from "dayjs";
+
+import { type Prisma } from "@prisma/client";
 
 const columnNames = [
   { title: "Código" },

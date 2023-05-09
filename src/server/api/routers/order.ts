@@ -205,6 +205,9 @@ export const orderRouter = createTRPCRouter({
             include: { books: true, equipment: true, owner: true },
           },
           earnings: true,
+          discount: {
+            include: { rule: true },
+          },
         },
       });
 
