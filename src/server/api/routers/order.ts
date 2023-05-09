@@ -302,6 +302,7 @@ export const orderRouter = createTRPCRouter({
   createOrder: protectedProcedure
     .input(
       z.object({
+        email: z.string().email().nullish(),
         startDate: z.date(),
         endDate: z.date(),
         workingDays: z.number(),
@@ -316,6 +317,7 @@ export const orderRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const {
+        email,
         startDate,
         endDate,
         pickupHour,
@@ -327,6 +329,27 @@ export const orderRouter = createTRPCRouter({
         total,
         workingDays,
       } = input;
+
+      let customer;
+
+      if (email) {
+        customer = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        console.log(
+          "0----------------------------------->",
+          customer,
+          !!customer
+        );
+
+        if (!customer) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Wrong customer email, customer does not exist",
+          });
+        }
+      }
 
       //GET UPDATED CART WITH MOST RECENT BOOKS
 
@@ -401,7 +424,7 @@ export const orderRouter = createTRPCRouter({
       try {
         newOrder = await prisma.order.create({
           data: {
-            customer: { connect: { id: customerId } },
+            customer: { connect: { id: customer ? customer.id : customerId } },
             equipments: { connect: equipmentsIds },
             book: { connect: { id: newBook.id } },
             location: { connect: { id: locationId } },

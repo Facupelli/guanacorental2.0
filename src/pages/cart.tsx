@@ -2,7 +2,7 @@ import Head from "next/head";
 import Nav from "@/components/Nav";
 
 import { useBoundStore } from "@/zustand/store";
-import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
+import { formatPrice, getIsAdmin, isEquipmentAvailable } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
@@ -20,10 +20,15 @@ import { type NextPage } from "next";
 import type { Equipment, Location } from "@/types/models";
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { ZodError } from "zod";
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
-  const { register, getValues } = useForm<{ message: string }>();
+  const { register, getValues } = useForm<{
+    message: string;
+    email?: string;
+  }>();
 
   const [showErrorModal, setErrorModal] = useState(false);
   const [error, setError] = useState("");
@@ -56,8 +61,15 @@ const CartPage: NextPage = () => {
     return 0;
   }, [workingDays, cartItems]);
 
+  if (!session) return <div>404</div>;
+
+  const isAdmin = getIsAdmin(session?.user.role);
+
   const handleBookOrder = () => {
     const message = getValues("message");
+    const email = getValues("email");
+
+    console.log(typeof email);
 
     const cart = cartItems.map((item) => ({
       id: item.id,
@@ -85,6 +97,7 @@ const CartPage: NextPage = () => {
           message,
           cart,
           workingDays,
+          email: email ? email : null,
         },
         {
           onSuccess: (data) => {
@@ -149,6 +162,7 @@ const CartPage: NextPage = () => {
             handleBookOrder={handleBookOrder}
             isLoading={isLoading}
             cart={cartItems}
+            isAdmin={isAdmin}
           />
         </section>
       </main>
@@ -215,10 +229,11 @@ type RightBarProps = {
   cartTotal: number;
   location: Location;
   pickupHour: string;
-  register: UseFormRegister<{ message: string }>;
+  register: UseFormRegister<{ message: string; email?: string }>;
   handleBookOrder: () => void;
   isLoading: boolean;
   cart: Equipment[];
+  isAdmin: boolean;
 };
 
 const RightBar = ({
@@ -229,6 +244,7 @@ const RightBar = ({
   handleBookOrder,
   isLoading,
   cart,
+  isAdmin,
 }: RightBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
@@ -265,7 +281,7 @@ const RightBar = ({
           {...register("message")}
         />
 
-        <div className="grid gap-3">
+        <div className="grid gap-6">
           <div className="flex items-center justify-between font-semibold">
             <p>Sucursal:</p>
             <p>{location.name}</p>
@@ -278,9 +294,19 @@ const RightBar = ({
           </div>
           <div className="flex items-center justify-between font-semibold">
             <p>Total:</p>
-
             <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
           </div>
+
+          {isAdmin && (
+            <div className="flex items-center justify-between font-semibold">
+              <p>Email cliente:</p>
+              <Input
+                type="email"
+                {...register("email")}
+                className="ml-auto h-8 w-1/2"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid gap-2">

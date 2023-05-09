@@ -73,6 +73,8 @@ export const calcualteAndCreateEarnings = async (newOrder: NewOrder) => {
       order: { connect: { id: newOrder.id } },
     },
   });
+
+  return earnings;
 };
 
 export const updateEarnings = async (

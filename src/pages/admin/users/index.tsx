@@ -22,6 +22,7 @@ import { api } from "@/utils/api";
 
 import { type Role } from "@prisma/client";
 import { type NextPage } from "next";
+import { Button } from "@/components/ui/button";
 
 const columns = [
   { title: "Alta" },
@@ -47,6 +48,10 @@ const AdminUsers: NextPage = () => {
     roleId,
   });
 
+  const handleCreateUser = () => {
+    void router.push("/new-user");
+  };
+
   const handleClickUser = (userId: string) => {
     void router.push(`/admin/users/${userId}`);
   };
@@ -65,11 +70,16 @@ const AdminUsers: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
           <div className="grid gap-6 pt-6">
-            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
-              <Label className="whitespace-nowrap">Rol del cliente</Label>
-              {roles.data && (
-                <SelectRole roles={roles.data} setValue={setValue} />
-              )}
+            <div className="flex">
+              <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
+                <Label className="whitespace-nowrap">Rol del cliente</Label>
+                {roles.data && (
+                  <SelectRole roles={roles.data} setValue={setValue} />
+                )}
+              </div>
+              <div className="ml-auto">
+                <Button onClick={handleCreateUser}>Crear Cliente</Button>
+              </div>
             </div>
             <Table headTitles={columns}>
               {data?.users.length === 0 ? (
