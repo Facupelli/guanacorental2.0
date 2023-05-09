@@ -109,25 +109,20 @@ export const calculateOwnerEarning = (
     );
 
     for (const equipment of equipmentOnOwners) {
-      const equipmentPrice = equipment.equipment.price;
       const ownerName = equipment.owner.name;
-      const quantity = equipment.books[0]?.quantity;
+      const total = newOrder.total;
 
-      if (workingDays && quantity) {
-        const total = workingDays * equipmentPrice * quantity;
-
-        if (ownerName === "Federico") {
-          federicoEarnings += total;
-        } else if (ownerName === "Oscar") {
-          oscarEarnings += total;
-        } else if (ownerName === "Sub") {
-          subEarnings += total * 0.7;
-          federicoEarnings += total * 0.15;
-          oscarEarnings += total * 0.15;
-        } else {
-          federicoEarnings += total / 2;
-          oscarEarnings += total / 2;
-        }
+      if (ownerName === "Federico") {
+        federicoEarnings += total;
+      } else if (ownerName === "Oscar") {
+        oscarEarnings += total;
+      } else if (ownerName === "Sub") {
+        subEarnings += total * 0.7;
+        federicoEarnings += total * 0.15;
+        oscarEarnings += total * 0.15;
+      } else {
+        federicoEarnings += total / 2;
+        oscarEarnings += total / 2;
       }
     }
 

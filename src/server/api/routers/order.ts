@@ -3,10 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
-import {
-  calculateOwnerEarning,
-  getEquipmentOnOwnerIds,
-} from "@/server/utils/order";
+import { getEquipmentOnOwnerIds } from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
@@ -302,6 +299,13 @@ export const orderRouter = createTRPCRouter({
   createOrder: protectedProcedure
     .input(
       z.object({
+        discount: z
+          .object({
+            value: z.number(),
+            typeName: z.string(),
+            code: z.string(),
+          })
+          .nullish(),
         email: z.string().email().nullish(),
         startDate: z.date(),
         endDate: z.date(),
@@ -317,6 +321,7 @@ export const orderRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const {
+        discount,
         email,
         startDate,
         endDate,
@@ -454,6 +459,22 @@ export const orderRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Create Order failed, please try again later",
+        });
+      }
+
+      // IF DISCOUNT UPDATE DISCOUNT
+
+      if (discount) {
+        await prisma.discount.update({
+          where: {
+            code: discount.code,
+          },
+          data: {
+            usage_count: {
+              increment: 1,
+            },
+            orders: { connect: { id: newOrder.id } },
+          },
         });
       }
 

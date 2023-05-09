@@ -217,6 +217,8 @@ model Order {
   equipments      EquipmentOnOwner[]
   status          String
   earnings        Earning[]
+  discount        Discount?             @relation(fields: [discount_id], references: [id])
+  discount_id     String?
   // cart            Cart?                 @relation(fields: [cartId], references: [id])
   // cartId          String?               @unique
   subtotal        Int
@@ -245,7 +247,7 @@ model DiscountType {
 
 model Discount {
   id                String                @default(cuid()) @id
-  code              String
+  code              String          @unique
   rule              DiscountRule    @relation(fields: [rule_id], references: [id])
   rule_id           String          @unique
   ends_at           DateTime?
@@ -254,6 +256,7 @@ model Discount {
   location          Location[]
   usage_count       Int
   usage_limit       Int?
+  orders            Order[]
   
   created_at        DateTime            @default(now())
 }

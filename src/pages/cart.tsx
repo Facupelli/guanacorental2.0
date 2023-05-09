@@ -3,7 +3,7 @@ import Nav from "@/components/Nav";
 
 import { useBoundStore } from "@/zustand/store";
 import { formatPrice, getIsAdmin, isEquipmentAvailable } from "@/lib/utils";
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,20 @@ import { type UseFormRegister, useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ZodError } from "zod";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Prisma } from "@prisma/client";
+import { DISCOUNT_TYPES } from "@/lib/magic_strings";
+
+type Discount = {
+  value: number;
+  typeName: string;
+  code: string;
+};
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
@@ -30,6 +44,7 @@ const CartPage: NextPage = () => {
     email?: string;
   }>();
 
+  const [discount, setDiscount] = useState<Discount | null>(null);
   const [showErrorModal, setErrorModal] = useState(false);
   const [error, setError] = useState("");
 
@@ -50,7 +65,10 @@ const CartPage: NextPage = () => {
     return undefined;
   }, [startDate, endDate, pickupHour]);
 
-  const cartTotal = useMemo(() => {
+  const calcaulateCartTotal = (
+    cartItems: Equipment[],
+    workingDays: number | undefined
+  ) => {
     const cartSum = cartItems.reduce(
       (acc, curr) => acc + curr.price * curr.quantity,
       0
@@ -59,7 +77,27 @@ const CartPage: NextPage = () => {
       return workingDays * cartSum;
     }
     return 0;
-  }, [workingDays, cartItems]);
+  };
+
+  const subtotal = calcaulateCartTotal(cartItems, workingDays);
+
+  const cartTotal = useMemo(() => {
+    if (workingDays) {
+      const total = subtotal;
+      if (discount) {
+        if (discount.typeName === DISCOUNT_TYPES.FIXED) {
+          return total - discount.value;
+        }
+
+        if (discount.typeName === DISCOUNT_TYPES.PERCENTAGE) {
+          return total - total * (discount.value / 100);
+        }
+      }
+
+      return total;
+    }
+    return 0;
+  }, [workingDays, cartItems, discount]);
 
   if (!session) return <div>404</div>;
 
@@ -68,8 +106,6 @@ const CartPage: NextPage = () => {
   const handleBookOrder = () => {
     const message = getValues("message");
     const email = getValues("email");
-
-    console.log(typeof email);
 
     const cart = cartItems.map((item) => ({
       id: item.id,
@@ -87,12 +123,13 @@ const CartPage: NextPage = () => {
     if (startDate && endDate && session?.user && workingDays) {
       mutate(
         {
+          discount,
           startDate,
           endDate,
           locationId: location.id,
           customerId: session.user.id,
           pickupHour,
-          subtotal: cartTotal,
+          subtotal,
           total: cartTotal,
           message,
           cart,
@@ -163,6 +200,9 @@ const CartPage: NextPage = () => {
             isLoading={isLoading}
             cart={cartItems}
             isAdmin={isAdmin}
+            setDiscount={setDiscount}
+            discount={discount}
+            subtotal={subtotal}
           />
         </section>
       </main>
@@ -234,6 +274,9 @@ type RightBarProps = {
   isLoading: boolean;
   cart: Equipment[];
   isAdmin: boolean;
+  setDiscount: Dispatch<SetStateAction<Discount | null>>;
+  discount: Discount | null;
+  subtotal: number;
 };
 
 const RightBar = ({
@@ -245,6 +288,9 @@ const RightBar = ({
   isLoading,
   cart,
   isAdmin,
+  setDiscount,
+  discount,
+  subtotal,
 }: RightBarProps) => {
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
@@ -282,14 +328,25 @@ const RightBar = ({
         />
 
         <div className="grid gap-6">
-          <div className="flex items-center justify-between font-semibold">
-            <p>Sucursal:</p>
-            <p>{location.name}</p>
+          <div>
+            <div className="flex items-center justify-between font-semibold">
+              <p>Sucursal:</p>
+              <p className="font-bold">{location.name}</p>
+            </div>
+
+            <div>
+              <AddCoupon
+                location={location}
+                setDiscount={setDiscount}
+                discount={discount}
+              />
+            </div>
           </div>
+
           <div className="flex items-center justify-between font-semibold">
             <p>Subtotal:</p>
             {(startDate || endDate) && (
-              <p className="font-semibold">{formatPrice(cartTotal)}</p>
+              <p className="font-semibold">{formatPrice(subtotal)}</p>
             )}
           </div>
           <div className="flex items-center justify-between font-semibold">
@@ -323,6 +380,66 @@ const RightBar = ({
         </div>
       </div>
     </section>
+  );
+};
+
+type AddCouponProps = {
+  location: Location;
+  setDiscount: Dispatch<SetStateAction<Discount | null>>;
+  discount: Discount | null;
+};
+
+const AddCoupon = ({ location, setDiscount, discount }: AddCouponProps) => {
+  const { register, getValues } = useForm<{ code: string }>();
+  const { mutate } = api.discount.getValidDiscountByCode.useMutation();
+
+  const handleApplyDiscount = () => {
+    const code = getValues("code");
+    mutate(
+      { code, location: location.id },
+      {
+        onSuccess: (data) => {
+          console.log(data);
+          setDiscount({
+            value: data.rule.value,
+            typeName: data.rule.type.name,
+            code: data.code,
+          });
+        },
+        onError: (err) => {
+          console.log(err.message);
+        },
+      }
+    );
+  };
+
+  return (
+    <Accordion type="single" collapsible>
+      <AccordionItem value="item-1" className="border-none">
+        <AccordionTrigger className=" font-semibold">
+          Ingresar cupón de descuento
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="flex gap-4 p-2">
+            <Input
+              type="text"
+              className="h-8"
+              {...register("code")}
+              disabled={!!discount}
+            />
+            <Button
+              disabled={!!discount}
+              type="button"
+              className="h-8"
+              variant={discount ? "secondary" : "default"}
+              onClick={handleApplyDiscount}
+            >
+              {discount ? "Aplicado" : "Aplicar"}
+            </Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
