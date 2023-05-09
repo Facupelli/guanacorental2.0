@@ -38,6 +38,12 @@ export const STATUS = {
   TODAY: "Entrega Hoy",
 };
 
+export const COUPON_STATUS = {
+  PENDING: "Pendiente",
+  ENDED: "Finalizado",
+  ACTIVE: "Active",
+};
+
 interface StatusStyles {
   [status: string]: string;
 }

@@ -6,7 +6,24 @@ import AdminLayout from "@/components/layout/AdminLayout";
 
 import { type NextPage } from "next";
 import { api } from "@/utils/api";
-import { DISCOUNT_TYPES } from "@/lib/magic_strings";
+import { COUPON_STATUS, DISCOUNT_TYPES, STATUS } from "@/lib/magic_strings";
+import { Prisma } from "@prisma/client";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import Table from "@/components/ui/Table";
+import dayjs from "dayjs";
+
+const columnNames = [
+  { title: "Código" },
+  { title: "Tipo" },
+  { title: "Valor" },
+  { title: "Sucursal" },
+  { title: "Status" },
+  { title: "Empieza" },
+  { title: "Termina" },
+  { title: "Usados" },
+  { title: "Límite" },
+];
 
 const AdminDiscounts: NextPage = () => {
   const router = useRouter();
@@ -27,40 +44,86 @@ const AdminDiscounts: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">DESCUENTOS</h1>
           <div className="grid gap-6 pt-6">
-            {data &&
-              data.map((discount) => (
-                <div key={discount.id}>
-                  <p>Código: {discount.code}</p>
-                  <p>Empieza: {discount.starts_at?.toLocaleDateString()}</p>
-                  <p>Termina: {discount.ends_at?.toLocaleDateString()}</p>
-
-                  <p>Tipo: {discount.rule.type.name}</p>
-
-                  <p>
-                    Valor: {discount.rule.value}
-                    {discount.rule.type.name === DISCOUNT_TYPES.FIXED
-                      ? "$"
-                      : "%"}
-                  </p>
-                  <p>{discount.rule.description}</p>
-
-                  <div>
-                    Sucursales:
-                    {discount.location.map((location) => (
-                      <p>{location.name}</p>
-                    ))}
-                  </div>
-
-                  <div>
-                    <p>Usados: {discount.usage_count}</p>
-                    <p>Limite: {discount.usage_limit}</p>
-                  </div>
-                </div>
-              ))}
+            <Table headTitles={columnNames}>
+              {data &&
+                data.map((discount) => (
+                  <DiscountRow key={discount.id} discount={discount} />
+                ))}
+            </Table>
           </div>
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+type Discount = Prisma.DiscountGetPayload<{
+  include: {
+    location: true;
+    rule: {
+      include: {
+        type: true;
+      };
+    };
+  };
+}>;
+
+type DiscountItemProps = {
+  discount: Discount;
+};
+
+const DiscountRow = ({ discount }: DiscountItemProps) => {
+  const getDiscountStatus = () => {
+    if (dayjs().isBefore(dayjs(discount.starts_at))) {
+      return COUPON_STATUS.PENDING;
+    }
+    if (
+      dayjs().isAfter(dayjs(discount.ends_at)) ||
+      (discount.usage_limit && discount.usage_count >= discount.usage_limit)
+    ) {
+      return COUPON_STATUS.ENDED;
+    }
+
+    return COUPON_STATUS.ACTIVE;
+  };
+
+  const status = getDiscountStatus();
+
+  const statusClases = {
+    [COUPON_STATUS.PENDING]:
+      "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800 w-fit",
+    [COUPON_STATUS.ENDED]:
+      "py-1 px-3 bg-red-100 rounded-xl text-slate-800 w-fit",
+    [COUPON_STATUS.ACTIVE]:
+      "py-1 px-3 bg-green-100 rounded-xl text-slate-800 w-fit",
+  };
+
+  return (
+    <tr className="text-sm">
+      <td className="py-2">
+        <p className="w-fit rounded-2xl bg-secondary-foreground/20 px-3 py-1">
+          {discount.code}
+        </p>
+      </td>
+      <td className="py-3">{discount.rule.type.name}</td>
+      <td className="py-3">
+        {discount.rule.type.name === DISCOUNT_TYPES.FIXED && "$"}
+        {discount.rule.value}{" "}
+        {discount.rule.type.name === DISCOUNT_TYPES.PERCENTAGE && "%"}
+      </td>
+      <td className="flex py-3">
+        <p>{discount.location.map((location) => location.name).join(", ")}</p>
+      </td>
+      <td className="py-2">
+        <p className={`${statusClases[status]}`}>{status}</p>
+      </td>
+      <td className="py-3">
+        {discount.starts_at?.toLocaleDateString() ?? "-"}
+      </td>
+      <td className="py-3">{discount.ends_at?.toLocaleDateString() ?? "-"}</td>
+      <td className="py-3">{discount.usage_count}</td>
+      <td className="py-3">{discount.usage_limit}</td>
+    </tr>
   );
 };
 
