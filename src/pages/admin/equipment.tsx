@@ -53,6 +53,8 @@ import type {
   Location,
   Owner,
 } from "@/types/models";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/server/auth";
 
 const tableTitles = [
   { title: "" },
@@ -462,10 +464,12 @@ const SelectOwner = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: { prisma, session: null },
+    ctx: { prisma, session },
     transformer: superjason,
   });
 

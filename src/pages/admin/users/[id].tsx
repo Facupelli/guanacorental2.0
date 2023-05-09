@@ -226,7 +226,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (id) {
     const helpers = createServerSideHelpers({
       router: appRouter,
-      ctx: { prisma, session: null },
+      ctx: { prisma, session },
       transformer: superjason,
     });
 

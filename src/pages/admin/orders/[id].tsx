@@ -57,12 +57,14 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
     orderId: router.query.id as string,
   });
 
-  if (!data) return <div>404</div>;
+  let order;
 
-  const order = {
-    ...data,
-    equipments: getOrderEquipmentOnOwners(data.equipments, data.bookId),
-  };
+  if (data) {
+    order = {
+      ...data,
+      equipments: getOrderEquipmentOnOwners(data.equipments, data.bookId),
+    };
+  }
 
   const isAdmin = getIsAdmin(user.role);
 
@@ -79,42 +81,50 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">PEDIDO DETALLE</h1>
-          <div className="grid gap-6 pt-6">
-            <div className="grid gap-6 rounded-md bg-white p-6">
-              <CustomerInfo
-                order={{ number: order.number, createdAt: order.created_at }}
-                customer={{
-                  name: order.customer.name,
-                  email: order.customer.email,
-                  phone: order.customer.address?.phone,
-                  dniNumber: order.customer.address?.dni_number,
-                }}
-              />
-
-              {order.earnings[0] && (
-                <EquipmentsBooked equipments={order.equipments} order={order} />
-              )}
-
-              <OrderInfo
-                info={{
-                  startDate: order.book.start_date,
-                  endDate: order.book.end_date,
-                  message: order.message,
-                  total: order.total,
-                  subtotal: order.subtotal,
-                  workingDays: order.book.working_days,
-                }}
-              />
-
-              {isAdmin && (
-                <EarningsInfo
-                  oscar={order.earnings[0]?.oscar ?? 0}
-                  federico={order.earnings[0]?.federico ?? 0}
-                  sub={order.earnings[0]?.sub ?? 0}
+          {isLoading && <div>Cargando...</div>}
+          {!data || !order ? (
+            <div>Order Not Found</div>
+          ) : (
+            <div className="grid gap-6 pt-6">
+              <div className="grid gap-6 rounded-md bg-white p-6">
+                <CustomerInfo
+                  order={{ number: order.number, createdAt: order.created_at }}
+                  customer={{
+                    name: order.customer.name,
+                    email: order.customer.email,
+                    phone: order.customer.address?.phone,
+                    dniNumber: order.customer.address?.dni_number,
+                  }}
                 />
-              )}
+
+                {order.earnings[0] && (
+                  <EquipmentsBooked
+                    equipments={order.equipments}
+                    order={order}
+                  />
+                )}
+
+                <OrderInfo
+                  info={{
+                    startDate: order.book.start_date,
+                    endDate: order.book.end_date,
+                    message: order.message,
+                    total: order.total,
+                    subtotal: order.subtotal,
+                    workingDays: order.book.working_days,
+                  }}
+                />
+
+                {isAdmin && (
+                  <EarningsInfo
+                    oscar={order.earnings[0]?.oscar ?? 0}
+                    federico={order.earnings[0]?.federico ?? 0}
+                    sub={order.earnings[0]?.sub ?? 0}
+                  />
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </AdminLayout>
       </main>
     </>
@@ -523,7 +533,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (id && session) {
     const helpers = createServerSideHelpers({
       router: appRouter,
-      ctx: { prisma, session: null },
+      ctx: { prisma, session },
       transformer: superjason,
     });
 

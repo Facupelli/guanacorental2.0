@@ -38,6 +38,8 @@ import {
 import type { Category, Equipment, Location } from "@/types/models";
 import { useForm } from "react-hook-form";
 import useDebounce from "@/hooks/useDebounce";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/server/auth";
 
 type Props = {
   locations: Location[];
@@ -327,10 +329,12 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: { prisma, session: null },
+    ctx: { prisma, session },
     transformer: superjason,
   });
 
