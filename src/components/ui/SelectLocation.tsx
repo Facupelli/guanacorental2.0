@@ -26,7 +26,6 @@ const SelectLocation = ({
   onValueChange,
   children,
 }: SelectLocationProps) => {
-  console.log(locations);
   return (
     <Select onValueChange={(e) => onValueChange(e)} defaultValue={defaultValue}>
       <SelectTrigger>

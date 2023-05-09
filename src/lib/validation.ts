@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const validationAddress = z.object({
+  email: z.string().optional(),
   full_name: z.string().nonempty(),
   company: z.string().optional(),
   phone: z.string().nonempty(),

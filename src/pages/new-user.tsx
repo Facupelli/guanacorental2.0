@@ -17,8 +17,10 @@ import { api } from "@/utils/api";
 import { validationAddress } from "@/lib/validation";
 
 import { type NextPage } from "next";
+import { getIsAdmin } from "@/lib/utils";
 
 type NewUserFormData = {
+  email?: string;
   full_name: string;
   company: string;
   phone: string;
@@ -51,12 +53,14 @@ const NewUserPage: NextPage = () => {
     resolver: zodResolver(validationAddress),
   });
 
-  console.log(errors);
-
-  const { isLoading, mutate } = api.user.createUserAddress.useMutation();
-
   const [, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    setShowModal(true);
+  }, []);
+
+  const { isLoading, mutate } = api.user.createUserAddress.useMutation();
 
   const onSubmit = (data: NewUserFormData) => {
     if (!session?.user.id) return;
@@ -74,9 +78,9 @@ const NewUserPage: NextPage = () => {
     );
   };
 
-  useEffect(() => {
-    setShowModal(true);
-  }, []);
+  if (!session) return <div>404</div>;
+
+  const isAdmin = getIsAdmin(session?.user.role);
 
   return (
     <>
@@ -93,20 +97,38 @@ const NewUserPage: NextPage = () => {
 
       <Nav />
 
-      <main className="min-h-screen bg-app-bg px-6 pt-[70px]">
+      <main className="min-h-screen bg-app-bg px-10 pt-[70px]">
         <h1 className="mt-12 text-3xl font-bold">Formulario Alta de Cliente</h1>
         {/* <ImportanModal showModal={showModal} setShowModal={setShowModal} /> */}
 
         <section className="max-w-xl py-10">
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
+            {isAdmin && (
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  className="bg-white"
+                  id="email"
+                  type="email"
+                  placeholder="juan@gmail.com"
+                  {...register("email")}
+                />
+                <p className="pt-1 text-sm text-primary/60">
+                  si la cuenta va a ser usada luego por el usuario deben usar el
+                  mail asociado con su centa de facebook o google
+                </p>
+              </div>
+            )}
+
             <div>
               <Label htmlFor="fullName">Nombre Completo</Label>
               <Input
                 className="bg-white"
                 id="fullName"
                 type="text"
-                placeholder="Jorge González"
+                placeholder="Juan Perez"
                 {...register("full_name")}
+                defaultValue={session?.user.name as string}
               />
             </div>
 
@@ -356,7 +378,11 @@ const SuccessModal = ({
   };
 
   return (
-    <DialogWithState isOpen={showSuccessModal} title="">
+    <DialogWithState
+      isOpen={showSuccessModal}
+      setOpen={setShowSuccessModal}
+      title=""
+    >
       <div className="grid gap-4 py-4">
         El alta fue enviada correctamente. Puede demorar hasta 48hs para
         aprobarla o denegarla. Te notificaremos via email.

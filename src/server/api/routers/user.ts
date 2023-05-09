@@ -102,6 +102,17 @@ export const userRouter = createTRPCRouter({
   createUserAddress: protectedProcedure
     .input(validationAddress.extend({ userId: z.string().nonempty() }))
     .mutation(async ({ input }) => {
+      let newUser;
+
+      if (input.email) {
+        newUser = await prisma.user.create({
+          data: {
+            email: input.email,
+            name: input.full_name,
+          },
+        });
+      }
+
       const address = await prisma.address.create({
         data: {
           full_name: input.full_name,
@@ -134,7 +145,7 @@ export const userRouter = createTRPCRouter({
       if (!customerRole) return;
 
       await prisma.user.update({
-        where: { id: input.userId },
+        where: { id: newUser ? newUser.id : input.userId },
         data: {
           address: { connect: { id: address.id } },
           role: { connect: { id: customerRole.id } },
