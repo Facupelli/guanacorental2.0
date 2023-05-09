@@ -208,6 +208,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
     location: order.locationId,
   });
 
+  const ctx = api.useContext();
   const { mutate } = api.order.removeEquipmentFromOrder.useMutation();
 
   const handleDeleteEquipment = (
@@ -226,7 +227,11 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
         },
       };
 
-      mutate(data);
+      mutate(data, {
+        onSuccess: () => {
+          ctx.order.getOrderById.invalidate();
+        },
+      });
     }
   };
 
@@ -402,6 +407,7 @@ const AddEquipment = ({
 }: AddEquipmentProps) => {
   const { register, getValues } = useForm<{ quantity: number }>();
 
+  const ctx = api.useContext();
   const { mutate } = api.order.addEquipmentToOrder.useMutation();
 
   const handleAddEquipment = () => {
@@ -420,13 +426,20 @@ const AddEquipment = ({
       })),
     };
 
-    mutate({
-      bookId,
-      orderId,
-      earningId,
-      discountId,
-      cart: [cart],
-    });
+    mutate(
+      {
+        bookId,
+        orderId,
+        earningId,
+        discountId,
+        cart: [cart],
+      },
+      {
+        onSuccess: () => {
+          ctx.order.getOrderById.invalidate();
+        },
+      }
+    );
   };
 
   return (
