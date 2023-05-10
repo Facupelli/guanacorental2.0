@@ -8,7 +8,22 @@ import {
   type ExpandedState,
   getExpandedRowModel,
   type Row,
+  Table as TableType,
 } from "@tanstack/react-table";
+
+type Order = Prisma.OrderGetPayload<{
+  include: {
+    customer: {
+      include: { address: true };
+    };
+    location: true;
+    book: true;
+    equipments: {
+      include: { books: true; equipment: true; owner: true };
+    };
+    earnings: true;
+  };
+}>;
 
 import {
   Table,
@@ -25,6 +40,8 @@ import {
   DropdownMenuCheckboxItem,
 } from "./dropdown-menu";
 import { Button } from "./button";
+import { Prisma } from "@prisma/client";
+import { Input } from "./input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,33 +75,13 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="rounded-md border bg-white">
-      <div className="flex px-6 py-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columnas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value: boolean) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex gap-10 px-6 py-4">
+        <Input
+          type="text"
+          placeholder="Buscar por número de pedido"
+          className="w-[400px]"
+        />
+        <VisibilityDropMenu table={table} />
       </div>
       <Table>
         <TableHeader>
@@ -147,3 +144,34 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
+
+const VisibilityDropMenu = ({ table }: { table: TableType<TData> }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="ml-auto">
+          Columnas
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {table
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .map((column) => {
+            return (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value: boolean) =>
+                  column.toggleVisibility(!!value)
+                }
+              >
+                {column.id}
+              </DropdownMenuCheckboxItem>
+            );
+          })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

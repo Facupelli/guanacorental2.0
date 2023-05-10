@@ -53,7 +53,7 @@ type Order = Prisma.OrderGetPayload<{
   };
 }>;
 
-const orderColumns: ColumnDef<Order>[] = [
+export const orderColumns: ColumnDef<Order>[] = [
   { accessorKey: "number", header: "N°" },
   { id: "fullName", accessorFn: (row) => row.customer.name, header: "Nombre" },
   {
@@ -110,20 +110,7 @@ const orderColumns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const order = row.original;
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem>Generar remito</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <ActionsDropMenu />;
     },
   },
 ];
@@ -165,7 +152,7 @@ const AdminOrders: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">PEDIDOS</h1>
           <div className="grid gap-6 pt-6">
-            <div className="flex w-2/3 items-center gap-6 rounded-md bg-white p-4">
+            <div className="flex items-center gap-6 rounded-md bg-white p-4">
               <Label>Sucursal:</Label>
               {locations?.data && (
                 <SelectLocation
@@ -187,29 +174,9 @@ const AdminOrders: NextPage = () => {
                 columns={orderColumns}
                 data={filteredOrers}
                 getRowCanExpand={() => true}
-                subComponent={renderSubComponent}
+                subComponent={equipmentsList}
               />
             )}
-            {/* <Table headTitles={orderTableColumns}>
-              {filteredOrers?.length === 0 ? (
-                <tr>
-                  <td colSpan={12} className="py-5">
-                    Actualmente no hay pedidos
-                  </td>
-                </tr>
-              ) : (
-                filteredOrers?.map((order) => (
-                  <OrderRow key={order.id} order={order} />
-                ))
-              )}
-              {isLoading && (
-                <tr>
-                  <td colSpan={12} className="py-5">
-                    Cargando...
-                  </td>
-                </tr>
-              )}
-            </Table> */}
           </div>
           <Pagination
             totalCount={data?.totalCount ?? 0}
@@ -251,7 +218,7 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
   );
 };
 
-const renderSubComponent = ({ row }: { row: Row<Order> }) => {
+export const equipmentsList = ({ row }: { row: Row<Order> }) => {
   return (
     <div>
       {row.original.equipments.map((ownerEquipment) => (
@@ -282,6 +249,23 @@ const renderSubComponent = ({ row }: { row: Row<Order> }) => {
         </div>
       ))}
     </div>
+  );
+};
+
+const ActionsDropMenu = () => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>Generar remito</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

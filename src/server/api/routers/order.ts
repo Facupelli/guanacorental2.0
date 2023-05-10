@@ -252,16 +252,17 @@ export const orderRouter = createTRPCRouter({
           locationId: input.location,
         },
         include: {
-          book: true,
-          equipments: {
-            include: { books: true, owner: true, equipment: true },
-          },
           customer: {
             include: {
               address: true,
             },
           },
           location: true,
+          book: true,
+          equipments: {
+            include: { books: true, owner: true, equipment: true },
+          },
+          earnings: true,
         },
       });
 

@@ -6,7 +6,6 @@ import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/table";
 import OrderRow from "@/components/OrderRow";
 import { Label } from "@/components/ui/label";
 import SelectLocation from "@/components/ui/SelectLocation";
@@ -18,6 +17,8 @@ import { handleAdminLocationChange } from "@/lib/utils";
 import { type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
+import { DataTable } from "@/components/ui/data-table";
+import { equipmentsList, orderColumns } from "./orders";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -31,18 +32,9 @@ type Order = Prisma.OrderGetPayload<{
       };
     };
     location: true;
+    earnings: true;
   };
 }>;
-
-const columnTitles = [
-  { title: "N°" },
-  { title: "Nombre" },
-  { title: "Retiro" },
-  { title: "Devolución" },
-  { title: "Estado" },
-  { title: "Total" },
-  { title: "Sucursal" },
-];
 
 const Admin: NextPage = () => {
   // const [calendarValue, setCalendarValue] = useState();
@@ -141,7 +133,7 @@ const Admin: NextPage = () => {
                   return "";
                 }}
               />
-              <div className="flex flex-col gap-2 rounded-md bg-white p-4 text-sm font-semibold">
+              <div className="flex w-[300px] flex-col gap-2 rounded-md bg-white p-4 text-sm font-semibold">
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full bg-green-400" />
                   <p>Retiro de equipos</p>
@@ -157,30 +149,21 @@ const Admin: NextPage = () => {
                   </div>
                   <p>Devolución y Retiro de equipos</p>
                 </div>
+                <div className="py-4 text-primary/60">
+                  Selecciona una fecha para ver los pedidos que se retiran o
+                  devuelven ese mismo día.
+                </div>
               </div>
             </div>
             <div className="col-span-12">
-              <Table headTitles={columnTitles}>
-                {orders && orders.length === 0 ? (
-                  <tr>
-                    <td className="py-5" colSpan={12}>
-                      No hay pedidos para hoy.
-                    </td>
-                  </tr>
-                ) : (
-                  orders &&
-                  orders.map((order) => (
-                    <OrderRow key={order.id} order={order} calendarView />
-                  ))
-                )}
-                {isLoading && (
-                  <tr>
-                    <td className="py-5" colSpan={12}>
-                      Cargando...
-                    </td>
-                  </tr>
-                )}
-              </Table>
+              {orders && (
+                <DataTable
+                  columns={orderColumns}
+                  data={orders}
+                  getRowCanExpand={() => true}
+                  subComponent={equipmentsList}
+                />
+              )}
             </div>
           </div>
         </AdminLayout>
