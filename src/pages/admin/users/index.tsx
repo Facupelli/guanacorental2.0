@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/table";
 import Pagination from "@/components/ui/Pagination";
 import {
   Select,
@@ -20,17 +19,55 @@ import { Label } from "@/components/ui/label";
 
 import { api } from "@/utils/api";
 
-import { type Role } from "@prisma/client";
+import { Prisma, type Role } from "@prisma/client";
 import { type NextPage } from "next";
 import { Button } from "@/components/ui/button";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/ui/data-table";
 
-const columns = [
-  { title: "Alta" },
-  { title: "Nombre" },
-  { title: "Teléfono" },
-  { title: "DNI" },
-  { title: "Provincia" },
-  { title: "Pedidos" },
+type User = Prisma.UserGetPayload<{
+  include: {
+    role: true;
+    address: true;
+    orders: true;
+  };
+}>;
+
+const userColumns: ColumnDef<User>[] = [
+  {
+    id: "alta",
+    header: "Alta",
+    accessorFn: (row) => row.address?.created_at.toLocaleDateString(),
+  },
+  { id: "fullName", accessorFn: (row) => row.name, header: "Nombre" },
+  {
+    id: "retiro",
+    header: "Teléfono",
+    accessorFn: (row) => row.address?.phone,
+  },
+  {
+    id: "devolución",
+    header: "DNI",
+    accessorFn: (row) => row.address?.dni_number,
+  },
+  {
+    id: "location",
+    header: "Provincia",
+    accessorFn: (row) => row.address?.province,
+  },
+  {
+    id: "orders",
+    header: "Pedidos",
+    accessorFn: (row) => row.orders.length,
+  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const order = row.original;
+
+  //     return <ActionsDropMenu />;
+  //   },
+  // },
 ];
 
 const AdminUsers: NextPage = () => {
@@ -81,47 +118,14 @@ const AdminUsers: NextPage = () => {
                 <Button onClick={handleCreateUser}>Crear Cliente</Button>
               </div>
             </div>
-            <Table headTitles={columns}>
-              {data?.users.length === 0 ? (
-                <tr>
-                  <td className="py-5" colSpan={12}>
-                    No hay usuarios
-                  </td>
-                </tr>
-              ) : (
-                data?.users.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="cursor-pointer text-sm"
-                    onClick={() => handleClickUser(user.id)}
-                  >
-                    <td className="py-4 ">
-                      {user.address?.created_at &&
-                        new Date(user.address?.created_at).toLocaleDateString(
-                          "es-AR",
-                          {
-                            year: "numeric",
-                            day: "numeric",
-                            month: "short",
-                          }
-                        )}
-                    </td>
-                    <td className="py-4">{user.name}</td>
-                    <td className="py-4">{user.address?.phone}</td>
-                    <td className="py-4">{user.address?.dni_number}</td>
-                    <td className="py-4">{user.address?.province}</td>
-                    <td className="py-4">{user.orders.length}</td>
-                  </tr>
-                ))
-              )}
-              {isLoading && (
-                <tr>
-                  <td className="py-5" colSpan={12}>
-                    Cargando...
-                  </td>
-                </tr>
-              )}
-            </Table>
+
+            {data?.users && (
+              <DataTable
+                data={data?.users}
+                columns={userColumns}
+                getRowCanExpand={() => false}
+              />
+            )}
 
             <Pagination
               totalCount={data?.totalCount ?? 0}

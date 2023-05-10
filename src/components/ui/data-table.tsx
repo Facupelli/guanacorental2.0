@@ -47,7 +47,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   getRowCanExpand: () => boolean;
-  subComponent: (props: { row: Row<TData> }) => ReactElement;
+  subComponent?: (props: { row: Row<TData> }) => ReactElement;
 }
 
 export function DataTable<TData, TValue>({
@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
                 {row.getIsExpanded() && (
                   <TableRow className="bg-[rgba(0,0,0,0.02)]">
                     <TableCell colSpan={row.getVisibleCells().length}>
-                      {subComponent({ row })}
+                      {subComponent && subComponent({ row })}
                     </TableCell>
                   </TableRow>
                 )}
