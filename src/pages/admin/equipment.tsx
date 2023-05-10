@@ -40,7 +40,6 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
-import Table from "@/components/ui/table";
 import { Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";
@@ -94,7 +93,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="pt-6">
-            <Table headTitles={tableTitles}>
+            {/* <Table headTitles={tableTitles}>
               {data?.equipment.map((equipment) => (
                 <EquipmentRow
                   key={equipment.id}
@@ -110,7 +109,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                   </td>
                 </tr>
               )}
-            </Table>
+            </Table> */}
 
             <Pagination
               totalCount={data?.totalCount ?? 0}

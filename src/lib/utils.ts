@@ -1,21 +1,9 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
-import { type Role } from "@prisma/client";
+import { Prisma, type Role } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
-import { DISCOUNT_TYPES } from "./magic_strings";
-
-export const orderTableColumns = [
-  { title: "N°" },
-  { title: "Nombre" },
-  { title: "Celular" },
-  { title: "Retiro" },
-  { title: "Devolución" },
-  { title: "Estado" },
-  { title: "Total" },
-  { title: "Remito" },
-  { title: "Sucursal" },
-];
+import { COUPON_STATUS, DISCOUNT_TYPES } from "./magic_strings";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -122,7 +110,7 @@ export const calcaulateCartTotal = (
   return 0;
 };
 
-type Discount = {
+type DiscountProp = {
   value: number;
   typeName: string;
   code: string;
@@ -130,7 +118,7 @@ type Discount = {
 
 export const calculateTotalWithDiscount = (
   total: number,
-  discount: Discount
+  discount: DiscountProp
 ) => {
   if (discount.typeName === DISCOUNT_TYPES.FIXED) {
     return total - discount.value;
@@ -141,4 +129,29 @@ export const calculateTotalWithDiscount = (
   }
 
   return total;
+};
+
+type Discount = Prisma.DiscountGetPayload<{
+  include: {
+    rule: {
+      include: {
+        type: true;
+      };
+    };
+    location: true;
+  };
+}>;
+
+export const getDiscountStatus = (discount: Discount) => {
+  if (dayjs().isBefore(dayjs(discount.starts_at))) {
+    return COUPON_STATUS.PENDING;
+  }
+  if (
+    dayjs().isAfter(dayjs(discount.ends_at)) ||
+    (discount.usage_limit && discount.usage_count >= discount.usage_limit)
+  ) {
+    return COUPON_STATUS.ENDED;
+  }
+
+  return COUPON_STATUS.ACTIVE;
 };

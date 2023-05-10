@@ -11,20 +11,6 @@ import {
   Table as TableType,
 } from "@tanstack/react-table";
 
-type Order = Prisma.OrderGetPayload<{
-  include: {
-    customer: {
-      include: { address: true };
-    };
-    location: true;
-    book: true;
-    equipments: {
-      include: { books: true; equipment: true; owner: true };
-    };
-    earnings: true;
-  };
-}>;
-
 import {
   Table,
   TableBody,
@@ -40,7 +26,6 @@ import {
   DropdownMenuCheckboxItem,
 } from "./dropdown-menu";
 import { Button } from "./button";
-import { Prisma } from "@prisma/client";
 import { Input } from "./input";
 
 interface DataTableProps<TData, TValue> {

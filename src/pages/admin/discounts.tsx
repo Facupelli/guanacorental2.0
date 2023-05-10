@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -21,24 +20,94 @@ import { Button } from "@/components/ui/button";
 import DialogWithState from "@/components/DialogWithState";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { api } from "@/utils/api";
-import { COUPON_STATUS, DISCOUNT_TYPES, STATUS } from "@/lib/magic_strings";
+import {
+  COUPON_STATUS,
+  DISCOUNT_TYPES,
+  STATUS,
+  discountStatusClass,
+} from "@/lib/magic_strings";
 
 import { type DiscountType, type Prisma } from "@prisma/client";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getDiscountStatus } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { DataTable } from "@/components/ui/data-table";
 
-const columnNames = [
-  { title: "Código" },
-  { title: "Tipo" },
-  { title: "Valor" },
-  { title: "Mínimo" },
-  { title: "Sucursal" },
-  { title: "Status" },
-  { title: "Empieza" },
-  { title: "Termina" },
-  { title: "Usados" },
-  { title: "Límite" },
+type Discount = Prisma.DiscountGetPayload<{
+  include: {
+    rule: {
+      include: {
+        type: true;
+      };
+    };
+    location: true;
+  };
+}>;
+
+export const discountColumns: ColumnDef<Discount>[] = [
+  { accessorKey: "code", header: "Código" },
+  { id: "type", accessorFn: (row) => row.rule.type.name, header: "Tipo" },
+  {
+    id: "value",
+    accessorFn: (row) => row.rule.value,
+    header: "Valor",
+  },
+  {
+    accessorKey: "min_total",
+    header: "Mínimo",
+  },
+  {
+    id: "location",
+    header: "Sucursal",
+    accessorFn: (row) =>
+      row.location.map((location) => location.name).join(", "),
+  },
+  {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      const status = getDiscountStatus(row.original);
+
+      return (
+        <div>
+          <span className={discountStatusClass[status]}>{status}</span>
+        </div>
+      );
+    },
+  },
+  {
+    header: "Empieza",
+    accessorFn: (row) => row.starts_at?.toLocaleDateString(),
+  },
+  {
+    accessorFn: (row) => row.ends_at?.toLocaleDateString(),
+    header: "Termina",
+  },
+  {
+    accessorKey: "usage_count",
+    header: "Usado",
+  },
+  {
+    accessorKey: "usage_limit",
+    header: "Límite",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const order = row.original;
+
+      return <ActionsDropMenu />;
+    },
+  },
 ];
 
 type DiscountForm = {
@@ -190,12 +259,14 @@ const AdminDiscounts: NextPage = () => {
                 </Button>
               </div>
             </div>
-            <Table headTitles={columnNames}>
-              {data &&
-                data.discounts.map((discount) => (
-                  <DiscountRow key={discount.id} discount={discount} />
-                ))}
-            </Table>
+
+            {data?.discounts && (
+              <DataTable
+                data={data.discounts}
+                columns={discountColumns}
+                getRowCanExpand={() => false}
+              />
+            )}
           </div>
         </AdminLayout>
       </main>
@@ -229,76 +300,21 @@ const SelectDiscountType = ({
   );
 };
 
-type Discount = Prisma.DiscountGetPayload<{
-  include: {
-    location: true;
-    rule: {
-      include: {
-        type: true;
-      };
-    };
-  };
-}>;
-
-type DiscountItemProps = {
-  discount: Discount;
-};
-
-const DiscountRow = ({ discount }: DiscountItemProps) => {
-  const getDiscountStatus = () => {
-    if (dayjs().isBefore(dayjs(discount.starts_at))) {
-      return COUPON_STATUS.PENDING;
-    }
-    if (
-      dayjs().isAfter(dayjs(discount.ends_at)) ||
-      (discount.usage_limit && discount.usage_count >= discount.usage_limit)
-    ) {
-      return COUPON_STATUS.ENDED;
-    }
-
-    return COUPON_STATUS.ACTIVE;
-  };
-
-  const status = getDiscountStatus();
-
-  const statusClases = {
-    [COUPON_STATUS.PENDING]:
-      "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800 w-fit",
-    [COUPON_STATUS.ENDED]:
-      "py-1 px-3 bg-red-100 rounded-xl text-slate-800 w-fit",
-    [COUPON_STATUS.ACTIVE]:
-      "py-1 px-3 bg-green-100 rounded-xl text-slate-800 w-fit",
-  };
-
+const ActionsDropMenu = () => {
   return (
-    <tr className="text-sm">
-      <td className="py-2">
-        <p className="w-fit rounded-2xl bg-secondary-foreground/10 px-3 py-1">
-          {discount.code}
-        </p>
-      </td>
-      <td className="py-3">{discount.rule.type.name}</td>
-      <td className="py-3">
-        {discount.rule.type.name === DISCOUNT_TYPES.FIXED && "$"}
-        {discount.rule.value}{" "}
-        {discount.rule.type.name === DISCOUNT_TYPES.PERCENTAGE && "%"}
-      </td>
-      <td className="py-3">
-        {discount.min_total && formatPrice(discount.min_total)}
-      </td>
-      <td className="flex py-3">
-        <p>{discount.location.map((location) => location.name).join(", ")}</p>
-      </td>
-      <td className="py-2">
-        <p className={`${statusClases[status]}`}>{status}</p>
-      </td>
-      <td className="py-3">
-        {discount.starts_at?.toLocaleDateString() ?? "-"}
-      </td>
-      <td className="py-3">{discount.ends_at?.toLocaleDateString() ?? "-"}</td>
-      <td className="py-3">{discount.usage_count}</td>
-      <td className="py-3">{discount.usage_limit}</td>
-    </tr>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>editar</DropdownMenuItem>
+        <DropdownMenuItem>eliminar</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

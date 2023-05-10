@@ -1,7 +1,8 @@
+import { ColumnDef, Row } from "@tanstack/react-table";
 import Head from "next/head";
+import Image from "next/image";
 import { useState } from "react";
 import { useBoundStore } from "@/zustand/store";
-import { ColumnDef, Row } from "@tanstack/react-table";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -28,16 +29,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DataTable } from "@/components/ui/data-table";
 
-import { ADMIN_ORDERS_SORT, statusClass } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT, orderStatusClass } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { handleAdminLocationChange, orderTableColumns } from "@/lib/utils";
+import { handleAdminLocationChange } from "@/lib/utils";
 import { api } from "@/utils/api";
 
 import { type NextPage } from "next";
 import { Prisma } from "@prisma/client";
-import Image from "next/image";
-import { DataTable } from "@/components/ui/data-table";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -78,7 +78,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       const statusValue: string = row.getValue("status");
       return (
         <div>
-          <span className={statusClass[statusValue]}>{statusValue}</span>
+          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
       );
     },
