@@ -1,8 +1,7 @@
 import superjason from "superjson";
-import { prisma } from "@/server/db";
-import { useState } from "react";
-import Head from "next/head";
-import Image from "next/image";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { getServerSession } from "next-auth";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   type UseFieldArrayRemove,
   type UseFormRegister,
@@ -10,7 +9,12 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { createServerSideHelpers } from "@trpc/react-query/server";
+import { useState } from "react";
+import Head from "next/head";
+import Image from "next/image";
+import { type GetServerSideProps, type NextPage } from "next";
+import { prisma } from "@/server/db";
+import { authOptions } from "@/server/auth";
 import { appRouter } from "@/server/api/root";
 
 import Nav from "@/components/Nav";
@@ -47,18 +51,14 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
+import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { formatPrice } from "@/lib/utils";
 
-import { type GetServerSideProps, type NextPage } from "next";
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
-import { ColumnDef } from "@tanstack/react-table";
-import { Prisma } from "@prisma/client";
-import { DataTable } from "@/components/ui/data-table";
+import { type Prisma } from "@prisma/client";
+import { formatPrice } from "@/lib/utils";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -67,58 +67,22 @@ type Equipment = Prisma.EquipmentGetPayload<{
   };
 }>;
 
-const tableTitles = [
-  { title: "" },
-  { title: "Nombre, Marca y Modelo" },
-  { title: "Imagen y Precio" },
-  { title: "Stock" },
-];
-
 export const equipmentColumns: ColumnDef<Equipment>[] = [
   {
     id: "name",
     header: "Nombre",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Input
-            type="text"
-            placeholder="nombre de equipo"
-            defaultValue={row.original.name}
-          />
-        </div>
-      );
-    },
+
+    accessorFn: (row) => row.name,
   },
   {
     id: "brand",
     header: "Marca",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Input
-            type="text"
-            placeholder="marca"
-            defaultValue={row.original.brand}
-          />
-        </div>
-      );
-    },
+    accessorFn: (row) => row.brand,
   },
   {
     id: "model",
     header: "Modelo",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Input
-            type="text"
-            placeholder="modelo"
-            defaultValue={row.original.model}
-          />
-        </div>
-      );
-    },
+    accessorFn: (row) => row.brand,
   },
 
   // {
@@ -132,14 +96,16 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
     id: "price",
     header: "Precio",
     cell: ({ row }) => {
+      return <div>{formatPrice(row.original.price)}</div>;
+    },
+  },
+  {
+    id: "stock",
+    header: "Stock total",
+    cell: ({ row }) => {
       return (
-        <div>
-          <Input
-            type="text"
-            placeholder="nombre de equipo"
-            defaultValue={row.original.price}
-            className="w-[80px]"
-          />
+        <div className="w-[40px]">
+          {row.original.owner.reduce((acc, curr) => acc + curr.stock, 0)}
         </div>
       );
     },
