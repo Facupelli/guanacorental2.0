@@ -12,11 +12,18 @@ const Nav = () => {
   const { data: session } = useSession();
 
   const setOpenCartModal = useBoundStore((state) => state.setOpenCartModal);
+  const showCartModal = useBoundStore((state) => state.showCartModal);
 
   const isAdmin = (session: Session | null) => {
     return !!session?.user.role.find((role) => role.name === ROLES.ADMIN);
   };
 
+  const handleOpenCart = () => {
+    if (showCartModal) {
+      return;
+    }
+    setOpenCartModal();
+  };
   return (
     <header>
       <nav className="fixed z-30 w-full bg-primary px-6 ">
@@ -36,7 +43,7 @@ const Nav = () => {
           <li className="ml-auto">
             <p
               className="flex cursor-pointer items-center gap-2 text-white"
-              onClick={setOpenCartModal}
+              onClick={handleOpenCart}
             >
               CARRITO
               <ShoppingCart className="h-4 w-4" />
