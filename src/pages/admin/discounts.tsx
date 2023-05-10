@@ -54,7 +54,17 @@ type Discount = Prisma.DiscountGetPayload<{
 }>;
 
 export const discountColumns: ColumnDef<Discount>[] = [
-  { accessorKey: "code", header: "Código" },
+  {
+    accessorKey: "code",
+    header: "Código",
+    cell: ({ row }) => {
+      return (
+        <pre className="rounded-2xl bg-secondary-foreground/10 p-1 px-2">
+          {row.original.code}
+        </pre>
+      );
+    },
+  },
   { id: "type", accessorFn: (row) => row.rule.type.name, header: "Tipo" },
   {
     id: "value",
