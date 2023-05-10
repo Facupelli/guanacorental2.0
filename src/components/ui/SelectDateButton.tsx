@@ -64,8 +64,22 @@ const SelectDateButton = () => {
         <DialogHeader>
           <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
           <DialogDescription>
-            Primero selecciona la fecha de inicio y después la fecha final.
-            Luego selecciona el horario de retiro de los equipos.
+            <div>
+              Primero selecciona la fecha de inicio y después la fecha final.
+              Luego selecciona el horario de retiro de los equipos.
+            </div>
+            <div>
+              Loss equipos no pueden ser retirado ni devueltos los sábados y
+              domingos, pero se pueden alquilar durante esos días.
+            </div>
+            <div>
+              Sistema day/weekend reitrando viernes 20:00hs y devolviendo lunes
+              09:00hs precio por una jornada.
+            </div>
+            <div>
+              Retiro vienres 09:00hs y devolución lunes 09:00hs precio x 1.5
+              jornada.
+            </div>
           </DialogDescription>
         </DialogHeader>
         <div className="grid justify-center gap-6 py-4">

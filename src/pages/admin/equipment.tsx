@@ -20,6 +20,13 @@ import { useBoundStore } from "@/zustand/store";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -40,26 +47,133 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
-import { Plus, RotateCw, X } from "lucide-react";
+import { MoreHorizontal, Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { formatPrice } from "@/lib/utils";
 
 import { type GetServerSideProps, type NextPage } from "next";
-import type {
-  Equipment,
-  EquipmentOnOwner,
-  Location,
-  Owner,
-} from "@/types/models";
+import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
+import { ColumnDef } from "@tanstack/react-table";
+import { Prisma } from "@prisma/client";
+import { DataTable } from "@/components/ui/data-table";
+
+type Equipment = Prisma.EquipmentGetPayload<{
+  include: {
+    owner: { include: { owner: true; location: true } };
+    category: true;
+  };
+}>;
 
 const tableTitles = [
   { title: "" },
   { title: "Nombre, Marca y Modelo" },
   { title: "Imagen y Precio" },
   { title: "Stock" },
+];
+
+export const equipmentColumns: ColumnDef<Equipment>[] = [
+  {
+    id: "name",
+    header: "Nombre",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="nombre de equipo"
+            defaultValue={row.original.name}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    id: "brand",
+    header: "Marca",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="marca"
+            defaultValue={row.original.brand}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    id: "model",
+    header: "Modelo",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="modelo"
+            defaultValue={row.original.model}
+          />
+        </div>
+      );
+    },
+  },
+
+  // {
+  //   id: "image",
+  //   header: "Imagen",
+  //   cell: ({ row }) => {
+  //     return <div className="">{row.original.image}</div>;
+  //   },
+  // },
+  {
+    id: "price",
+    header: "Precio",
+    cell: ({ row }) => {
+      return (
+        <div>
+          <Input
+            type="text"
+            placeholder="nombre de equipo"
+            defaultValue={row.original.price}
+            className="w-[80px]"
+          />
+        </div>
+      );
+    },
+  },
+  {
+    id: "availability",
+    header: "Disponible",
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-center">
+          <Switch
+            defaultChecked={row.original.available}
+            title="habilitado"
+            // {...register("available")}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    id: "category",
+    header: "Categoría",
+    cell: ({ row }) => {
+      return <div>{row.original.category.name}</div>;
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const order = row.original;
+
+      return <ActionsDropMenu />;
+    },
+  },
 ];
 
 type Props = {
@@ -93,6 +207,14 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="pt-6">
+            {data?.equipment && (
+              <DataTable
+                columns={equipmentColumns}
+                data={data.equipment}
+                getRowCanExpand={() => false}
+              />
+            )}
+
             {/* <Table headTitles={tableTitles}>
               {data?.equipment.map((equipment) => (
                 <EquipmentRow
@@ -460,6 +582,25 @@ const SelectOwner = ({
         </SelectGroup>
       </SelectContent>
     </Select>
+  );
+};
+
+const ActionsDropMenu = () => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>editar</DropdownMenuItem>
+        <DropdownMenuItem>stock</DropdownMenuItem>
+        <DropdownMenuItem>imagen</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

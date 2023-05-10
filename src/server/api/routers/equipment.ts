@@ -112,6 +112,7 @@ export const equipmentRouter = createTRPCRouter({
         skip: input.skip,
         include: {
           owner: { include: { owner: true, location: true } },
+          category:true
         },
       });
 
