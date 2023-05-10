@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { SyntheticEvent, useState } from "react";
 import { type Prisma } from "@prisma/client";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 type OrderRowProps = Prisma.OrderGetPayload<{
   include: {
@@ -92,8 +93,19 @@ const OrderRow = ({
       {showMore &&
         order.equipments.map((ownerEquipment, i) => (
           <tr key={ownerEquipment.id} className="text-sm">
+            {ownerEquipment.equipment.image && (
+              <td className="w-10">
+                <div className="relative h-10 w-10">
+                  <Image
+                    src={ownerEquipment.equipment.image}
+                    alt="equipment picture"
+                    fill
+                  />
+                </div>
+              </td>
+            )}
             <td
-              colSpan={4}
+              colSpan={3}
               className={`${
                 i === order.equipments.length - 1 ? "pb-5" : "py-1"
               } px-2`}

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/Table";
+import Table from "@/components/ui/table";
 import Pagination from "@/components/ui/Pagination";
 import {
   Select,

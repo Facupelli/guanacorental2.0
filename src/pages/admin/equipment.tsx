@@ -40,7 +40,7 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
-import Table from "@/components/ui/Table";
+import Table from "@/components/ui/table";
 import { Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";

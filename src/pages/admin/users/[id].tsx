@@ -15,7 +15,7 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import OrderRow from "@/components/OrderRow";
 import Pagination from "@/components/ui/Pagination";
-import Table from "@/components/ui/Table";
+import Table from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { CheckSquare, EditIcon } from "lucide-react";
 

@@ -1,10 +1,10 @@
 import Head from "next/head";
 import { useState } from "react";
 import { useBoundStore } from "@/zustand/store";
+import { ColumnDef, Row } from "@tanstack/react-table";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/Table";
 import SelectLocation from "@/components/ui/SelectLocation";
 import {
   Select,
@@ -17,14 +17,116 @@ import {
 import { Label } from "@/components/ui/label";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
-import OrderRow from "@/components/OrderRow";
 
-import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
+import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { ADMIN_ORDERS_SORT, statusClass } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { handleAdminLocationChange, orderTableColumns } from "@/lib/utils";
 import { api } from "@/utils/api";
 
 import { type NextPage } from "next";
+import { Prisma } from "@prisma/client";
+import Image from "next/image";
+import { DataTable } from "@/components/ui/data-table";
+
+type Order = Prisma.OrderGetPayload<{
+  include: {
+    customer: {
+      include: { address: true };
+    };
+    location: true;
+    book: true;
+    equipments: {
+      include: { books: true; equipment: true; owner: true };
+    };
+    earnings: true;
+  };
+}>;
+
+const orderColumns: ColumnDef<Order>[] = [
+  { accessorKey: "number", header: "N°" },
+  { id: "fullName", accessorFn: (row) => row.customer.name, header: "Nombre" },
+  {
+    id: "phone",
+    accessorFn: (row) => row.customer.address?.phone,
+    header: "Teléfono",
+  },
+  {
+    id: "retiro",
+    header: "Retiro",
+    accessorFn: (row) => row.book.start_date.toLocaleDateString(),
+  },
+  {
+    id: "devolución",
+    header: "Devolución",
+    accessorFn: (row) => row.book.end_date.toLocaleDateString(),
+  },
+  {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      const statusValue: string = row.getValue("status");
+      return (
+        <div>
+          <span className={statusClass[statusValue]}>{statusValue}</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: "sucursal",
+    header: "Sucursal",
+    accessorFn: (row) => row.location.name,
+  },
+  {
+    id: "expander",
+    cell: ({ row, getValue }) => {
+      return row.getCanExpand() ? (
+        <button {...{ onClick: row.getToggleExpandedHandler() }}>
+          {row.getIsExpanded() ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
+      ) : (
+        ""
+      );
+    },
+    footer: (props) => props.column.id,
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const order = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+            <DropdownMenuItem>Generar remito</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
 
 const AdminOrders: NextPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +182,15 @@ const AdminOrders: NextPage = () => {
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
               <SelectSortOrders setValue={setValue} />
             </div>
-            <Table headTitles={orderTableColumns}>
+            {filteredOrers && (
+              <DataTable
+                columns={orderColumns}
+                data={filteredOrers}
+                getRowCanExpand={() => true}
+                subComponent={renderSubComponent}
+              />
+            )}
+            {/* <Table headTitles={orderTableColumns}>
               {filteredOrers?.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="py-5">
@@ -99,7 +209,7 @@ const AdminOrders: NextPage = () => {
                   </td>
                 </tr>
               )}
-            </Table>
+            </Table> */}
           </div>
           <Pagination
             totalCount={data?.totalCount ?? 0}
@@ -138,6 +248,40 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
         </SelectGroup>
       </SelectContent>
     </Select>
+  );
+};
+
+const renderSubComponent = ({ row }: { row: Row<Order> }) => {
+  return (
+    <div>
+      {row.original.equipments.map((ownerEquipment) => (
+        <div className="flex items-center gap-4">
+          {ownerEquipment.equipment.image && (
+            <div className="relative h-10 w-10 rounded-full">
+              <Image
+                src={ownerEquipment.equipment.image}
+                alt="equipment picture"
+                fill
+                style={{ borderRadius: "100%" }}
+              />
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">{ownerEquipment.equipment.name}</p>
+            <p className="font-semibold">{ownerEquipment.equipment.brand}</p>
+            <p>{ownerEquipment.equipment.model}</p>
+          </div>
+          <div>
+            <p>
+              x
+              {ownerEquipment.books.reduce((acc, curr) => {
+                return acc + curr.quantity;
+              }, 0)}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 

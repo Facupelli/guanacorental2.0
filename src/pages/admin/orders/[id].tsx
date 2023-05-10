@@ -545,7 +545,7 @@ type EarningsInfoProps = {
 const EarningsInfo = ({ oscar, federico, sub }: EarningsInfoProps) => {
   return (
     <section className="grid gap-6 rounded-md border border-app-bg p-4">
-      <h2 className="text-lg font-semibold">Ganancias</h2>
+      <h2 className="text-lg font-semibold">División</h2>
 
       <div className="grid max-w-[50%] grid-cols-3">
         <div className="grid gap-1">

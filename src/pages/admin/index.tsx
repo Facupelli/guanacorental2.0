@@ -6,7 +6,7 @@ import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Table from "@/components/ui/Table";
+import Table from "@/components/ui/table";
 import OrderRow from "@/components/OrderRow";
 import { Label } from "@/components/ui/label";
 import SelectLocation from "@/components/ui/SelectLocation";
@@ -17,6 +17,7 @@ import { handleAdminLocationChange } from "@/lib/utils";
 
 import { type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
+import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -61,7 +62,13 @@ const Admin: NextPage = () => {
           dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
           dayjs(order.book.end_date).isSame(dayjs(day), "day")
       );
-      setOrders(orders);
+
+      const filteredOrers = orders.map((order) => ({
+        ...order,
+        equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
+      }));
+
+      setOrders(filteredOrers);
     }
   };
 
