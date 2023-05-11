@@ -156,12 +156,12 @@ const AdminUsers: NextPage = () => {
               </TabsContent>
               <TabsContent value="petitions">
                 <div className="grid grid-cols-3 gap-6">
-                  {petitionUsers.data?.map((user) => (
-                    <div className="col-span-1 ">
+                  <div className="col-span-1 overflow-y-auto">
+                    {petitionUsers.data?.map((user) => (
                       <div
-                        className={`flex cursor-pointer items-center gap-2 rounded-md p-4 ${
+                        className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg p-4 ${
                           petitionUserSelected?.id === user.id
-                            ? "bg-secondary-foreground/20"
+                            ? "border-secondary bg-white"
                             : ""
                         }`}
                         onClick={() => setPetitionUser(user)}
@@ -181,8 +181,8 @@ const AdminUsers: NextPage = () => {
                           <p className="font-semibold">{user.name}</p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   {petitionUserSelected && (
                     <UserPetitionInfo user={petitionUserSelected} />
                   )}
@@ -243,106 +243,105 @@ const ActionsDropMenu = ({ user }: { user: User }) => {
 
 const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
   return (
-    <div
-      key={user.id}
-      className="col-span-2 grid gap-4 rounded-md bg-white p-6"
-    >
-      <div className="grid grid-cols-4">
-        <div>
-          <p className="text-sm text-primary/60">DNI</p>
-          <p className="font-semibold">{user.address?.dni_number}</p>
+    <div key={user.id} className="col-span-2 grid gap-5 rounded-md bg-white">
+      <div className="p-6">
+        <div className="grid grid-cols-4">
+          <div>
+            <p className="text-sm text-primary/60">DNI</p>
+            <p className="font-semibold">{user.address?.dni_number}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Teléfono</p>
+            <p className="font-semibold">{user.address?.phone}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Fecha de nacimiento</p>
+            <p className="font-semibold">{user.address?.birth_date}</p>
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm text-primary/60">Teléfono</p>
-          <p className="font-semibold">{user.address?.phone}</p>
+        <div className="grid grid-cols-4">
+          <div className="col-span-2">
+            <p className="text-sm text-primary/60">Domicilio</p>
+            <p className="font-semibold">{user.address?.address_1}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Localidad</p>
+            <p className="font-semibold">{user.address?.city}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Provincia</p>
+            <p className="font-semibold">{user.address?.province}</p>
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm text-primary/60">Fecha de nacimiento</p>
-          <p className="font-semibold">{user.address?.birth_date}</p>
+        <div className="grid grid-cols-4 gap-y-2">
+          <div>
+            <p className="text-sm text-primary/60">Ocupación</p>
+            <p className="font-semibold">{user.address?.occupation}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Estudiante</p>
+            <p className="font-semibold">{user.address?.student}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Empleado</p>
+            <p className="font-semibold">{user.address?.employee}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">Empresa</p>
+            <p className="font-semibold">{user.address?.company}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-primary/60">CUIT</p>
+            <p className="font-semibold">{user.address?.cuit}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4">
+          <div>
+            <p className="text-sm text-primary/60">contacto 1</p>
+            <p className="font-semibold">{user.address?.contact_1}</p>
+          </div>
+          <div>
+            <p className="text-sm text-primary/60">vínculo 1</p>
+            <p className="font-semibold">{user.address?.bond_1}</p>
+          </div>
+          <div>
+            <p className="text-sm text-primary/60">contacto 2</p>
+            <p className="font-semibold">{user.address?.contact_2}</p>
+          </div>
+          <div>
+            <p className="text-sm text-primary/60">vínculo 2</p>
+            <p className="font-semibold">{user.address?.bond_2}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4">
+          <div>
+            <p className="text-sm text-primary/60">Banco</p>
+            <p className="font-semibold">{user.address?.bank}</p>
+          </div>
+          <div>
+            <p className="text-sm text-primary/60">Alias</p>
+            <p className="font-semibold">{user.address?.alias}</p>
+          </div>
+          <div>
+            <p className="text-sm text-primary/60">cbu</p>
+            <p className="font-semibold">{user.address?.cbu}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-4">
-        <div>
-          <p className="text-sm text-primary/60">Domicilio</p>
-          <p className="font-semibold">{user.address?.address_1}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">Localidad</p>
-          <p className="font-semibold">{user.address?.city}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">Provincia</p>
-          <p className="font-semibold">{user.address?.province}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-y-2">
-        <div>
-          <p className="text-sm text-primary/60">Ocupación</p>
-          <p className="font-semibold">{user.address?.occupation}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">Estudiante</p>
-          <p className="font-semibold">{user.address?.student}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">Empleado</p>
-          <p className="font-semibold">{user.address?.employee}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">Empresa</p>
-          <p className="font-semibold">{user.address?.company}</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-primary/60">CUIT</p>
-          <p className="font-semibold">{user.address?.cuit}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4">
-        <div>
-          <p className="text-sm text-primary/60">contacto 1</p>
-          <p className="font-semibold">{user.address?.contact_1}</p>
-        </div>
-        <div>
-          <p className="text-sm text-primary/60">vínculo 1</p>
-          <p className="font-semibold">{user.address?.bond_1}</p>
-        </div>
-        <div>
-          <p className="text-sm text-primary/60">contacto 2</p>
-          <p className="font-semibold">{user.address?.contact_2}</p>
-        </div>
-        <div>
-          <p className="text-sm text-primary/60">vínculo 2</p>
-          <p className="font-semibold">{user.address?.bond_2}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4">
-        <div>
-          <p className="text-sm text-primary/60">Banco</p>
-          <p className="font-semibold">{user.address?.bank}</p>
-        </div>
-        <div>
-          <p className="text-sm text-primary/60">Alias</p>
-          <p className="font-semibold">{user.address?.alias}</p>
-        </div>
-        <div>
-          <p className="text-sm text-primary/60">cbu</p>
-          <p className="font-semibold">{user.address?.cbu}</p>
-        </div>
-      </div>
-
-      <div className="flex justify-end gap-4 pt-4">
+      <div className="flex justify-end gap-4 rounded-bl-md rounded-br-md bg-secondary p-6">
         <Button size="sm" variant="destructive">
           Rechazar
         </Button>
