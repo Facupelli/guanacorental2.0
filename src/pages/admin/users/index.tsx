@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 
 import { type Prisma, type Role } from "@prisma/client";
-import type { CellFunctions } from "@/types/table";
+import type { Columns } from "@/types/table";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -34,14 +34,9 @@ type User = Prisma.UserGetPayload<{
   };
 }>;
 
-type Columns = {
-  title: string;
-  cell: (rowData: User, cellProps?: CellProps<User>) => ReactElement;
-};
+type CellProps = {};
 
-type CellProps<T> = {} & CellFunctions<T>;
-
-const userColumns: Columns[] = [
+const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
     cell: (rowData) => (

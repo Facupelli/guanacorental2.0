@@ -8,21 +8,13 @@ import {
 } from "@/components/ui/table";
 import { useRowExpansion } from "@/hooks/useRowExpansion";
 
-import type { CellFunctions } from "@/types/table";
+import type { CellFunctions, Columns } from "@/types/table";
 import {
   type ReactNode,
   type Dispatch,
   type ReactElement,
   type SetStateAction,
 } from "react";
-
-type Columns<T, P> = {
-  title: string;
-  cell: (
-    rowData: T,
-    cellProps?: P | (undefined & CellFunctions<T>)
-  ) => ReactElement;
-};
 
 type TableProps<T, P> = {
   columns: Columns<T, P>[];
@@ -92,7 +84,7 @@ const Row = <T, P>({
       <TableRow onClick={() => setRowData(data)}>
         {columns.map((column) => (
           <TableCell>
-            {column.cell(data, cellProps && { ...cellProps, ...cellFunctions })}
+            {column.cell(data, { cellProps, cellFunctions })}
           </TableCell>
         ))}
       </TableRow>

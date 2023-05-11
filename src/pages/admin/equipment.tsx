@@ -45,15 +45,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DialogWithState from "@/components/DialogWithState";
+import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal, Plus, X } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { formatPrice } from "@/lib/utils";
 
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
-import type { CellFunctions } from "@/types/table";
-import DataTable from "@/components/ui/data-table";
+import type { Columns } from "@/types/table";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -62,14 +61,8 @@ type Equipment = Prisma.EquipmentGetPayload<{
   };
 }>;
 
-type Columns = {
-  title: string;
-  cell: (rowData: Equipment, cellProps?: CellProps<Equipment>) => ReactElement;
-};
-
-type CellProps<T> = {} & CellFunctions<T>;
-
-export const equipmentColumns: Columns[] = [
+type CellProps = {};
+export const equipmentColumns: Columns<Equipment, CellProps>[] = [
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
   { title: "Marca", cell: (rowData) => <div>{rowData.brand}</div> },
   { title: "Model", cell: (rowData) => <div>{rowData.model}</div> },

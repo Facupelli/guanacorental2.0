@@ -1,10 +1,9 @@
 import { Prisma } from "@prisma/client";
-import { ReactElement } from "react";
 import { orderStatusClass } from "./magic_strings";
 import ActionsDropMenu from "@/components/order/ActionDropMenu";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Columns } from "@/types/table";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -20,19 +19,9 @@ type Order = Prisma.OrderGetPayload<{
   };
 }>;
 
-type CellFunctions<T> = {
-  isRowExpanded: boolean;
-  toggleRowExpansion: () => void;
-};
+type CellProps = {};
 
-type CellProps<T> = {} & CellFunctions<T>;
-
-type Columns = {
-  title: string;
-  cell: (rowData: Order, cellProps?: CellProps<Order>) => ReactElement;
-};
-
-export const orderColumns: Columns[] = [
+export const orderColumns: Columns<Order, CellProps>[] = [
   { title: "N°", cell: (rowData) => <div>{rowData.number}</div> },
   { title: "Nombre", cell: (rowData) => <div>{rowData.customer.name}</div> },
   {
@@ -70,20 +59,20 @@ export const orderColumns: Columns[] = [
   },
   {
     title: "",
-    cell: (rowData, cellProps) => {
+    cell: (rowData, cellData) => {
       return (
         <div>
-          {cellProps?.isRowExpanded ? (
+          {cellData.cellFunctions.isRowExpanded ? (
             <button
               className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={() => cellProps?.toggleRowExpansion()}
+              onClick={() => cellData.cellFunctions.toggleRowExpansion()}
             >
               <ChevronUp className="h-4 w-4" />
             </button>
           ) : (
             <button
               className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={() => cellProps?.toggleRowExpansion()}
+              onClick={() => cellData.cellFunctions.toggleRowExpansion()}
             >
               <ChevronDown className="h-4 w-4" />
             </button>

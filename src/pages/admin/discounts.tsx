@@ -42,6 +42,7 @@ import { getDiscountStatus } from "@/lib/utils";
 import { discountStatusClass } from "@/lib/magic_strings";
 import { DiscountType, Prisma } from "@prisma/client";
 import DataTable from "@/components/ui/data-table";
+import { Columns } from "@/types/table";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {
@@ -59,12 +60,7 @@ type CellProps = {
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
 };
 
-type Columns = {
-  title: string;
-  cell: (rowData: Discount, cellProps?: CellProps) => ReactElement;
-};
-
-const columns: Columns[] = [
+const columns: Columns<Discount, CellProps>[] = [
   {
     title: "Código",
     cell: (rowData) => (
@@ -121,11 +117,11 @@ const columns: Columns[] = [
   },
   {
     title: "",
-    cell: (rowData, cellProps) => (
+    cell: (rowData, cellData) => (
       <ActionsDropMenu
         discount={rowData}
-        setShowModal={cellProps?.setShowModal}
-        setDiscount={cellProps?.setDiscount}
+        setShowModal={cellData.cellProps?.setShowModal}
+        setDiscount={cellData.cellProps?.setDiscount}
       />
     ),
   },
