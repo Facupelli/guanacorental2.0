@@ -121,7 +121,7 @@ const columns: Columns[] = [
   },
   {
     title: "",
-    cell: (rowData: Discount, cellProps) => (
+    cell: (rowData, cellProps) => (
       <ActionsDropMenu
         discount={rowData}
         setShowModal={cellProps?.setShowModal}

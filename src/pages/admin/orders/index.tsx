@@ -1,7 +1,7 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
@@ -29,7 +29,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DataTable } from "@/components/ui/data-table";
 
 import { ADMIN_ORDERS_SORT, orderStatusClass } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
@@ -38,6 +37,7 @@ import { api } from "@/utils/api";
 
 import { type NextPage } from "next";
 import { Prisma } from "@prisma/client";
+import DataTable from "@/components/ui/data-table";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -53,29 +53,34 @@ type Order = Prisma.OrderGetPayload<{
   };
 }>;
 
-export const orderColumns: ColumnDef<Order>[] = [
-  { accessorKey: "number", header: "N°" },
-  { id: "fullName", accessorFn: (row) => row.customer.name, header: "Nombre" },
+type CellProps = {};
+
+type Columns = {
+  title: string;
+  cell: (rowData: Order, cellProps?: CellProps) => ReactElement;
+};
+
+const orderColumns: Columns[] = [
+  { title: "N°", cell: (rowData) => <div>{rowData.number}</div> },
+  { title: "Nombre", cell: (rowData) => <div>{rowData.customer.name}</div> },
   {
-    id: "phone",
-    accessorFn: (row) => row.customer.address?.phone,
-    header: "Teléfono",
+    title: "Teléfono",
+    cell: (rowData) => <div>{rowData.customer.address?.phone}</div>,
   },
   {
-    id: "retiro",
-    header: "Retiro",
-    accessorFn: (row) => row.book.start_date.toLocaleDateString(),
+    title: "Retiro",
+    cell: (rowData) => (
+      <div>{rowData.book.start_date.toLocaleDateString()}</div>
+    ),
   },
   {
-    id: "devolución",
-    header: "Devolución",
-    accessorFn: (row) => row.book.end_date.toLocaleDateString(),
+    title: "Devolución",
+    cell: (rowData) => <div>{rowData.book.end_date.toLocaleDateString()}</div>,
   },
   {
-    accessorKey: "status",
-    header: "Estado",
-    cell: ({ row }) => {
-      const statusValue: string = row.getValue("status");
+    title: "Estado",
+    cell: (rowData) => {
+      const statusValue: string = rowData.status;
       return (
         <div>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
@@ -84,38 +89,40 @@ export const orderColumns: ColumnDef<Order>[] = [
     },
   },
   {
-    id: "sucursal",
-    header: "Sucursal",
-    accessorFn: (row) => row.location.name,
+    title: "Sucursal",
+    cell: (rowData) => <div>{rowData.location.name}</div>,
   },
   {
-    id: "expander",
-    cell: ({ row, getValue }) => {
-      return row.getCanExpand() ? (
-        <button {...{ onClick: row.getToggleExpandedHandler() }}>
-          {row.getIsExpanded() ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-      ) : (
-        ""
-      );
-    },
-    footer: (props) => props.column.id,
+    title: "Sucursal",
+    cell: (rowData) => <div>{rowData.location.name}</div>,
   },
   {
-    id: "actions",
-    cell: ({ row }) => {
-      const order = row.original;
-
-      return <ActionsDropMenu />;
-    },
+    title: "",
+    cell: (rowData) => <ActionsDropMenu />,
   },
 ];
 
+// {
+//   id: "expander",
+//   cell: ({ row, getValue }) => {
+//     return row.getCanExpand() ? (
+//       <button {...{ onClick: row.getToggleExpandedHandler() }}>
+//         {row.getIsExpanded() ? (
+//           <ChevronUp className="h-4 w-4" />
+//         ) : (
+//           <ChevronDown className="h-4 w-4" />
+//         )}
+//       </button>
+//     ) : (
+//       ""
+//     );
+//   },
+//   footer: (props) => props.column.id,
+// },
+
 const AdminOrders: NextPage = () => {
+  const [orderSelected, setOrder] = useState<Order | null>(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
@@ -171,11 +178,16 @@ const AdminOrders: NextPage = () => {
             </div>
             {filteredOrers && (
               <DataTable
-                columns={orderColumns}
                 data={filteredOrers}
-                getRowCanExpand={() => true}
-                subComponent={equipmentsList}
+                columns={orderColumns}
+                setRowData={setOrder}
               />
+              // <DataTable
+              //   columns={orderColumns}
+              //   data={filteredOrers}
+              //   getRowCanExpand={() => true}
+              //   subComponent={equipmentsList}
+              // />
             )}
           </div>
           <Pagination
