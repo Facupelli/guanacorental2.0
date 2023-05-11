@@ -71,8 +71,6 @@ export const orderColumns: Columns[] = [
   {
     title: "",
     cell: (rowData, cellProps) => {
-      console.log(cellProps?.isRowExpanded);
-
       return (
         <div>
           {cellProps?.isRowExpanded ? (

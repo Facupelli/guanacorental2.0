@@ -1,7 +1,7 @@
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -23,7 +23,7 @@ import { Prisma, type Role } from "@prisma/client";
 import { type NextPage } from "next";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/ui/data-table";
+import DataTable from "@/components/ui/data-table";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -33,45 +33,39 @@ type User = Prisma.UserGetPayload<{
   };
 }>;
 
-const userColumns: ColumnDef<User>[] = [
-  {
-    id: "alta",
-    header: "Alta",
-    accessorFn: (row) => row.address?.created_at.toLocaleDateString(),
-  },
-  { id: "fullName", accessorFn: (row) => row.name, header: "Nombre" },
-  {
-    id: "retiro",
-    header: "Teléfono",
-    accessorFn: (row) => row.address?.phone,
-  },
-  {
-    id: "devolución",
-    header: "DNI",
-    accessorFn: (row) => row.address?.dni_number,
-  },
-  {
-    id: "location",
-    header: "Provincia",
-    accessorFn: (row) => row.address?.province,
-  },
-  {
-    id: "orders",
-    header: "Pedidos",
-    accessorFn: (row) => row.orders.length,
-  },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => {
-  //     const order = row.original;
+type CellFunctions<T> = {
+  isRowExpanded: boolean;
+  toggleRowExpansion: () => void;
+};
 
-  //     return <ActionsDropMenu />;
-  //   },
-  // },
+type CellProps<T> = {} & CellFunctions<T>;
+
+type Columns = {
+  title: string;
+  cell: (rowData: User, cellProps?: CellProps<User>) => ReactElement;
+};
+
+const userColumns: Columns[] = [
+  {
+    title: "Alta",
+    cell: (rowData) => (
+      <div>{rowData.address?.created_at.toLocaleDateString()}</div>
+    ),
+  },
+  { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
+  { title: "Teléfono", cell: (rowData) => <div>{rowData.address?.phone}</div> },
+  { title: "DNI", cell: (rowData) => <div>{rowData.address?.dni_number}</div> },
+  {
+    title: "Provincia",
+    cell: (rowData) => <div>{rowData.address?.province}</div>,
+  },
+  { title: "Pedidos", cell: (rowData) => <div>{rowData.orders.length}</div> },
 ];
 
 const AdminUsers: NextPage = () => {
   const router = useRouter();
+  const [userSelected, setUser] = useState<User | null>(null);
+
   const { watch, setValue } = useForm<{ roleId: string }>();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -121,9 +115,9 @@ const AdminUsers: NextPage = () => {
 
             {data?.users && (
               <DataTable
-                data={data?.users}
+                data={data.users}
+                setRowData={setUser}
                 columns={userColumns}
-                getRowCanExpand={() => false}
               />
             )}
 
