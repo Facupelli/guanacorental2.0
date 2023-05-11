@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
                   ))}
                 </TableRow>
                 {row.getIsExpanded() && (
-                  <TableRow className="bg-[rgba(0,0,0,0.02)]">
+                  <TableRow className="bg-secondary/50">
                     <TableCell colSpan={row.getVisibleCells().length}>
                       {subComponent && subComponent({ row })}
                     </TableCell>

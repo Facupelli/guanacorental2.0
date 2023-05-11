@@ -220,7 +220,7 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
 
 export const equipmentsList = ({ row }: { row: Row<Order> }) => {
   return (
-    <div>
+    <div className="grid gap-4">
       {row.original.equipments.map((ownerEquipment) => (
         <div className="flex items-center gap-4">
           {ownerEquipment.equipment.image && (
