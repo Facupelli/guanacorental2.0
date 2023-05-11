@@ -7,6 +7,7 @@ import { orderRouter } from "./routers/order";
 import { roleRouter } from "./routers/role";
 import { discountRouter } from "./routers/discount";
 import { ownerRouter } from "./routers/owner";
+import { rentRouter } from "./routers/rent";
 
 /**
  * This is the primary router for your server.
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   role: roleRouter,
   discount: discountRouter,
   owner: ownerRouter,
+  rent: rentRouter,
 });
 
 // export type definition of API

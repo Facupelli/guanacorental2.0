@@ -1,17 +1,8 @@
-import { useRouter } from "next/router";
 import Head from "next/head";
 import { type NextPage } from "next";
 import { UseFormSetValue, useForm } from "react-hook-form";
 import { Dispatch, SetStateAction, useState, ReactElement } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import {
@@ -29,20 +20,20 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { getDiscountStatus } from "@/lib/utils";
 import { discountStatusClass } from "@/lib/magic_strings";
-import { DiscountType, Prisma } from "@prisma/client";
-import DataTable from "@/components/ui/data-table";
-import { Columns } from "@/types/table";
+
+import type { DiscountType, Prisma } from "@prisma/client";
+import type { Columns } from "@/types/table";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {
