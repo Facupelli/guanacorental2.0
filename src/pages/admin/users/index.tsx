@@ -24,6 +24,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { api } from "@/utils/api";
 
@@ -104,33 +105,52 @@ const AdminUsers: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
-          <div className="grid gap-6 pt-6">
-            <div className="flex">
-              <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
-                <Label className="whitespace-nowrap">Rol del cliente</Label>
-                {roles.data && (
-                  <SelectRole roles={roles.data} setValue={setValue} />
-                )}
-              </div>
-              <div className="ml-auto">
-                <Button onClick={handleCreateUser}>Crear Cliente</Button>
-              </div>
-            </div>
+          <div className=" pt-6">
+            <Tabs defaultValue="account" className="">
+              <TabsList className="mb-4">
+                <TabsTrigger value="customers" className="w-[200px]">
+                  Clientes
+                </TabsTrigger>
+                <TabsTrigger value="petitions" className="w-[200px]">
+                  Altas
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="customers">
+                <div className="grid gap-6">
+                  <div className="flex">
+                    <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
+                      <Label className="whitespace-nowrap">
+                        Rol del cliente
+                      </Label>
+                      {roles.data && (
+                        <SelectRole roles={roles.data} setValue={setValue} />
+                      )}
+                    </div>
+                    <div className="ml-auto">
+                      <Button onClick={handleCreateUser}>Crear Cliente</Button>
+                    </div>
+                  </div>
 
-            {data?.users && (
-              <DataTable
-                data={data.users}
-                setRowData={setUser}
-                columns={userColumns}
-              />
-            )}
+                  {data?.users && (
+                    <DataTable
+                      data={data.users}
+                      setRowData={setUser}
+                      columns={userColumns}
+                    />
+                  )}
 
-            <Pagination
-              totalCount={data?.totalCount ?? 0}
-              currentPage={currentPage}
-              pageSize={pageSize}
-              onPageChange={(page) => setCurrentPage(page as number)}
-            />
+                  <Pagination
+                    totalCount={data?.totalCount ?? 0}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    onPageChange={(page) => setCurrentPage(page as number)}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent value="petitions">
+                Change your password here.
+              </TabsContent>
+            </Tabs>
           </div>
         </AdminLayout>
       </main>
