@@ -1,7 +1,34 @@
+import { type UseFormRegister, useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
-import Nav from "@/components/Nav";
 
 import { useBoundStore } from "@/zustand/store";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
+
+import Nav from "@/components/Nav";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import SelectDateButton from "@/components/ui/SelectDateButton";
+import DialogWithState from "@/components/DialogWithState";
+import { DialogFooter } from "@/components/ui/dialog";
+import CartItemCounter from "@/components/CartItemCounter";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Info, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+
+import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { api } from "@/utils/api";
 import {
   calcaulateCartTotal,
   calculateTotalWithDiscount,
@@ -9,33 +36,9 @@ import {
   getIsAdmin,
   isEquipmentAvailable,
 } from "@/lib/utils";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-
-import { Button } from "@/components/ui/button";
-import SelectDateButton from "@/components/ui/SelectDateButton";
-import DialogWithState from "@/components/DialogWithState";
-import { DialogFooter } from "@/components/ui/dialog";
-import CartItemCounter from "@/components/CartItemCounter";
-import { X } from "lucide-react";
-
-import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
-import { api } from "@/utils/api";
 
 import { type NextPage } from "next";
 import type { Equipment, Location } from "@/types/models";
-import { type UseFormRegister, useForm } from "react-hook-form";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { ZodError } from "zod";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Prisma } from "@prisma/client";
-import { DISCOUNT_TYPES } from "@/lib/magic_strings";
 
 type Discount = {
   value: number;
@@ -343,7 +346,10 @@ const RightBar = ({
 
           {isAdmin && (
             <div className="flex items-center justify-between font-semibold">
-              <p>Email cliente:</p>
+              <div className="flex items-center">
+                <p>Email cliente:</p>
+                <CLientEmailTip />
+              </div>
               <Input
                 type="email"
                 {...register("email")}
@@ -367,6 +373,27 @@ const RightBar = ({
         </div>
       </div>
     </section>
+  );
+};
+
+const CLientEmailTip = () => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger className=" border-none hover:bg-secondary" asChild>
+          <Button variant="outline" className="w-10 rounded-full p-0">
+            <Info className="h-4 w-4" />
+            <span className="sr-only">Info</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[300px]">
+          <p>
+            El pedido estará registrado a nombre del usuario asociado al correo
+            electrónico provisto.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
