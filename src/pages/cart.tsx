@@ -7,11 +7,10 @@ import { Dispatch, SetStateAction, useMemo, useState } from "react";
 
 import Nav from "@/components/Nav";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import DialogWithState from "@/components/DialogWithState";
@@ -378,22 +377,20 @@ const RightBar = ({
 
 const CLientEmailTip = () => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger className=" border-none hover:bg-secondary" asChild>
-          <Button variant="outline" className="w-10 rounded-full p-0">
-            <Info className="h-4 w-4" />
-            <span className="sr-only">Info</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-[300px]">
-          <p>
-            El pedido estará registrado a nombre del usuario asociado al correo
-            electrónico provisto.
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Popover>
+      <PopoverTrigger className=" border-none hover:bg-secondary" asChild>
+        <Button variant="outline" className="w-10 rounded-full p-0">
+          <Info className="h-4 w-4" />
+          <span className="sr-only">Info</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="max-w-[300px]">
+        <p>
+          El pedido estará registrado a nombre del usuario asociado al correo
+          electrónico provisto.
+        </p>
+      </PopoverContent>
+    </Popover>
   );
 };
 
