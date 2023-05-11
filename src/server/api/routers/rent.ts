@@ -7,36 +7,65 @@ import { prisma } from "@/server/db";
 import dayjs from "dayjs";
 import { z } from "zod";
 
+type EarningQuery = {
+  where?: {
+    order: {
+      book: {
+        start_date: { gte: Date; lte: Date };
+      };
+    };
+  };
+};
+
+type OrderQuery = {
+  where?: WherePipe;
+};
+
+type WherePipe = {
+  book?: {
+    start_date: {
+      gte: Date;
+      lte: Date;
+    };
+  };
+};
+
 export const rentRouter = createTRPCRouter({
   getTotal: protectedProcedure
-    .input(z.object({ month: z.date().optional() }))
+    .input(z.object({ month: z.string(), year: z.string() }))
     .query(async ({ input }) => {
-      const { month } = input;
+      const { month, year } = input;
 
-      const firstMonthDay = dayjs("2023-05").startOf("month").toDate();
-      const lastMonthDay = dayjs("2023-05").endOf("month").toDate();
+      const orderQuery: OrderQuery = {};
+      const earningQuery: EarningQuery = {};
 
-      const orders = await prisma.order.findMany({
-        where: {
-          book: {
-            start_date: { gte: firstMonthDay, lte: lastMonthDay },
-          },
-        },
-      });
+      console.log("----------------------", year);
 
-      const totalFromOrders = orders.reduce((acc, curr) => {
-        return acc + curr.total;
-      }, 0);
+      if (month !== "all" || year !== "all") {
+        const firstMonthDay = dayjs(`${year}-${month}`)
+          .startOf("month")
+          .toDate();
+        const lastMonthDay = dayjs(`${year}-${month}`).endOf("month").toDate();
 
-      const earnigns = await prisma.earning.findMany({
-        where: {
+        orderQuery.where = {
+          book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
+        };
+        earningQuery.where = {
           order: {
             book: {
               start_date: { gte: firstMonthDay, lte: lastMonthDay },
             },
           },
-        },
-      });
+        };
+      }
+
+      const orders = await prisma.order.findMany(orderQuery);
+
+      const totalFromOrders = orders.reduce((acc, curr) => {
+        return acc + curr.total;
+      }, 0);
+
+      const earnigns = await prisma.earning.findMany(earningQuery);
 
       const splitFromEarnings = earnigns.reduce(
         (acc, curr) => {

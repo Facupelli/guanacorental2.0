@@ -1,16 +1,43 @@
-import Nav from "@/components/Nav";
-import AdminLayout from "@/components/layout/AdminLayout";
-import { formatPrice } from "@/lib/utils";
-import { authOptions } from "@/server/auth";
-import { api } from "@/utils/api";
-import { GetServerSideProps, NextPage } from "next";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/server/auth";
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 
-const AdminRents: NextPage = () => {
-  const { data } = api.rent.getTotal.useQuery({});
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Nav from "@/components/Nav";
+import AdminLayout from "@/components/layout/AdminLayout";
 
-  console.log(data);
+import { formatPrice } from "@/lib/utils";
+import { api } from "@/utils/api";
+import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
+import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
+import dayjs from "dayjs";
+
+type RentForm = { month: string; year: string };
+
+const AdminRents: NextPage = () => {
+  const { setValue, watch } = useForm<RentForm>({
+    defaultValues: {
+      month: "all",
+      year: String(dayjs().year()),
+    },
+  });
+
+  const year = watch("year");
+  const month = watch("month");
+
+  const { data } = api.rent.getTotal.useQuery({
+    year,
+    month,
+  });
 
   return (
     <>
@@ -26,6 +53,11 @@ const AdminRents: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">RENTAS</h1>
           <div className="grid gap-6 pt-6">
+            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
+              <SelectMonth setValue={setValue} />
+              <SelectYear setValue={setValue} />
+            </div>
+
             <div className="w-fit rounded-md bg-white px-8 py-4">
               <p className="font-semibold text-primary/70">Total</p>
               <p className="text-2xl font-bold">
@@ -73,6 +105,55 @@ const AdminRents: NextPage = () => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+type SelectProps = {
+  setValue: UseFormSetValue<RentForm>;
+};
+
+const SelectMonth = ({ setValue }: SelectProps) => {
+  return (
+    <Select onValueChange={(e) => setValue("month", e)}>
+      <SelectTrigger>
+        <SelectValue placeholder="elegir mes" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Mes</SelectLabel>
+          <SelectItem value="all">Todos</SelectItem>
+          {monthList.map((month) => (
+            <SelectItem value={MONTHS[month] ?? "all"} key={month}>
+              {month}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+};
+
+const SelectYear = ({ setValue }: SelectProps) => {
+  return (
+    <Select
+      onValueChange={(e) => setValue("year", e)}
+      defaultValue={String(dayjs().year())}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="elegir año" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Año</SelectLabel>
+          <SelectItem value="all">Todos</SelectItem>
+          {yearList.map((year) => (
+            <SelectItem value={year} key={year}>
+              {year}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 

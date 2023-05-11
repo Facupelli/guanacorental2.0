@@ -67,3 +67,39 @@ export const ADMIN_ORDERS_SORT = {
   "NEXT ORDERS": "NEXT ORDERS",
   HISTORY: "HISTORY",
 };
+
+interface Months {
+  [month: string]: string;
+}
+
+export const MONTHS: Months = {
+  Enero: "01",
+  Febrero: "02",
+  Marzo: "03",
+  Abril: "04",
+  Mayo: "05",
+  Junio: "06",
+  Julio: "07",
+  Agosto: "08",
+  Octubre: "09",
+  Septiembre: "10",
+  Noviembre: "11",
+  Diciembre: "12",
+};
+
+export const yearList = ["2023", "2024", "2025", "2026"];
+
+export const monthList = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Octubre",
+  "Septiembre",
+  "Noviembre",
+  "Diciembre",
+];
