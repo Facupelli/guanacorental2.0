@@ -1,6 +1,4 @@
-import { ColumnDef, Row } from "@tanstack/react-table";
 import Head from "next/head";
-import Image from "next/image";
 import { ReactElement, useState } from "react";
 import { useBoundStore } from "@/zustand/store";
 
@@ -21,15 +19,6 @@ import Pagination from "@/components/ui/Pagination";
 
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { ADMIN_ORDERS_SORT, orderStatusClass } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { handleAdminLocationChange } from "@/lib/utils";
@@ -38,6 +27,7 @@ import { api } from "@/utils/api";
 import { type NextPage } from "next";
 import { Prisma } from "@prisma/client";
 import DataTable from "@/components/ui/data-table";
+import { orderColumns } from "@/lib/order";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -52,73 +42,6 @@ type Order = Prisma.OrderGetPayload<{
     earnings: true;
   };
 }>;
-
-type CellProps = {};
-
-type Columns = {
-  title: string;
-  cell: (rowData: Order, cellProps?: CellProps) => ReactElement;
-};
-
-const orderColumns: Columns[] = [
-  { title: "N°", cell: (rowData) => <div>{rowData.number}</div> },
-  { title: "Nombre", cell: (rowData) => <div>{rowData.customer.name}</div> },
-  {
-    title: "Teléfono",
-    cell: (rowData) => <div>{rowData.customer.address?.phone}</div>,
-  },
-  {
-    title: "Retiro",
-    cell: (rowData) => (
-      <div>{rowData.book.start_date.toLocaleDateString()}</div>
-    ),
-  },
-  {
-    title: "Devolución",
-    cell: (rowData) => <div>{rowData.book.end_date.toLocaleDateString()}</div>,
-  },
-  {
-    title: "Estado",
-    cell: (rowData) => {
-      const statusValue: string = rowData.status;
-      return (
-        <div>
-          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Sucursal",
-    cell: (rowData) => <div>{rowData.location.name}</div>,
-  },
-  {
-    title: "Sucursal",
-    cell: (rowData) => <div>{rowData.location.name}</div>,
-  },
-  {
-    title: "",
-    cell: (rowData) => <ActionsDropMenu />,
-  },
-];
-
-// {
-//   id: "expander",
-//   cell: ({ row, getValue }) => {
-//     return row.getCanExpand() ? (
-//       <button {...{ onClick: row.getToggleExpandedHandler() }}>
-//         {row.getIsExpanded() ? (
-//           <ChevronUp className="h-4 w-4" />
-//         ) : (
-//           <ChevronDown className="h-4 w-4" />
-//         )}
-//       </button>
-//     ) : (
-//       ""
-//     );
-//   },
-//   footer: (props) => props.column.id,
-// },
 
 const AdminOrders: NextPage = () => {
   const [orderSelected, setOrder] = useState<Order | null>(null);
@@ -227,57 +150,6 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
         </SelectGroup>
       </SelectContent>
     </Select>
-  );
-};
-
-export const equipmentsList = ({ row }: { row: Row<Order> }) => {
-  return (
-    <div className="grid gap-4">
-      {row.original.equipments.map((ownerEquipment) => (
-        <div className="flex items-center gap-4">
-          {ownerEquipment.equipment.image && (
-            <div className="relative h-10 w-10 rounded-full">
-              <Image
-                src={ownerEquipment.equipment.image}
-                alt="equipment picture"
-                fill
-                style={{ borderRadius: "100%" }}
-              />
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <p className="font-semibold">{ownerEquipment.equipment.name}</p>
-            <p className="font-semibold">{ownerEquipment.equipment.brand}</p>
-            <p>{ownerEquipment.equipment.model}</p>
-          </div>
-          <div>
-            <p>
-              x
-              {ownerEquipment.books.reduce((acc, curr) => {
-                return acc + curr.quantity;
-              }, 0)}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const ActionsDropMenu = () => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-        <DropdownMenuItem>Generar remito</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 };
 
