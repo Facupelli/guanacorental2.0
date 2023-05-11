@@ -306,7 +306,7 @@ export const orderRouter = createTRPCRouter({
       }
 
       if (sort === ADMIN_ORDERS_SORT["LAST ORDERS"]) {
-        query.orderBy = { created_at: "asc" };
+        query.orderBy = { created_at: "desc" };
       }
 
       if (sort === ADMIN_ORDERS_SORT.HISTORY) {
