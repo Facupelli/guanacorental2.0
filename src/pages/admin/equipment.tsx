@@ -45,14 +45,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DialogWithState from "@/components/DialogWithState";
-import { MoreHorizontal, Plus, RotateCw, X } from "lucide-react";
+import { MoreHorizontal, Plus, X } from "lucide-react";
+import { DataTable } from "@/components/ui/data-table";
 
 import { api } from "@/utils/api";
+import { formatPrice } from "@/lib/utils";
 
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
-import { formatPrice } from "@/lib/utils";
-import { DataTable } from "@/components/ui/data-table";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -138,8 +138,10 @@ type Props = {
 };
 
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+  const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 2;
+  const pageSize = 15;
 
   const location = useBoundStore((state) => state.location);
 
@@ -157,6 +159,14 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <DialogWithState
+        isOpen={showAddEquipmentModal}
+        setOpen={setShowAddEquipmentModal}
+        title="Agregar equipo"
+      >
+        <AddEquipment />
+      </DialogWithState>
+
       <Nav />
 
       <main className="">
@@ -164,7 +174,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="flex">
             <div className="ml-auto">
-              <Button onClick={() => true} size="sm">
+              <Button onClick={() => setShowAddEquipmentModal(true)} size="sm">
                 Agregar equipo
               </Button>
             </div>
@@ -420,12 +430,92 @@ const ActionsDropMenu = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-          <DropdownMenuItem>editar</DropdownMenuItem>
-          <DropdownMenuItem>stock</DropdownMenuItem>
-          <DropdownMenuItem>imagen</DropdownMenuItem>
+          <DropdownMenuItem>Editar equipo</DropdownMenuItem>
+          <DropdownMenuItem>Editar stock</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
+  );
+};
+
+type AddEquipmentForm = {
+  name: string;
+  model: string;
+  brand: string;
+  price: number;
+  image: string;
+  categoryId: string;
+};
+
+const AddEquipment = () => {
+  const { register, handleSubmit } = useForm<AddEquipmentForm>();
+
+  return (
+    <form>
+      <div>
+        <Label htmlFor="name">Nombre</Label>
+        <Input type="text" id="name" {...register("name")} />
+      </div>
+
+      <div>
+        <Label htmlFor="brand">Marca</Label>
+        <Input type="text" id="brand" {...register("brand")} />
+      </div>
+
+      <div>
+        <Label htmlFor="model">Modelo</Label>
+        <Input type="text" id="model" {...register("model")} />
+      </div>
+
+      <div>
+        <Label htmlFor="price">Precio</Label>
+        <Input
+          type="text"
+          id="price"
+          {...register("price", { valueAsNumber: true })}
+        />
+      </div>
+
+      <div>
+        <Label>Categoría</Label>
+        <SelectEquipmentCategory register={register} />
+      </div>
+
+      <div>
+        <Label htmlFor="image">Imagen</Label>
+        <Input type="text" id="image" {...register("image")} />
+      </div>
+
+      <div className="grid py-6">
+        <Button>Agregar</Button>
+      </div>
+    </form>
+  );
+};
+
+const SelectEquipmentCategory = ({
+  register,
+}: {
+  register: UseFormRegister<AddEquipmentForm>;
+}) => {
+  const { data } = api.category.getAllCategories.useQuery();
+
+  return (
+    <Select {...register("categoryId")}>
+      <SelectTrigger>
+        <SelectValue placeholder="seleccionar categoría" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Sucursales</SelectLabel>
+          {data?.map((category) => (
+            <SelectItem value={category.id} key={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
