@@ -30,9 +30,6 @@ const createLocationSlice: StateCreator<
 });
 
 interface DateSlice {
-  showDateModal: boolean;
-  setOpenDateModal: () => void;
-  setCloseDateModal: () => void;
   pickupHour: string;
   setPickupHour: (hour: string) => void;
   startDate: Date | null;
@@ -47,15 +44,12 @@ const createDateSlice: StateCreator<
   [],
   DateSlice
 > = (set) => ({
-  showDateModal: false,
   startDate: null,
   endDate: null,
   pickupHour: "",
   setPickupHour: (hour) => set(() => ({ pickupHour: hour })),
   setStartDate: (startDate) => set(() => ({ startDate })),
   setEndDate: (endDate) => set(() => ({ endDate })),
-  setOpenDateModal: () => set(() => ({ showDateModal: true })),
-  setCloseDateModal: () => set(() => ({ showDateModal: false })),
 });
 
 interface CartSlice {

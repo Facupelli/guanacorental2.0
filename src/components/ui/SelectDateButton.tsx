@@ -26,18 +26,18 @@ import { ROLES } from "@/lib/magic_strings";
 import { type Value } from "react-calendar/dist/cjs/shared/types";
 import DialogWithState from "../DialogWithState";
 import { useState } from "react";
+import { useDateModal } from "@/hooks/useDateModal";
 
 const SelectDateButton = () => {
+  const [isOpen, setOpen] = useState(false);
   const { data: session } = useSession();
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  const isOpen = useBoundStore((state) => state.showDateModal);
-  const setOpen = useBoundStore((state) => state.setOpenDateModal);
-  const endDate = useBoundStore((state) => state.startDate);
-  const startDate = useBoundStore((state) => state.endDate);
+  // const endDate = useBoundStore((state) => state.startDate);
+  // const startDate = useBoundStore((state) => state.endDate);
 
-  const [modal, setModal] = useState(isOpen);
+  // const [modal, setModal] = useState(isOpen);
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
@@ -69,9 +69,9 @@ const SelectDateButton = () => {
   // };
 
   return (
-    <Dialog open={modal} onOpenChange={setModal}>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" onClick={setOpen}>
+        <Button size="sm">
           <CalendarDays className="mr-2 h-4 w-4" /> Seleccionar Fecha
         </Button>
       </DialogTrigger>
@@ -113,7 +113,7 @@ const SelectDateButton = () => {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => setModal(false)}>Aceptar</Button>
+          <Button onClick={() => setOpen(false)}>Aceptar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

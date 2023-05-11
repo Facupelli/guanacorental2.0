@@ -12,6 +12,7 @@ import {
   getUpdatedCart,
   updateEarnings,
 } from "@/server/utils/updateOrder";
+import dayjs from "dayjs";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -244,10 +245,12 @@ export const orderRouter = createTRPCRouter({
   getCalendarOrders: protectedProcedure
     .input(z.object({ location: z.string() }))
     .query(async ({ input }) => {
+      const date = dayjs().subtract(1, "month").toDate();
+
       const orders = await prisma.order.findMany({
         where: {
           book: {
-            start_date: { gte: new Date() },
+            start_date: { gte: date },
           },
           locationId: input.location,
         },
@@ -476,7 +479,9 @@ export const orderRouter = createTRPCRouter({
             subtotal,
             message,
             status: STATUS.PENDING,
-            discount: { connect: { id: discountModel?.id } },
+            discount: discountModel
+              ? { connect: { id: discountModel?.id } }
+              : undefined,
           },
           include: {
             book: true,
@@ -505,6 +510,7 @@ export const orderRouter = createTRPCRouter({
           where: { id: newBook.id },
         });
 
+        console.log(err);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Create Order failed, please try again later",

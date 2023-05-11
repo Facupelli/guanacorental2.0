@@ -1,6 +1,6 @@
 import Head from "next/head";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import { useBoundStore } from "@/zustand/store";
 
@@ -12,13 +12,14 @@ import SelectLocation from "@/components/ui/SelectLocation";
 import { SelectItem } from "@/components/ui/select";
 
 import { api } from "@/utils/api";
-import { handleAdminLocationChange } from "@/lib/utils";
+import { getIsAdmin, handleAdminLocationChange } from "@/lib/utils";
 
 import { type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import DataTable from "@/components/ui/data-table";
 import { equipmentsList, orderColumns } from "@/lib/order";
+import { useSession } from "next-auth/react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -37,6 +38,8 @@ type Order = Prisma.OrderGetPayload<{
 }>;
 
 const Admin: NextPage = () => {
+  const { data: session } = useSession();
+
   const [orderSelected, setOrder] = useState<Order | null>(null);
 
   // const [calendarValue, setCalendarValue] = useState();
@@ -65,6 +68,16 @@ const Admin: NextPage = () => {
       setOrders(filteredOrers);
     }
   };
+
+  useEffect(() => {
+    handleClickDay(new Date());
+  }, [data]);
+
+  let isAdmin = session ? getIsAdmin(session.user.role) : false;
+
+  let calendarMinDate = isAdmin
+    ? dayjs().subtract(1, "month").startOf("day").toDate()
+    : dayjs().startOf("day").toDate();
 
   return (
     <>
@@ -95,10 +108,10 @@ const Admin: NextPage = () => {
                 </SelectLocation>
               )}
             </div>
-            <div className="flex gap-6">
+            <div className="flex max-w-[650px] gap-6">
               <Calendar
                 locale="es-ES"
-                minDate={new Date()}
+                minDate={calendarMinDate}
                 onClickDay={handleClickDay}
                 className="rounded-lg p-4"
                 defaultValue={new Date()}
