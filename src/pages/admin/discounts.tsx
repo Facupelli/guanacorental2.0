@@ -41,7 +41,7 @@ import { api } from "@/utils/api";
 import { getDiscountStatus } from "@/lib/utils";
 import { discountStatusClass } from "@/lib/magic_strings";
 import { DiscountType, Prisma } from "@prisma/client";
-import { DataTable } from "@/components/ui/data-table";
+import DataTable from "@/components/ui/data-table";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {
@@ -195,28 +195,12 @@ const AdminDiscounts: NextPage = () => {
             </div>
 
             {data?.discounts && (
-              <Table className="bg-white">
-                <TableHeader>
-                  <TableRow>
-                    {columns.map((column) => (
-                      <TableHead className="font-semibold text-black">
-                        {column.title}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.discounts.map((discount) => (
-                    <TableRow onClick={() => setDiscount(discount)}>
-                      {columns.map((column) => (
-                        <TableCell>
-                          {column.cell(discount, cellProps)}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <DataTable
+                data={data.discounts}
+                columns={columns}
+                cellProps={cellProps}
+                setRowData={setDiscount}
+              />
             )}
           </div>
         </AdminLayout>

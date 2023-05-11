@@ -1,16 +1,3 @@
-import { ReactElement, useState } from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  type VisibilityState,
-  type ExpandedState,
-  getExpandedRowModel,
-  type Row,
-  Table as TableType,
-} from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -18,150 +5,49 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-} from "./dropdown-menu";
-import { Button } from "./button";
-import { Input } from "./input";
-import { useRouter } from "next/router";
+} from "@/components/ui/table";
+import { type Dispatch, type ReactElement, type SetStateAction } from "react";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  getRowCanExpand: () => boolean;
-  subComponent?: (props: { row: Row<TData> }) => ReactElement;
-  searchComponent?: () => ReactElement;
-}
+type Columns<T, P> = {
+  title: string;
+  cell: (rowData: T, cellProps?: P) => ReactElement;
+};
 
-export function DataTable<TData, TValue>({
+type TableProps<T, P> = {
+  columns: Columns<T, P>[];
+  data: T[];
+  setRowData: Dispatch<SetStateAction<T | null>>;
+  cellProps?: P;
+};
+
+const DataTable = <T, P>({
   columns,
   data,
-  getRowCanExpand,
-  subComponent,
-  searchComponent,
-  ...props
-}: DataTableProps<TData, TValue>) {
-  const router = useRouter();
-
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [expanded, setExpanded] = useState<ExpandedState>({});
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      columnVisibility,
-      expanded,
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand,
-    onColumnVisibilityChange: setColumnVisibility,
-    onExpandedChange: setExpanded,
-  });
-
+  setRowData,
+  cellProps,
+}: TableProps<T, P>) => {
   return (
-    <div className="rounded-md border bg-white">
-      <div className="flex gap-10 px-6 py-4">
-        {searchComponent && searchComponent()}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columnas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value: boolean) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={header.id}
-                    className="font-semibold text-black"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
+    <Table className="rounded-md bg-white">
+      <TableHeader>
+        <TableRow>
+          {columns.map((column) => (
+            <TableHead className="font-semibold text-black">
+              {column.title}
+            </TableHead>
           ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <>
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // if (row.original.equipments) {
-                    //   router.push(`/admin/orders/${row.original.id}`);
-                    // }
-                    // if (row.original.role) {
-                    //   router.push(`/admin/users/${row.original.id}`);
-                    // }
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                {row.getIsExpanded() && (
-                  <TableRow className="bg-secondary/50">
-                    <TableCell colSpan={row.getVisibleCells().length}>
-                      {subComponent && subComponent({ row })}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data.map((data) => (
+          <TableRow onClick={() => setRowData(data)}>
+            {columns.map((column) => (
+              <TableCell>{column.cell(data, cellProps)}</TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
-}
+};
+
+export default DataTable;
