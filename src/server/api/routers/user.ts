@@ -5,6 +5,20 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
+  getPetitionUsers: protectedProcedure.query(async () => {
+    const users = await prisma.user.findMany({
+      where: {
+        petition_sent: true,
+        customer_approved: false,
+      },
+      include: {
+        address: true,
+      },
+    });
+
+    return users;
+  }),
+
   editUser: protectedProcedure
     .input(z.object({ userId: z.string(), name: z.string() }))
     .mutation(async ({ input }) => {
@@ -130,7 +144,7 @@ export const userRouter = createTRPCRouter({
           cuit: input.cuit,
           bussines_name: input.bussiness_name,
           bank: input.bank,
-          alias: input.bank,
+          alias: input.alias,
           cbu: input.cbu,
           contact_1: input.contact_1,
           bond_1: input.bond_1,
@@ -150,6 +164,7 @@ export const userRouter = createTRPCRouter({
         data: {
           address: { connect: { id: address.id } },
           role: { connect: { id: customerRole.id } },
+          petition_sent: true,
         },
       });
 

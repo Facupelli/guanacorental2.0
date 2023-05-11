@@ -35,12 +35,19 @@ import { type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 type User = Prisma.UserGetPayload<{
   include: {
     role: true;
     address: true;
     orders: true;
+  };
+}>;
+
+type PetitionUser = Prisma.UserGetPayload<{
+  include: {
+    address: true;
   };
 }>;
 
@@ -70,6 +77,9 @@ const userColumns: Columns<User, CellProps>[] = [
 const AdminUsers: NextPage = () => {
   const router = useRouter();
   const [userSelected, setUser] = useState<User | null>(null);
+  const [petitionUserSelected, setPetitionUser] = useState<PetitionUser | null>(
+    null
+  );
 
   const { watch, setValue } = useForm<{ roleId: string }>();
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,6 +88,7 @@ const AdminUsers: NextPage = () => {
   const roleId = watch("roleId");
 
   const roles = api.role.getAllRoles.useQuery();
+  const petitionUsers = api.user.getPetitionUsers.useQuery();
   const { data, isLoading } = api.user.getAllUsers.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
@@ -86,10 +97,6 @@ const AdminUsers: NextPage = () => {
 
   const handleCreateUser = () => {
     void router.push("/new-user");
-  };
-
-  const handleClickUser = (userId: string) => {
-    void router.push(`/admin/users/${userId}`);
   };
 
   return (
@@ -106,13 +113,13 @@ const AdminUsers: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">CLIENTES</h1>
           <div className=" pt-6">
-            <Tabs defaultValue="account" className="">
-              <TabsList className="mb-4">
-                <TabsTrigger value="customers" className="w-[200px]">
+            <Tabs defaultValue="customers">
+              <TabsList className="mb-4 w-1/3" defaultValue="customers">
+                <TabsTrigger value="customers" className="w-full">
                   Clientes
                 </TabsTrigger>
-                <TabsTrigger value="petitions" className="w-[200px]">
-                  Altas
+                <TabsTrigger value="petitions" className="w-full">
+                  Altas - {petitionUsers.data?.length}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="customers">
@@ -148,7 +155,38 @@ const AdminUsers: NextPage = () => {
                 </div>
               </TabsContent>
               <TabsContent value="petitions">
-                Change your password here.
+                <div className="grid grid-cols-3 gap-6">
+                  {petitionUsers.data?.map((user) => (
+                    <div className="col-span-1 ">
+                      <div
+                        className={`flex cursor-pointer items-center gap-2 rounded-md p-4 ${
+                          petitionUserSelected?.id === user.id
+                            ? "bg-secondary-foreground/20"
+                            : ""
+                        }`}
+                        onClick={() => setPetitionUser(user)}
+                      >
+                        {user.image && (
+                          <div className="relative h-10 w-10 rounded-full">
+                            <Image
+                              src={user.image}
+                              fill
+                              alt="profile picture"
+                              style={{ borderRadius: "100%" }}
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm text-primary/60">Nombre</p>
+                          <p className="font-semibold">{user.name}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {petitionUserSelected && (
+                    <UserPetitionInfo user={petitionUserSelected} />
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
@@ -200,6 +238,117 @@ const ActionsDropMenu = ({ user }: { user: User }) => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+};
+
+const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
+  return (
+    <div
+      key={user.id}
+      className="col-span-2 grid gap-4 rounded-md bg-white p-6"
+    >
+      <div className="grid grid-cols-4">
+        <div>
+          <p className="text-sm text-primary/60">DNI</p>
+          <p className="font-semibold">{user.address?.dni_number}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Teléfono</p>
+          <p className="font-semibold">{user.address?.phone}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Fecha de nacimiento</p>
+          <p className="font-semibold">{user.address?.birth_date}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4">
+        <div>
+          <p className="text-sm text-primary/60">Domicilio</p>
+          <p className="font-semibold">{user.address?.address_1}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Localidad</p>
+          <p className="font-semibold">{user.address?.city}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Provincia</p>
+          <p className="font-semibold">{user.address?.province}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-y-2">
+        <div>
+          <p className="text-sm text-primary/60">Ocupación</p>
+          <p className="font-semibold">{user.address?.occupation}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Estudiante</p>
+          <p className="font-semibold">{user.address?.student}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Empleado</p>
+          <p className="font-semibold">{user.address?.employee}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">Empresa</p>
+          <p className="font-semibold">{user.address?.company}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-primary/60">CUIT</p>
+          <p className="font-semibold">{user.address?.cuit}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4">
+        <div>
+          <p className="text-sm text-primary/60">contacto 1</p>
+          <p className="font-semibold">{user.address?.contact_1}</p>
+        </div>
+        <div>
+          <p className="text-sm text-primary/60">vínculo 1</p>
+          <p className="font-semibold">{user.address?.bond_1}</p>
+        </div>
+        <div>
+          <p className="text-sm text-primary/60">contacto 2</p>
+          <p className="font-semibold">{user.address?.contact_2}</p>
+        </div>
+        <div>
+          <p className="text-sm text-primary/60">vínculo 2</p>
+          <p className="font-semibold">{user.address?.bond_2}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4">
+        <div>
+          <p className="text-sm text-primary/60">Banco</p>
+          <p className="font-semibold">{user.address?.bank}</p>
+        </div>
+        <div>
+          <p className="text-sm text-primary/60">Alias</p>
+          <p className="font-semibold">{user.address?.alias}</p>
+        </div>
+        <div>
+          <p className="text-sm text-primary/60">cbu</p>
+          <p className="font-semibold">{user.address?.cbu}</p>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-4 pt-4">
+        <Button size="sm" variant="destructive">
+          Rechazar
+        </Button>
+        <Button size="sm">Aceptar</Button>
+      </div>
+    </div>
   );
 };
 

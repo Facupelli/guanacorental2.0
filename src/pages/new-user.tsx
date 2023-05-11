@@ -64,7 +64,6 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
     resolver: zodResolver(validationAddress),
   });
 
-  const [showSignModal, setShowSignModal] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -96,19 +95,7 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
         <link rel="icon" href="/logo-favicon.ico" />
       </Head>
 
-      {/* <DialogWithState
-        isOpen={showSignModal}
-        setOpen={() => false}
-        title="Iniciar Sesión"
-      >
-        <div>Debes estar logeado para poder mandar el alta</div>
-        <div>
-          <GoogleButton />
-          <FacebookButton />
-        </div>
-      </DialogWithState> */}
-
-      <ImportanModal showModal={showModal} setShowModal={setShowModal} />
+      {/* <ImportanModal showModal={showModal} setShowModal={setShowModal} />*/}
 
       <SuccessModal
         showSuccessModal={showSuccessModal}
@@ -365,7 +352,6 @@ type ImportanModalProps = {
 };
 
 const ImportanModal = ({ showModal, setShowModal }: ImportanModalProps) => {
-  console.log(showModal);
   return (
     <DialogWithState
       isOpen={showModal}
