@@ -18,14 +18,17 @@ import {
 
 type Columns<T, P> = {
   title: string;
-  cell: (rowData: T, cellProps?: P & CellFunctions<T>) => ReactElement;
+  cell: (
+    rowData: T,
+    cellProps?: P | (undefined & CellFunctions<T>)
+  ) => ReactElement;
 };
 
 type TableProps<T, P> = {
   columns: Columns<T, P>[];
   data: T[];
   setRowData: Dispatch<SetStateAction<T | null>>;
-  cellProps?: P & CellFunctions<T>;
+  cellProps?: P | undefined;
   expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
 
@@ -66,7 +69,7 @@ type RowProps<T, P> = {
   columns: Columns<T, P>[];
   data: T;
   setRowData: Dispatch<SetStateAction<T | null>>;
-  cellProps?: P & CellFunctions<T>;
+  cellProps?: P | undefined;
   expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
 
@@ -89,7 +92,7 @@ const Row = <T, P>({
       <TableRow onClick={() => setRowData(data)}>
         {columns.map((column) => (
           <TableCell>
-            {column.cell(data, { ...cellProps, ...cellFunctions })}
+            {column.cell(data, cellProps && { ...cellProps, ...cellFunctions })}
           </TableCell>
         ))}
       </TableRow>
