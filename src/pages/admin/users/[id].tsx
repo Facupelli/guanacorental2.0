@@ -19,8 +19,8 @@ import { Input } from "@/components/ui/input";
 import { CheckSquare, EditIcon } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { DataTable } from "@/components/ui/data-table";
-import { equipmentsList, orderColumns } from "../orders";
+import DataTable from "@/components/ui/data-table";
+import { equipmentsList, orderColumns } from "@/lib/order";
 
 type UserForm = {
   name: string;
@@ -186,10 +186,9 @@ const AdminUserDetail: NextPage = () => {
                   ) : (
                     data?.user.orders && (
                       <DataTable
-                        data={data?.user.orders}
+                        data={data.user.orders}
                         columns={orderColumns}
-                        getRowCanExpand={() => true}
-                        subComponent={equipmentsList}
+                        expandedComponent={equipmentsList}
                       />
                     )
                   )}

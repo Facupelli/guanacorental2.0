@@ -17,6 +17,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { api } from "@/utils/api";
 
@@ -25,6 +32,8 @@ import DataTable from "@/components/ui/data-table";
 
 import { type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -51,6 +60,10 @@ const userColumns: Columns<User, CellProps>[] = [
     cell: (rowData) => <div>{rowData.address?.province}</div>,
   },
   { title: "Pedidos", cell: (rowData) => <div>{rowData.orders.length}</div> },
+  {
+    title: "",
+    cell: (rowData) => <ActionsDropMenu user={rowData} />,
+  },
 ];
 
 const AdminUsers: NextPage = () => {
@@ -148,6 +161,25 @@ const SelectRole = ({
         </SelectGroup>
       </SelectContent>
     </Select>
+  );
+};
+
+const ActionsDropMenu = ({ user }: { user: User }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>
+          <Link href={`/admin/users/${user.id}`}>Ver detalle</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

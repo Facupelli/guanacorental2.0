@@ -19,7 +19,7 @@ import {
 type TableProps<T, P> = {
   columns: Columns<T, P>[];
   data: T[];
-  setRowData: Dispatch<SetStateAction<T | null>>;
+  setRowData?: Dispatch<SetStateAction<T | null>>;
   cellProps?: P | undefined;
   expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
@@ -60,7 +60,7 @@ const DataTable = <T, P>({
 type RowProps<T, P> = {
   columns: Columns<T, P>[];
   data: T;
-  setRowData: Dispatch<SetStateAction<T | null>>;
+  setRowData?: Dispatch<SetStateAction<T | null>>;
   cellProps?: P | undefined;
   expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
@@ -83,7 +83,7 @@ const Row = <T, P>({
     <>
       <TableRow
         onClick={() => {
-          setRowData(data);
+          setRowData && setRowData(data);
         }}
       >
         {columns.map((column) => (
