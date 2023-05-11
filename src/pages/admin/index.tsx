@@ -17,8 +17,8 @@ import { handleAdminLocationChange } from "@/lib/utils";
 import { type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { DataTable } from "@/components/ui/data-table";
-import { equipmentsList, orderColumns } from "./orders";
+import DataTable from "@/components/ui/data-table";
+import { equipmentsList, orderColumns } from "@/lib/order";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -37,6 +37,8 @@ type Order = Prisma.OrderGetPayload<{
 }>;
 
 const Admin: NextPage = () => {
+  const [orderSelected, setOrder] = useState<Order | null>(null);
+
   // const [calendarValue, setCalendarValue] = useState();
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
@@ -158,10 +160,10 @@ const Admin: NextPage = () => {
             <div className="col-span-12">
               {orders && (
                 <DataTable
-                  columns={orderColumns}
                   data={orders}
-                  getRowCanExpand={() => true}
-                  subComponent={equipmentsList}
+                  columns={orderColumns}
+                  setRowData={setOrder}
+                  expandedComponent={equipmentsList}
                 />
               )}
             </div>
