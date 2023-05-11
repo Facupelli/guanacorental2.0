@@ -181,7 +181,9 @@ const LeftBar = ({
       <SelectLocation
         locations={locations}
         placeholder="Elegir sucursal"
-        defaultValue={`${location.id}-${location.name}`}
+        defaultValue={
+          location.id ? `${location.id}-${location.name}` : undefined
+        }
         onValueChange={(e) => handleLocationChange(e, setLocation)}
       />
 
