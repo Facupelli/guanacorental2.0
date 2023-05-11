@@ -15,12 +15,12 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import OrderRow from "@/components/OrderRow";
 import Pagination from "@/components/ui/Pagination";
-import Table from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { CheckSquare, EditIcon } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { orderTableColumns } from "@/lib/utils";
+import { DataTable } from "@/components/ui/data-table";
+import { equipmentsList, orderColumns } from "../orders";
 
 type UserForm = {
   name: string;
@@ -33,7 +33,7 @@ const AdminUserDetail: NextPage = () => {
   const [editProfile, setEditProfile] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 5;
 
   const ctx = api.useContext();
   const { data, isLoading } = api.user.getUserById.useQuery({
@@ -178,30 +178,23 @@ const AdminUserDetail: NextPage = () => {
                 </div>
               </section>
 
-              <section className="grid rounded-md border border-app-bg ">
+              <section className="grid rounded-md  ">
                 <h5 className="p-4 text-lg font-semibold">Pedidos</h5>
                 <div className="pb-4">
-                  <Table headTitles={orderTableColumns}>
-                    {data?.user.orders?.length === 0 ? (
-                      <tr>
-                        <td colSpan={12} className="py-5">
-                          Actualmente no hay pedidos
-                        </td>
-                      </tr>
-                    ) : (
-                      data?.user.orders?.map((order) => (
-                        <OrderRow key={order.id} order={order} />
-                      ))
-                    )}
+                  {data?.user.orders?.length === 0 ? (
+                    <div className="py-5">Actualmente no hay pedidos</div>
+                  ) : (
+                    data?.user.orders && (
+                      <DataTable
+                        data={data?.user.orders}
+                        columns={orderColumns}
+                        getRowCanExpand={() => true}
+                        subComponent={equipmentsList}
+                      />
+                    )
+                  )}
 
-                    {isLoading && (
-                      <tr>
-                        <td colSpan={12} className="py-5">
-                          Cargando...
-                        </td>
-                      </tr>
-                    )}
-                  </Table>
+                  {isLoading && <div className="py-5">Cargando...</div>}
 
                   <Pagination
                     totalCount={data?.totalUserOrders ?? 0}
@@ -239,7 +232,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         session,
-        trpcState: helpers.dehydrate(),
+        // trpcState: helpers.dehydrate(),
       },
     };
   }

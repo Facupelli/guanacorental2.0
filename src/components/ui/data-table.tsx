@@ -27,6 +27,7 @@ import {
 } from "./dropdown-menu";
 import { Button } from "./button";
 import { Input } from "./input";
+import { useRouter } from "next/router";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,6 +42,8 @@ export function DataTable<TData, TValue>({
   getRowCanExpand,
   subComponent,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
+
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
@@ -66,7 +69,32 @@ export function DataTable<TData, TValue>({
           placeholder="Buscar por número de pedido"
           className="w-[400px]"
         />
-        <VisibilityDropMenu table={table} />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columnas
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value: boolean) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <Table>
         <TableHeader>
@@ -98,6 +126,15 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // if (row.original.equipments) {
+                    //   router.push(`/admin/orders/${row.original.id}`);
+                    // }
+                    // if (row.original.role) {
+                    //   router.push(`/admin/users/${row.original.id}`);
+                    // }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -129,34 +166,3 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
-
-const VisibilityDropMenu = ({ table }: { table: TableType<TData> }) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="ml-auto">
-          Columnas
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {table
-          .getAllColumns()
-          .filter((column) => column.getCanHide())
-          .map((column) => {
-            return (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value: boolean) =>
-                  column.toggleVisibility(!!value)
-                }
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            );
-          })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};

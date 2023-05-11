@@ -44,6 +44,7 @@ export const userRouter = createTRPCRouter({
                 },
               },
               location: true,
+              earnings: true,
             },
           },
           address: true,
