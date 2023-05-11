@@ -7,17 +7,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRowExpansion } from "@/hooks/useRowExpansion";
+
+import type { CellFunctions } from "@/types/table";
 import {
   type ReactNode,
   type Dispatch,
   type ReactElement,
   type SetStateAction,
 } from "react";
-
-type CellFunctions<T> = {
-  isRowExpanded: boolean;
-  toggleRowExpansion: () => void;
-};
 
 type Columns<T, P> = {
   title: string;

@@ -2,6 +2,7 @@ import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { ReactElement, useState } from "react";
+import { type NextPage } from "next";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -19,11 +20,11 @@ import { Label } from "@/components/ui/label";
 
 import { api } from "@/utils/api";
 
-import { Prisma, type Role } from "@prisma/client";
-import { type NextPage } from "next";
 import { Button } from "@/components/ui/button";
-import { ColumnDef } from "@tanstack/react-table";
 import DataTable from "@/components/ui/data-table";
+
+import { type Prisma, type Role } from "@prisma/client";
+import type { CellFunctions } from "@/types/table";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -33,17 +34,12 @@ type User = Prisma.UserGetPayload<{
   };
 }>;
 
-type CellFunctions<T> = {
-  isRowExpanded: boolean;
-  toggleRowExpansion: () => void;
-};
-
-type CellProps<T> = {} & CellFunctions<T>;
-
 type Columns = {
   title: string;
   cell: (rowData: User, cellProps?: CellProps<User>) => ReactElement;
 };
+
+type CellProps<T> = {} & CellFunctions<T>;
 
 const userColumns: Columns[] = [
   {

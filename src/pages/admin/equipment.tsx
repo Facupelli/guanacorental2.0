@@ -46,13 +46,14 @@ import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DialogWithState from "@/components/DialogWithState";
 import { MoreHorizontal, Plus, X } from "lucide-react";
-import { DataTable } from "@/components/ui/data-table";
 
 import { api } from "@/utils/api";
 import { formatPrice } from "@/lib/utils";
 
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
+import type { CellFunctions } from "@/types/table";
+import DataTable from "@/components/ui/data-table";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -61,75 +62,49 @@ type Equipment = Prisma.EquipmentGetPayload<{
   };
 }>;
 
-export const equipmentColumns: ColumnDef<Equipment>[] = [
-  {
-    id: "name",
-    header: "Nombre",
+type Columns = {
+  title: string;
+  cell: (rowData: Equipment, cellProps?: CellProps<Equipment>) => ReactElement;
+};
 
-    accessorFn: (row) => row.name,
-  },
+type CellProps<T> = {} & CellFunctions<T>;
+
+export const equipmentColumns: Columns[] = [
+  { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
+  { title: "Marca", cell: (rowData) => <div>{rowData.brand}</div> },
+  { title: "Model", cell: (rowData) => <div>{rowData.model}</div> },
+  { title: "Precio", cell: (rowData) => <div>{rowData.price}</div> },
   {
-    id: "brand",
-    header: "Marca",
-    accessorFn: (row) => row.brand,
-  },
-  {
-    id: "model",
-    header: "Modelo",
-    accessorFn: (row) => row.model,
-  },
-  {
-    id: "price",
-    header: "Precio",
-    cell: ({ row }) => {
-      return <div>{formatPrice(row.original.price)}</div>;
-    },
-  },
-  {
-    id: "stock",
-    header: "Stock total",
-    cell: ({ row }) => {
+    title: "Stock",
+    cell: (rowData) => {
       return (
         <div className="w-[40px]">
-          {row.original.owner.reduce((acc, curr) => acc + curr.stock, 0)}
+          {rowData.owner.reduce((acc, curr) => acc + curr.stock, 0)}
         </div>
       );
     },
   },
   {
-    id: "location",
-    header: "Sucursal",
-    cell: ({ row }) => {
+    title: "Sucursal",
+    cell: (rowData) => {
       const locations = new Set();
-      row.original.owner.map((owner) => locations.add(owner.location.name));
+      rowData.owner.map((owner) => locations.add(owner.location.name));
 
       return <div className="w-[40px]">{Array.from(locations).join(", ")}</div>;
     },
   },
+  { title: "Categoría", cell: (rowData) => <div>{rowData.category.name}</div> },
   {
-    id: "category",
-    header: "Categoría",
-    cell: ({ row }) => {
-      return <div>{row.original.category.name}</div>;
-    },
-  },
-  {
-    id: "availability",
-    header: "Disponible",
-    cell: ({ row }) => {
+    title: "Disponible",
+    cell: (rowData) => {
       return (
         <div className="flex justify-center">
-          <Switch defaultChecked={row.original.available} title="habilitado" />
+          <Switch defaultChecked={rowData.available} title="habilitado" />
         </div>
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row, table }) => {
-      return <ActionsDropMenu />;
-    },
-  },
+  { title: "", cell: (rowData) => <ActionsDropMenu /> },
 ];
 
 type Props = {
@@ -138,6 +113,7 @@ type Props = {
 };
 
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+  const [equipmentSelected, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -184,7 +160,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
               <DataTable
                 columns={equipmentColumns}
                 data={data.equipment}
-                getRowCanExpand={() => false}
+                setRowData={setEquipment}
               />
             )}
 
