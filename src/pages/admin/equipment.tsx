@@ -1,7 +1,6 @@
 import superjason from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { getServerSession } from "next-auth";
-import { ColumnDef } from "@tanstack/react-table";
 import {
   type UseFieldArrayRemove,
   type UseFormRegister,
@@ -9,7 +8,7 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { useState } from "react";
+import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { type GetServerSideProps, type NextPage } from "next";
@@ -21,6 +20,8 @@ import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { useBoundStore } from "@/zustand/store";
 
+import { ColumnDef, Table as TableType } from "@tanstack/react-table";
+
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,14 +31,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -51,7 +44,7 @@ import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
-import { DataTable } from "@/components/ui/data-table";
+import DialogWithState from "@/components/DialogWithState";
 import { MoreHorizontal, Plus, RotateCw, X } from "lucide-react";
 
 import { api } from "@/utils/api";
@@ -59,6 +52,7 @@ import { api } from "@/utils/api";
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import { formatPrice } from "@/lib/utils";
+import { DataTable } from "@/components/ui/data-table";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -82,16 +76,8 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
   {
     id: "model",
     header: "Modelo",
-    accessorFn: (row) => row.brand,
+    accessorFn: (row) => row.model,
   },
-
-  // {
-  //   id: "image",
-  //   header: "Imagen",
-  //   cell: ({ row }) => {
-  //     return <div className="">{row.original.image}</div>;
-  //   },
-  // },
   {
     id: "price",
     header: "Precio",
@@ -111,18 +97,13 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
     },
   },
   {
-    id: "availability",
-    header: "Disponible",
+    id: "location",
+    header: "Sucursal",
     cell: ({ row }) => {
-      return (
-        <div className="flex justify-center">
-          <Switch
-            defaultChecked={row.original.available}
-            title="habilitado"
-            // {...register("available")}
-          />
-        </div>
-      );
+      const locations = new Set();
+      row.original.owner.map((owner) => locations.add(owner.location.name));
+
+      return <div className="w-[40px]">{Array.from(locations).join(", ")}</div>;
     },
   },
   {
@@ -133,10 +114,19 @@ export const equipmentColumns: ColumnDef<Equipment>[] = [
     },
   },
   {
-    id: "actions",
+    id: "availability",
+    header: "Disponible",
     cell: ({ row }) => {
-      const order = row.original;
-
+      return (
+        <div className="flex justify-center">
+          <Switch defaultChecked={row.original.available} title="habilitado" />
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row, table }) => {
       return <ActionsDropMenu />;
     },
   },
@@ -149,7 +139,7 @@ type Props = {
 
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 15;
+  const pageSize = 2;
 
   const location = useBoundStore((state) => state.location);
 
@@ -172,6 +162,13 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
+          <div className="flex">
+            <div className="ml-auto">
+              <Button onClick={() => true} size="sm">
+                Agregar equipo
+              </Button>
+            </div>
+          </div>
           <div className="pt-6">
             {data?.equipment && (
               <DataTable
@@ -180,24 +177,6 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 getRowCanExpand={() => false}
               />
             )}
-
-            {/* <Table headTitles={tableTitles}>
-              {data?.equipment.map((equipment) => (
-                <EquipmentRow
-                  key={equipment.id}
-                  equipment={equipment}
-                  owners={owners}
-                  locations={locations}
-                />
-              ))}
-              {isLoading && (
-                <tr>
-                  <td className="py-5" colSpan={12}>
-                    Cargando...
-                  </td>
-                </tr>
-              )}
-            </Table> */}
 
             <Pagination
               totalCount={data?.totalCount ?? 0}
@@ -222,125 +201,13 @@ type EquipmentForm = {
   available: string;
 };
 
-const EquipmentRow = ({
-  equipment,
-  owners,
-  locations,
-}: {
-  equipment: Equipment;
-  owners: Owner[];
-  locations: Location[];
-}) => {
-  const { register, getValues } = useForm<EquipmentForm>();
-  const ctx = api.useContext();
-
-  const { mutate, isLoading } = api.equipment.putEquipment.useMutation();
-
-  const handleUpdate = () => {
-    const data = getValues();
-
-    mutate(
-      { ...data, equipmentId: equipment.id },
-      {
-        onSuccess: () => {
-          void ctx.equipment.adminGetEquipment.invalidate();
-        },
-        onError: (err) => {
-          console.log(err.message);
-        },
-      }
-    );
-  };
-
-  return (
-    <tr key={equipment.id} className="center border-b border-app-bg text-sm">
-      <td className="py- w-14">
-        {equipment.image && (
-          <div className="relative h-14 w-14">
-            <Image
-              src={equipment.image}
-              fill
-              style={{ objectFit: "cover" }}
-              alt="equipment picture"
-            />
-          </div>
-        )}
-      </td>
-      <td className="grid gap-1 py-4">
-        <div className="flex items-center gap-1">
-          <Input
-            type="text"
-            defaultValue={equipment.name}
-            className="h-6"
-            {...register("name")}
-          />
-          <Input
-            type="text"
-            defaultValue={equipment.brand}
-            className="h-6"
-            {...register("brand")}
-          />
-        </div>
-        <Input
-          type="text"
-          defaultValue={equipment.model}
-          className="h-6"
-          {...register("model")}
-        />
-      </td>
-      <td className="py-4">
-        <div className="grid gap-1">
-          <Input
-            type="text"
-            defaultValue={equipment.price}
-            className="h-6"
-            {...register("price", { valueAsNumber: true })}
-          />
-          <Input
-            type="text"
-            defaultValue={equipment.image as string}
-            className="h-6"
-            {...register("image")}
-          />
-        </div>
-      </td>
-      <td className="py-4">
-        <div className="grid  gap-2 ">
-          <OwnerLocationStockModal
-            owners={owners}
-            owner={equipment.owner}
-            equipment={equipment}
-            locations={locations}
-          />
-          <div className="flex h-6 items-center justify-center">
-            <Switch
-              defaultChecked={equipment.available}
-              title="habilitado"
-              {...register("available")}
-            />
-          </div>
-        </div>
-      </td>
-      <td className="py-4">
-        <Button
-          className="h-12 px-2"
-          title="actualizar"
-          type="button"
-          onClick={handleUpdate}
-          disabled={isLoading}
-        >
-          <RotateCw className="h-4 w-4" />
-        </Button>
-      </td>
-    </tr>
-  );
-};
-
 type OwnerLocationStockProps = {
   equipment: Equipment;
   locations: Location[];
   owner: EquipmentOnOwner[] | undefined;
   owners: Owner[];
+  isOpen: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export type Form = {
@@ -356,6 +223,8 @@ const OwnerLocationStockModal = ({
   locations,
   owner,
   owners,
+  isOpen,
+  setOpen,
 }: OwnerLocationStockProps) => {
   const {
     register,
@@ -391,81 +260,69 @@ const OwnerLocationStockModal = ({
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button size="sm" className="h-6 text-xs" variant="secondary">
-          ver
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {equipment.name} {equipment.brand}
-          </DialogTitle>
-          <DialogDescription>{equipment.model}</DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
-            <Label className="col-span-2">Dueño</Label>
-            <Label className="col-span-2">Sucursal</Label>
-            <Label className="col-span-2">Stock</Label>
-          </div>
-          <div>
-            {owner?.map((owner) => (
-              <div
-                key={owner.id}
-                className="grid grid-cols-7 items-center gap-2"
-              >
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.owner?.name}
-                </p>
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.location.name}
-                </p>
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.stock}
-                </p>
-                <Button variant="link" className="text-gray-800">
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
-            <div className="pt-4">
-              {fields?.map((field, index) => (
-                <FieldArray
-                  key={field.id}
-                  remove={remove}
-                  locations={locations}
-                  owners={owners}
-                  register={register}
-                  setValue={setValue}
-                  index={index}
-                />
-              ))}
+    <DialogWithState
+      title={`${equipment.name} ${equipment.brand}`}
+      description={equipment.model}
+      isOpen={isOpen}
+      setOpen={setOpen}
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
+          <Label className="col-span-2">Dueño</Label>
+          <Label className="col-span-2">Sucursal</Label>
+          <Label className="col-span-2">Stock</Label>
+        </div>
+        <div>
+          {owner?.map((owner) => (
+            <div key={owner.id} className="grid grid-cols-7 items-center gap-2">
+              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                {owner.owner?.name}
+              </p>
+              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                {owner.location.name}
+              </p>
+              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                {owner.stock}
+              </p>
+              <Button variant="link" className="text-gray-800">
+                <X className="h-3 w-3" />
+              </Button>
             </div>
+          ))}
+          <div className="pt-4">
+            {fields?.map((field, index) => (
+              <FieldArray
+                key={field.id}
+                remove={remove}
+                locations={locations}
+                owners={owners}
+                register={register}
+                setValue={setValue}
+                index={index}
+              />
+            ))}
           </div>
+        </div>
 
-          <div className="flex justify-center pt-6">
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => append({ ownerId: "", stock: 1, locationId: "" })}
-              className="flex items-center gap-2 "
-            >
-              Agregar dueño <Plus className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex justify-center pt-6">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => append({ ownerId: "", stock: 1, locationId: "" })}
+            className="flex items-center gap-2 "
+          >
+            Agregar dueño <Plus className="h-4 w-4" />
+          </Button>
+        </div>
 
-          <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={isLoading}>
-              Actualizar
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex justify-end pt-4">
+          <Button type="submit" disabled={isLoading}>
+            Actualizar
+          </Button>
+        </div>
+      </form>
+    </DialogWithState>
   );
 };
 
@@ -553,20 +410,22 @@ const SelectOwner = ({
 
 const ActionsDropMenu = () => {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-        <DropdownMenuItem>editar</DropdownMenuItem>
-        <DropdownMenuItem>stock</DropdownMenuItem>
-        <DropdownMenuItem>imagen</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+          <DropdownMenuItem>editar</DropdownMenuItem>
+          <DropdownMenuItem>stock</DropdownMenuItem>
+          <DropdownMenuItem>imagen</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 
@@ -594,3 +453,117 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default EquipmentAdmin;
+
+// const EquipmentRow = ({
+//   equipment,
+//   owners,
+//   locations,
+// }: {
+//   equipment: Equipment;
+//   owners: Owner[];
+//   locations: Location[];
+// }) => {
+//   const { register, getValues } = useForm<EquipmentForm>();
+//   const ctx = api.useContext();
+
+//   const { mutate, isLoading } = api.equipment.putEquipment.useMutation();
+
+//   const handleUpdate = () => {
+//     const data = getValues();
+
+//     mutate(
+//       { ...data, equipmentId: equipment.id },
+//       {
+//         onSuccess: () => {
+//           void ctx.equipment.adminGetEquipment.invalidate();
+//         },
+//         onError: (err) => {
+//           console.log(err.message);
+//         },
+//       }
+//     );
+//   };
+
+//   return (
+//     <tr key={equipment.id} className="center border-b border-app-bg text-sm">
+//       <td className="py- w-14">
+//         {equipment.image && (
+//           <div className="relative h-14 w-14">
+//             <Image
+//               src={equipment.image}
+//               fill
+//               style={{ objectFit: "cover" }}
+//               alt="equipment picture"
+//             />
+//           </div>
+//         )}
+//       </td>
+//       <td className="grid gap-1 py-4">
+//         <div className="flex items-center gap-1">
+//           <Input
+//             type="text"
+//             defaultValue={equipment.name}
+//             className="h-6"
+//             {...register("name")}
+//           />
+//           <Input
+//             type="text"
+//             defaultValue={equipment.brand}
+//             className="h-6"
+//             {...register("brand")}
+//           />
+//         </div>
+//         <Input
+//           type="text"
+//           defaultValue={equipment.model}
+//           className="h-6"
+//           {...register("model")}
+//         />
+//       </td>
+//       <td className="py-4">
+//         <div className="grid gap-1">
+//           <Input
+//             type="text"
+//             defaultValue={equipment.price}
+//             className="h-6"
+//             {...register("price", { valueAsNumber: true })}
+//           />
+//           <Input
+//             type="text"
+//             defaultValue={equipment.image as string}
+//             className="h-6"
+//             {...register("image")}
+//           />
+//         </div>
+//       </td>
+//       <td className="py-4">
+//         <div className="grid  gap-2 ">
+//           <OwnerLocationStockModal
+//             owners={owners}
+//             owner={equipment.owner}
+//             equipment={equipment}
+//             locations={locations}
+//           />
+//           <div className="flex h-6 items-center justify-center">
+//             <Switch
+//               defaultChecked={equipment.available}
+//               title="habilitado"
+//               {...register("available")}
+//             />
+//           </div>
+//         </div>
+//       </td>
+//       <td className="py-4">
+//         <Button
+//           className="h-12 px-2"
+//           title="actualizar"
+//           type="button"
+//           onClick={handleUpdate}
+//           disabled={isLoading}
+//         >
+//           <RotateCw className="h-4 w-4" />
+//         </Button>
+//       </td>
+//     </tr>
+//   );
+// };
