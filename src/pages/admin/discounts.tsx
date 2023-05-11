@@ -351,7 +351,10 @@ const SelectDiscountType = ({
   setValue: UseFormSetValue<DiscountForm>;
 }) => {
   return (
-    <Select onValueChange={(e) => setValue("typeId", e)}>
+    <Select
+      onValueChange={(e) => setValue("typeId", e)}
+      defaultValue={types.filter((type) => type.name === "Percentage")[0]?.id}
+    >
       <SelectTrigger>
         <SelectValue placeholder="selecionar tipo" />
       </SelectTrigger>
