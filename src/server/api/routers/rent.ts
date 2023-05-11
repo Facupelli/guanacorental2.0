@@ -39,8 +39,6 @@ export const rentRouter = createTRPCRouter({
       const orderQuery: OrderQuery = {};
       const earningQuery: EarningQuery = {};
 
-      console.log("----------------------", year);
-
       if (month !== "all" || year !== "all") {
         const firstMonthDay = dayjs(`${year}-${month}`)
           .startOf("month")

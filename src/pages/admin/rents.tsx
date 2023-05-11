@@ -20,6 +20,7 @@ import { api } from "@/utils/api";
 import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
 import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
 import dayjs from "dayjs";
+import { Label } from "@/components/ui/label";
 
 type RentForm = { month: string; year: string };
 
@@ -53,9 +54,15 @@ const AdminRents: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">RENTAS</h1>
           <div className="grid gap-6 pt-6">
-            <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
-              <SelectMonth setValue={setValue} />
-              <SelectYear setValue={setValue} />
+            <div className="flex w-1/2 items-center gap-6 rounded-md bg-white p-4">
+              <div className="flex w-full items-center gap-2">
+                <Label>Mes</Label>
+                <SelectMonth setValue={setValue} />
+              </div>
+              <div className="flex w-full items-center gap-2">
+                <Label>Año</Label>
+                <SelectYear setValue={setValue} />
+              </div>
             </div>
 
             <div className="w-fit rounded-md bg-white px-8 py-4">
