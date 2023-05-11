@@ -1,10 +1,17 @@
-import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { type NextPage } from "next";
-import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
-import { useState } from "react";
+import { UseFormSetValue, useForm } from "react-hook-form";
+import { Dispatch, SetStateAction, useState, ReactElement } from "react";
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import {
@@ -22,24 +29,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
-import {
-  COUPON_STATUS,
-  DISCOUNT_TYPES,
-  STATUS,
-  discountStatusClass,
-} from "@/lib/magic_strings";
-
-import { type DiscountType, type Prisma } from "@prisma/client";
-import { formatPrice, getDiscountStatus } from "@/lib/utils";
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { getDiscountStatus } from "@/lib/utils";
+import { discountStatusClass } from "@/lib/magic_strings";
+import { DiscountType, Prisma } from "@prisma/client";
 import { DataTable } from "@/components/ui/data-table";
 
 type Discount = Prisma.DiscountGetPayload<{
@@ -53,39 +54,47 @@ type Discount = Prisma.DiscountGetPayload<{
   };
 }>;
 
-export const discountColumns: ColumnDef<Discount>[] = [
+type CellProps = {
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  setDiscount: Dispatch<SetStateAction<Discount | null>>;
+};
+
+type Columns = {
+  title: string;
+  cell: (rowData: Discount, cellProps?: CellProps) => ReactElement;
+};
+
+const columns: Columns[] = [
   {
-    accessorKey: "code",
-    header: "Código",
-    cell: ({ row }) => {
-      return (
-        <pre className="rounded-2xl bg-secondary-foreground/10 p-1 px-2">
-          {row.original.code}
-        </pre>
-      );
-    },
-  },
-  { id: "type", accessorFn: (row) => row.rule.type.name, header: "Tipo" },
-  {
-    id: "value",
-    accessorFn: (row) => row.rule.value,
-    header: "Valor",
-  },
-  {
-    accessorKey: "min_total",
-    header: "Mínimo",
+    title: "Código",
+    cell: (rowData) => (
+      <pre className="rounded-2xl bg-secondary-foreground/10 p-1 px-2">
+        {rowData.code}
+      </pre>
+    ),
   },
   {
-    id: "location",
-    header: "Sucursal",
-    accessorFn: (row) =>
-      row.location.map((location) => location.name).join(", "),
+    title: "Tipo",
+    cell: (rowData) => <div>{rowData.rule.type.name}</div>,
   },
   {
-    accessorKey: "status",
-    header: "Estado",
-    cell: ({ row }) => {
-      const status = getDiscountStatus(row.original);
+    title: "Valor",
+    cell: (rowData) => <div>{rowData.rule.value}</div>,
+  },
+  {
+    title: "Mínimo",
+    cell: (rowData) => <div>{rowData.min_total}</div>,
+  },
+  {
+    title: "Sucursal",
+    cell: (rowData) => (
+      <div>{rowData.location.map((location) => location.name).join(", ")}</div>
+    ),
+  },
+  {
+    title: "Estado",
+    cell: (rowData) => {
+      const status = getDiscountStatus(rowData);
 
       return (
         <div>
@@ -95,28 +104,30 @@ export const discountColumns: ColumnDef<Discount>[] = [
     },
   },
   {
-    header: "Empieza",
-    accessorFn: (row) => row.starts_at?.toLocaleDateString(),
+    title: "Empieza",
+    cell: (rowData) => <div>{rowData.starts_at?.toLocaleDateString()}</div>,
   },
   {
-    accessorFn: (row) => row.ends_at?.toLocaleDateString(),
-    header: "Termina",
+    title: "Termina",
+    cell: (rowData) => <div>{rowData.ends_at?.toLocaleDateString()}</div>,
   },
   {
-    accessorKey: "usage_count",
-    header: "Usado",
+    title: "Usado",
+    cell: (rowData) => <div>{rowData.usage_count}</div>,
   },
   {
-    accessorKey: "usage_limit",
-    header: "Límite",
+    title: "Límite",
+    cell: (rowData) => <div>{rowData.usage_limit}</div>,
   },
   {
-    id: "actions",
-    cell: ({ row }) => {
-      const order = row.original;
-
-      return <ActionsDropMenu />;
-    },
+    title: "",
+    cell: (rowData: Discount, cellProps) => (
+      <ActionsDropMenu
+        discount={rowData}
+        setShowModal={cellProps?.setShowModal}
+        setDiscount={cellProps?.setDiscount}
+      />
+    ),
   },
 ];
 
@@ -133,13 +144,103 @@ type DiscountForm = {
 };
 
 const AdminDiscounts: NextPage = () => {
-  const { register, handleSubmit, setValue } = useForm<DiscountForm>();
+  const [discountSelected, setDiscount] = useState<Discount | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const ctx = api.useContext();
-  const locations = api.location.getAllLocations.useQuery();
   const { data } = api.discount.getAllDiscounts.useQuery();
+
+  const cellProps = {
+    setShowModal,
+    setDiscount,
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Guanaco Admin | Descuentos</title>
+        <meta name="description" content="Generated by create-t3-app" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <DialogWithState
+        setOpen={setShowModal}
+        isOpen={showModal}
+        title="Crear Descuento"
+      >
+        <DiscountForm
+          setShowModal={setShowModal}
+          discountTypes={data?.types}
+          discountSelected={discountSelected}
+        />
+      </DialogWithState>
+
+      <Nav />
+
+      <main className="">
+        <AdminLayout>
+          <h1 className="text-lg font-bold">DESCUENTOS</h1>
+          <div className="grid gap-6 pt-6">
+            <div className="flex">
+              <div className="ml-auto">
+                <Button
+                  onClick={() => {
+                    setDiscount(null);
+                    setShowModal(true);
+                  }}
+                  size="sm"
+                >
+                  Crear descuento
+                </Button>
+              </div>
+            </div>
+
+            {data?.discounts && (
+              <Table className="bg-white">
+                <TableHeader>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableHead className="font-semibold text-black">
+                        {column.title}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.discounts.map((discount) => (
+                    <TableRow onClick={() => setDiscount(discount)}>
+                      {columns.map((column) => (
+                        <TableCell>
+                          {column.cell(discount, cellProps)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </AdminLayout>
+      </main>
+    </>
+  );
+};
+
+type DiscountFormProps = {
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  discountTypes: DiscountType[] | undefined;
+  discountSelected: Discount | null;
+};
+
+const DiscountForm = ({
+  setShowModal,
+  discountTypes,
+  discountSelected,
+}: DiscountFormProps) => {
+  const { register, handleSubmit, setValue } = useForm<DiscountForm>();
+
+  const ctx = api.useContext();
   const { mutate } = api.discount.createDiscount.useMutation();
+  const locations = api.location.getAllLocations.useQuery();
 
   const onSubmit = (data: DiscountForm) => {
     mutate(
@@ -162,125 +263,103 @@ const AdminDiscounts: NextPage = () => {
   };
 
   return (
-    <>
-      <Head>
-        <title>Guanaco Admin | Descuentos</title>
-        <meta name="description" content="Generated by create-t3-app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <Label id="code">Código</Label>
+        <Input
+          type="text"
+          {...register("code")}
+          required
+          defaultValue={discountSelected?.code}
+        />
+      </div>
 
-      <DialogWithState
-        setOpen={setShowModal}
-        isOpen={showModal}
-        title="Crear Descuento"
-      >
-        <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <Label id="code">Código</Label>
-            <Input type="text" {...register("code")} required />
-          </div>
+      <div className="grid grid-cols-2 gap-10">
+        <div>
+          <Label id="starts">Empieza</Label>
+          <Input
+            type="date"
+            {...register("startsAt", { valueAsDate: true })}
+            defaultValue={discountSelected?.starts_at?.toDateString()}
+          />
+        </div>
 
-          <div className="grid grid-cols-2 gap-10">
-            <div>
-              <Label id="starts">Empieza</Label>
-              <Input
-                type="date"
-                {...register("startsAt", { valueAsDate: true })}
-              />
-            </div>
+        <div>
+          <Label id="ens">Termina</Label>
+          <Input
+            type="date"
+            {...register("endsAt", { valueAsDate: true })}
+            defaultValue={discountSelected?.ends_at?.toDateString()}
+          />
+        </div>
+      </div>
 
-            <div>
-              <Label id="ens">Termina</Label>
-              <Input
-                type="date"
-                {...register("endsAt", { valueAsDate: true })}
-              />
-            </div>
-          </div>
+      <div>
+        <Label id="limit">Límite</Label>
+        <Input
+          type="text"
+          {...register("usageLimit", { valueAsNumber: true })}
+          defaultValue={discountSelected?.usage_limit ?? undefined}
+        />
+      </div>
 
-          <div>
-            <Label id="limit">Límite</Label>
-            <Input
-              type="text"
-              {...register("usageLimit", { valueAsNumber: true })}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label>Sucursales:</Label>
-            <div className="grid grid-cols-3">
-              {locations.data &&
-                locations.data.map((location) => (
-                  <div className="flex items-center gap-4" key={location.id}>
-                    <Input
-                      className="h-5 w-5"
-                      type="checkbox"
-                      id={location.name}
-                      value={location.id}
-                      {...register("locationIds", { required: true })}
-                    />
-                    <Label htmlFor={location.name}>{location.name}</Label>
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          {data && (
-            <div>
-              <Label id="limit">Tipo</Label>
-              <SelectDiscountType types={data?.types} setValue={setValue} />
-            </div>
-          )}
-
-          <div>
-            <Label id="value">Valor</Label>
-            <Input
-              type="text"
-              {...register("value", { valueAsNumber: true })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label id="value">Mínimo de la orden</Label>
-            <Input
-              type="text"
-              {...register("minTotal", { valueAsNumber: true })}
-              required
-            />
-          </div>
-
-          <div className="grid pt-4">
-            <Button type="submit">Crear</Button>
-          </div>
-        </form>
-      </DialogWithState>
-
-      <Nav />
-
-      <main className="">
-        <AdminLayout>
-          <h1 className="text-lg font-bold">DESCUENTOS</h1>
-          <div className="grid gap-6 pt-6">
-            <div className="flex">
-              <div className="ml-auto">
-                <Button onClick={() => setShowModal(true)} size="sm">
-                  Crear descuento
-                </Button>
+      <div className="grid gap-2">
+        <Label>Sucursales:</Label>
+        <div className="grid grid-cols-3">
+          {locations.data &&
+            locations.data.map((location) => (
+              <div className="flex items-center gap-4" key={location.id}>
+                <Input
+                  className="h-5 w-5"
+                  type="checkbox"
+                  id={location.name}
+                  value={location.id}
+                  {...register("locationIds", { required: true })}
+                  defaultChecked={
+                    discountSelected
+                      ? discountSelected.location
+                          .map((location) => location.id)
+                          .includes(location.id)
+                      : undefined
+                  }
+                />
+                <Label htmlFor={location.name}>{location.name}</Label>
               </div>
-            </div>
+            ))}
+        </div>
+      </div>
 
-            {data?.discounts && (
-              <DataTable
-                data={data.discounts}
-                columns={discountColumns}
-                getRowCanExpand={() => false}
-              />
-            )}
-          </div>
-        </AdminLayout>
-      </main>
-    </>
+      {discountTypes && (
+        <div>
+          <Label id="limit">Tipo</Label>
+          <SelectDiscountType types={discountTypes} setValue={setValue} />
+        </div>
+      )}
+
+      <div>
+        <Label id="value">Valor</Label>
+        <Input
+          type="text"
+          {...register("value", { valueAsNumber: true })}
+          defaultValue={discountSelected?.rule.value}
+          required
+        />
+      </div>
+
+      <div>
+        <Label id="value">Mínimo de la orden</Label>
+        <Input
+          type="text"
+          {...register("minTotal", { valueAsNumber: true })}
+          defaultValue={discountSelected?.min_total ?? undefined}
+          required
+        />
+      </div>
+
+      <div className="grid pt-4">
+        <Button type="submit">Crear</Button>
+      </div>
+    </form>
   );
 };
 
@@ -300,7 +379,11 @@ const SelectDiscountType = ({
         <SelectGroup>
           <SelectLabel>Tipo de descuento</SelectLabel>
           {types.map((type) => (
-            <SelectItem value={type.id} key={type.id}>
+            <SelectItem
+              value={type.id}
+              key={type.id}
+              disabled={type.name === "Fixed"}
+            >
               {type.name}
             </SelectItem>
           ))}
@@ -310,7 +393,15 @@ const SelectDiscountType = ({
   );
 };
 
-const ActionsDropMenu = () => {
+const ActionsDropMenu = ({
+  setShowModal,
+  setDiscount,
+  discount,
+}: {
+  setShowModal?: Dispatch<SetStateAction<boolean>>;
+  setDiscount?: Dispatch<SetStateAction<Discount | null>>;
+  discount: Discount;
+}) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -321,7 +412,14 @@ const ActionsDropMenu = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-        <DropdownMenuItem>editar</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            setDiscount && setDiscount(discount);
+            setShowModal && setShowModal(true);
+          }}
+        >
+          editar
+        </DropdownMenuItem>
         <DropdownMenuItem>eliminar</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

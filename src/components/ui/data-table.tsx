@@ -34,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   getRowCanExpand: () => boolean;
   subComponent?: (props: { row: Row<TData> }) => ReactElement;
+  searchComponent?: () => ReactElement;
 }
 
 export function DataTable<TData, TValue>({
@@ -41,6 +42,8 @@ export function DataTable<TData, TValue>({
   data,
   getRowCanExpand,
   subComponent,
+  searchComponent,
+  ...props
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
 
@@ -64,11 +67,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="rounded-md border bg-white">
       <div className="flex gap-10 px-6 py-4">
-        <Input
-          type="text"
-          placeholder="Buscar por número de pedido"
-          className="w-[400px]"
-        />
+        {searchComponent && searchComponent()}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
