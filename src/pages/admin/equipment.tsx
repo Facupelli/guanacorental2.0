@@ -445,13 +445,25 @@ type AddEquipmentForm = {
   price: number;
   image: string;
   categoryId: string;
+  accessories: string;
 };
 
 const AddEquipment = () => {
   const { register, handleSubmit } = useForm<AddEquipmentForm>();
 
+  const ctx = api.useContext();
+  const { mutate } = api.equipment.createEquipment.useMutation();
+
+  const onSubmit = (data: AddEquipmentForm) => {
+    mutate(data, {
+      onSuccess: () => {
+        ctx.equipment.adminGetEquipment.invalidate();
+      },
+    });
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Label htmlFor="name">Nombre</Label>
         <Input type="text" id="name" {...register("name")} />
@@ -484,6 +496,11 @@ const AddEquipment = () => {
       <div>
         <Label htmlFor="image">Imagen</Label>
         <Input type="text" id="image" {...register("image")} />
+      </div>
+
+      <div>
+        <Label htmlFor="accessories">Accesorios</Label>
+        <Input type="text" id="accessories" {...register("accessories")} />
       </div>
 
       <div className="grid py-6">
