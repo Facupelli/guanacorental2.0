@@ -17,8 +17,6 @@ import { Label } from "@/components/ui/label";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
 
-import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
-
 import { ADMIN_ORDERS_SORT, orderStatusClass } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { handleAdminLocationChange } from "@/lib/utils";
@@ -27,7 +25,7 @@ import { api } from "@/utils/api";
 import { type NextPage } from "next";
 import { Prisma } from "@prisma/client";
 import DataTable from "@/components/ui/data-table";
-import { orderColumns } from "@/lib/order";
+import { orderColumns, equipmentsList } from "@/lib/order";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -104,6 +102,7 @@ const AdminOrders: NextPage = () => {
                 data={filteredOrers}
                 columns={orderColumns}
                 setRowData={setOrder}
+                expandedComponent={equipmentsList}
               />
               // <DataTable
               //   columns={orderColumns}

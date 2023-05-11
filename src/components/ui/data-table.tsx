@@ -7,7 +7,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRowExpansion } from "@/hooks/useRowExpansion";
-import { type Dispatch, type ReactElement, type SetStateAction } from "react";
+import {
+  type ReactNode,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction,
+} from "react";
 
 type CellFunctions<T> = {
   isRowExpanded: boolean;
@@ -24,6 +29,7 @@ type TableProps<T, P> = {
   data: T[];
   setRowData: Dispatch<SetStateAction<T | null>>;
   cellProps?: P & CellFunctions<T>;
+  expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
 
 const DataTable = <T, P>({
@@ -31,14 +37,8 @@ const DataTable = <T, P>({
   data,
   setRowData,
   cellProps,
+  expandedComponent,
 }: TableProps<T, P>) => {
-  const { toggleRowExpansion, isRowExpanded } = useRowExpansion<T>();
-
-  const cellFunctions: CellFunctions<T> = {
-    isRowExpanded,
-    toggleRowExpansion,
-  };
-
   return (
     <Table className="rounded-md bg-white">
       <TableHeader>
@@ -57,6 +57,7 @@ const DataTable = <T, P>({
             columns={columns}
             setRowData={setRowData}
             cellProps={cellProps}
+            expandedComponent={expandedComponent}
           />
         ))}
       </TableBody>
@@ -69,6 +70,7 @@ type RowProps<T, P> = {
   data: T;
   setRowData: Dispatch<SetStateAction<T | null>>;
   cellProps?: P & CellFunctions<T>;
+  expandedComponent?: (props: { rowData: T }) => ReactNode;
 };
 
 const Row = <T, P>({
@@ -76,6 +78,7 @@ const Row = <T, P>({
   data,
   setRowData,
   cellProps,
+  expandedComponent,
 }: RowProps<T, P>) => {
   const { toggleRowExpansion, isRowExpanded } = useRowExpansion<T>();
 
@@ -95,7 +98,9 @@ const Row = <T, P>({
       </TableRow>
       {isRowExpanded && (
         <TableRow>
-          <TableCell colSpan={12}>Expanded content</TableCell>
+          <TableCell colSpan={12} className="bg-secondary">
+            {expandedComponent && expandedComponent({ rowData: data })}
+          </TableCell>
         </TableRow>
       )}
     </>

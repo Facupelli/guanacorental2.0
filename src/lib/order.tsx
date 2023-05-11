@@ -77,14 +77,14 @@ export const orderColumns: Columns[] = [
         <div>
           {cellProps?.isRowExpanded ? (
             <button
-              className="rounded-sm p-2 hover:bg-secondary"
+              className="rounded-full p-2 hover:bg-primary-foreground"
               onClick={() => cellProps?.toggleRowExpansion()}
             >
               <ChevronUp className="h-4 w-4" />
             </button>
           ) : (
             <button
-              className="rounded-sm p-2 hover:bg-secondary"
+              className="rounded-full p-2 hover:bg-primary-foreground"
               onClick={() => cellProps?.toggleRowExpansion()}
             >
               <ChevronDown className="h-4 w-4" />
