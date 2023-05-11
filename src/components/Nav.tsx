@@ -2,7 +2,7 @@ import { useBoundStore } from "@/zustand/store";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, UserCog } from "lucide-react";
+import { FacebookIcon, ShoppingCart, UserCog } from "lucide-react";
 import { ROLES } from "@/lib/magic_strings";
 import { type Session } from "next-auth";
 import { useRouter } from "next/router";
@@ -69,38 +69,50 @@ const Nav = () => {
           ) : (
             <>
               <li>
-                <button
-                  onClick={() => void signIn("google")}
-                  className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
-                >
-                  <div className="mr-2 flex items-center">
-                    <Image
-                      src="/google/g-logo.png"
-                      width={18}
-                      height={18}
-                      alt="google g logo"
-                    />
-                  </div>
-                  <p className="whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
-                    Acceder con Google
-                  </p>
-                </button>
+                <GoogleButton />
               </li>
               <li>
-                <button
-                  onClick={() => void signIn("facebook")}
-                  className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
-                >
-                  <p className="whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
-                    Acceder con Facebook
-                  </p>
-                </button>
+                <FacebookButton />
               </li>
             </>
           )}
         </ul>
       </nav>
     </header>
+  );
+};
+
+export const GoogleButton = () => {
+  return (
+    <button
+      onClick={() => void signIn("google")}
+      className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
+    >
+      <div className="mr-2 flex items-center">
+        <Image
+          src="/google/g-logo.png"
+          width={18}
+          height={18}
+          alt="google g logo"
+        />
+      </div>
+      <p className="whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
+        Acceder con Google
+      </p>
+    </button>
+  );
+};
+
+export const FacebookButton = () => {
+  return (
+    <button
+      onClick={() => void signIn("facebook")}
+      className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
+    >
+      <div className="flex items-center gap-2 whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
+        <FacebookIcon className="h-4 w-4" /> Acceder con Facebook
+      </div>
+    </button>
   );
 };
 
