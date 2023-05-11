@@ -213,7 +213,7 @@ const LeftBar = ({
             onClick={() => setCategory("")}
             className={`cursor-pointer rounded-sm px-2 py-1 ${
               !selectedCategory
-                ? "bg-secondary-foreground font-semibold text-white"
+                ? "bg-secondary font-bold text-secondary-foreground"
                 : ""
             }`}
           >
@@ -225,7 +225,7 @@ const LeftBar = ({
               onClick={() => setCategory(category.id)}
               className={`cursor-pointer rounded-sm px-2 py-1 ${
                 selectedCategory === category.id
-                  ? "bg-secondary-foreground font-semibold text-white"
+                  ? "bg-secondary font-bold text-secondary-foreground"
                   : ""
               }`}
             >
