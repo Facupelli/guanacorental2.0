@@ -1,5 +1,6 @@
+import { type UseFormSetValue, useForm } from "react-hook-form";
 import Head from "next/head";
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
@@ -14,18 +15,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { type UseFormSetValue, useForm } from "react-hook-form";
 import Pagination from "@/components/ui/Pagination";
+import DataTable from "@/components/ui/data-table";
 
-import { ADMIN_ORDERS_SORT, orderStatusClass } from "@/lib/magic_strings";
+import { api } from "@/utils/api";
+import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { handleAdminLocationChange } from "@/lib/utils";
-import { api } from "@/utils/api";
+import { orderColumns, equipmentsList } from "@/lib/order";
 
 import { type NextPage } from "next";
-import { Prisma } from "@prisma/client";
-import DataTable from "@/components/ui/data-table";
-import { orderColumns, equipmentsList } from "@/lib/order";
+import { type Prisma } from "@prisma/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {

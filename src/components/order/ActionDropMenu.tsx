@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,9 +8,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
 
-const ActionsDropMenu = () => {
+import { type Prisma } from "@prisma/client";
+
+type Order = Prisma.OrderGetPayload<{
+  include: {
+    customer: {
+      include: { address: true };
+    };
+    location: true;
+    book: true;
+    equipments: {
+      include: { books: true; equipment: true; owner: true };
+    };
+    earnings: true;
+  };
+}>;
+
+const ActionsDropMenu = ({ order }: { order: Order }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -19,6 +36,9 @@ const ActionsDropMenu = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>
+          <Link href={`/admin/orders/${order.id}`}>Ver detalle</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem>Generar remito</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

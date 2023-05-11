@@ -4,6 +4,7 @@ import ActionsDropMenu from "@/components/order/ActionDropMenu";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Columns } from "@/types/table";
+import { MouseEvent } from "react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -60,19 +61,24 @@ export const orderColumns: Columns<Order, CellProps>[] = [
   {
     title: "",
     cell: (rowData, cellData) => {
+      const handleClickExpand = (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        cellData.cellFunctions.toggleRowExpansion();
+      };
+
       return (
         <div>
           {cellData.cellFunctions.isRowExpanded ? (
             <button
               className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={() => cellData.cellFunctions.toggleRowExpansion()}
+              onClick={handleClickExpand}
             >
               <ChevronUp className="h-4 w-4" />
             </button>
           ) : (
             <button
               className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={() => cellData.cellFunctions.toggleRowExpansion()}
+              onClick={handleClickExpand}
             >
               <ChevronDown className="h-4 w-4" />
             </button>
@@ -83,7 +89,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
   },
   {
     title: "",
-    cell: (rowData) => <ActionsDropMenu />,
+    cell: (rowData) => <ActionsDropMenu order={rowData} />,
   },
 ];
 

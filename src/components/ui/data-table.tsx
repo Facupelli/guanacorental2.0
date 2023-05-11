@@ -81,7 +81,11 @@ const Row = <T, P>({
 
   return (
     <>
-      <TableRow onClick={() => setRowData(data)}>
+      <TableRow
+        onClick={() => {
+          setRowData(data);
+        }}
+      >
         {columns.map((column) => (
           <TableCell>
             {column.cell(data, { cellProps, cellFunctions })}
