@@ -269,7 +269,7 @@ const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
 
   return (
     <div key={user.id} className="col-span-2 grid gap-5 rounded-md bg-white">
-      <div className="p-6">
+      <div className="grid gap-6 p-6">
         <div className="grid grid-cols-4">
           <div>
             <p className="text-sm text-primary/60">DNI</p>
