@@ -176,7 +176,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { userId, customerApproved } = input;
 
-      await prisma.user.update({
+      const user = await prisma.user.update({
         where: {
           id: userId,
         },
@@ -185,6 +185,6 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      return { message: "success" };
+      return { message: "success", user };
     }),
 });

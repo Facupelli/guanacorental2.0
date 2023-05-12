@@ -1,7 +1,7 @@
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { ReactElement, useState } from "react";
+import { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { type NextPage } from "next";
 
 import Nav from "@/components/Nav";
@@ -165,6 +165,7 @@ const AdminUsers: NextPage = () => {
                             : ""
                         }`}
                         onClick={() => setPetitionUser(user)}
+                        key={user.id}
                       >
                         {user.image && (
                           <div className="relative h-10 w-10 rounded-full">
@@ -184,7 +185,10 @@ const AdminUsers: NextPage = () => {
                     ))}
                   </div>
                   {petitionUserSelected && (
-                    <UserPetitionInfo user={petitionUserSelected} />
+                    <UserPetitionInfo
+                      user={petitionUserSelected}
+                      setPetitionUser={setPetitionUser}
+                    />
                   )}
                 </div>
               </TabsContent>
@@ -241,7 +245,13 @@ const ActionsDropMenu = ({ user }: { user: User }) => {
   );
 };
 
-const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
+const UserPetitionInfo = ({
+  user,
+  setPetitionUser,
+}: {
+  user: PetitionUser;
+  setPetitionUser: Dispatch<SetStateAction<PetitionUser | null>>;
+}) => {
   const ctx = api.useContext();
   const { mutate } = api.user.approveUser.useMutation();
 
@@ -250,6 +260,7 @@ const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
       { userId: user.id, customerApproved: true },
       {
         onSuccess: () => {
+          setPetitionUser(null);
           ctx.user.getPetitionUsers.invalidate();
         },
       }
@@ -371,10 +382,10 @@ const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
       </div>
 
       <div className="flex justify-end gap-4 rounded-bl-md rounded-br-md bg-secondary p-6">
-        <Button size="sm" variant="destructive" onClick={handleApprove}>
+        <Button size="sm" variant="destructive" onClick={handleReject}>
           Rechazar
         </Button>
-        <Button size="sm" onClick={handleReject}>
+        <Button size="sm" onClick={handleApprove}>
           Aceptar
         </Button>
       </div>

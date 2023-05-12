@@ -35,21 +35,22 @@ const DataTable = <T, P>({
     <Table className="rounded-md bg-white">
       <TableHeader>
         <TableRow>
-          {columns.map((column) => (
-            <TableHead className="font-semibold text-black">
+          {columns.map((column, i) => (
+            <TableHead className="font-semibold text-black" key={i}>
               {column.title}
             </TableHead>
           ))}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((data) => (
+        {data.map((data, i) => (
           <Row
             data={data}
             columns={columns}
             setRowData={setRowData}
             cellProps={cellProps}
             expandedComponent={expandedComponent}
+            key={i}
           />
         ))}
       </TableBody>
@@ -86,8 +87,8 @@ const Row = <T, P>({
           setRowData && setRowData(data);
         }}
       >
-        {columns.map((column) => (
-          <TableCell>
+        {columns.map((column, i) => (
+          <TableCell key={i}>
             {column.cell(data, { cellProps, cellFunctions })}
           </TableCell>
         ))}
