@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { type NextPage } from "next";
 import { UseFormSetValue, useForm } from "react-hook-form";
@@ -34,7 +35,6 @@ import { discountStatusClass } from "@/lib/magic_strings";
 
 import type { DiscountType, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
-import { useSession } from "next-auth/react";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {

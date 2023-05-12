@@ -207,8 +207,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const isAdmin = getIsAdmin(session);
   const isEmployee = getIsEmployee(session);
 
-  console.log("-----------------------------------", isAdmin);
-
   if (!isAdmin && !isEmployee) {
     return {
       redirect: {

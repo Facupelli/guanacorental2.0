@@ -8,20 +8,16 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import { type GetServerSideProps, type NextPage } from "next";
 import { prisma } from "@/server/db";
 import { authOptions } from "@/server/auth";
 import { appRouter } from "@/server/api/root";
+import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { useBoundStore } from "@/zustand/store";
-
-import { ColumnDef, Table as TableType } from "@tanstack/react-table";
-
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,12 +44,12 @@ import DialogWithState from "@/components/DialogWithState";
 import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal, Plus, X } from "lucide-react";
 
+import { getIsAdmin } from "@/lib/utils";
 import { api } from "@/utils/api";
 
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
-import { getIsAdmin } from "@/lib/utils";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
