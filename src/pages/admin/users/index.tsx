@@ -242,6 +242,31 @@ const ActionsDropMenu = ({ user }: { user: User }) => {
 };
 
 const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
+  const ctx = api.useContext();
+  const { mutate } = api.user.approveUser.useMutation();
+
+  const handleApprove = () => {
+    mutate(
+      { userId: user.id, customerApproved: true },
+      {
+        onSuccess: () => {
+          ctx.user.getPetitionUsers.invalidate();
+        },
+      }
+    );
+  };
+
+  const handleReject = () => {
+    mutate(
+      { userId: user.id, customerApproved: false },
+      {
+        onSuccess: () => {
+          ctx.user.getPetitionUsers.invalidate();
+        },
+      }
+    );
+  };
+
   return (
     <div key={user.id} className="col-span-2 grid gap-5 rounded-md bg-white">
       <div className="p-6">
@@ -342,10 +367,12 @@ const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
       </div>
 
       <div className="flex justify-end gap-4 rounded-bl-md rounded-br-md bg-secondary p-6">
-        <Button size="sm" variant="destructive">
+        <Button size="sm" variant="destructive" onClick={handleApprove}>
           Rechazar
         </Button>
-        <Button size="sm">Aceptar</Button>
+        <Button size="sm" onClick={handleReject}>
+          Aceptar
+        </Button>
       </div>
     </div>
   );

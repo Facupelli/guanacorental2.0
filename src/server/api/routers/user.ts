@@ -170,4 +170,21 @@ export const userRouter = createTRPCRouter({
 
       return { message: "success" };
     }),
+
+  approveUser: protectedProcedure
+    .input(z.object({ userId: z.string(), customerApproved: z.boolean() }))
+    .mutation(async ({ input }) => {
+      const { userId, customerApproved } = input;
+
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          customer_approved: customerApproved,
+        },
+      });
+
+      return { message: "success" };
+    }),
 });
