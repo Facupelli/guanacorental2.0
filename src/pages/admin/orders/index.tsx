@@ -1,3 +1,4 @@
+import { getServerSession } from "next-auth";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Head from "next/head";
 import { useState } from "react";
@@ -21,10 +22,15 @@ import DataTable from "@/components/ui/data-table";
 import { api } from "@/utils/api";
 import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { handleAdminLocationChange } from "@/lib/utils";
+import {
+  getIsAdmin,
+  getIsEmployee,
+  handleAdminLocationChange,
+} from "@/lib/utils";
 import { orderColumns, equipmentsList } from "@/lib/order";
+import { authOptions } from "@/server/auth";
 
-import { type NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 
 type Order = Prisma.OrderGetPayload<{
@@ -152,4 +158,36 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
+  if (!isAdmin && !isEmployee) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  const { user } = session;
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
 export default AdminOrders;

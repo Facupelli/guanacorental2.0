@@ -1,8 +1,12 @@
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { Dispatch, ReactElement, SetStateAction, useState } from "react";
-import { type NextPage } from "next";
+import { Dispatch, SetStateAction, useState } from "react";
+import { type GetServerSideProps, type NextPage } from "next";
+import Link from "next/link";
+import Image from "next/image";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -25,19 +29,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { api } from "@/utils/api";
-
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
+import { MoreHorizontal } from "lucide-react";
+
+import { api } from "@/utils/api";
+import { authOptions } from "@/server/auth";
+import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
 import { type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
-import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { useSession } from "next-auth/react";
-import { getIsAdmin } from "@/lib/utils";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -398,6 +399,39 @@ const UserPetitionInfo = ({
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
+  if (!isAdmin && !isEmployee) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  const { user } = session;
+
+  return {
+    props: {
+      user,
+    },
+  };
 };
 
 export default AdminUsers;

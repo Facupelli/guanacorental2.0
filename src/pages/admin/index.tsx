@@ -1,25 +1,30 @@
-import Head from "next/head";
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
+import { useEffect, useState } from "react";
+import Head from "next/head";
 import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import OrderRow from "@/components/OrderRow";
 import { Label } from "@/components/ui/label";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { SelectItem } from "@/components/ui/select";
-
-import { api } from "@/utils/api";
-import { getIsAdmin, handleAdminLocationChange } from "@/lib/utils";
-
-import { type NextPage } from "next";
-import { type Prisma } from "@prisma/client";
-import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import DataTable from "@/components/ui/data-table";
+
+import { authOptions } from "@/server/auth";
+import { api } from "@/utils/api";
+import {
+  getIsAdmin,
+  getIsEmployee,
+  handleAdminLocationChange,
+} from "@/lib/utils";
+import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { equipmentsList, orderColumns } from "@/lib/order";
-import { useSession } from "next-auth/react";
+
+import { type GetServerSideProps, type NextPage } from "next";
+import { type Prisma } from "@prisma/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -185,6 +190,41 @@ const Admin: NextPage = () => {
       </main>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
+  console.log("-----------------------------------", isAdmin);
+
+  if (!isAdmin && !isEmployee) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  const { user } = session;
+
+  return {
+    props: {
+      user,
+    },
+  };
 };
 
 export default Admin;
