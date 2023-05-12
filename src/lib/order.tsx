@@ -1,10 +1,10 @@
-import { Prisma } from "@prisma/client";
 import { orderStatusClass } from "./magic_strings";
 import ActionsDropMenu from "@/components/order/ActionDropMenu";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Columns } from "@/types/table";
-import { MouseEvent } from "react";
+import { type Columns } from "@/types/table";
+import { type Prisma } from "@prisma/client";
+import { type MouseEvent } from "react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -20,7 +20,7 @@ type Order = Prisma.OrderGetPayload<{
   };
 }>;
 
-type CellProps = {};
+type CellProps = unknown;
 
 export const orderColumns: Columns<Order, CellProps>[] = [
   { title: "N°", cell: (rowData) => <div>{rowData.number}</div> },
@@ -97,7 +97,7 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
   return (
     <div className="grid gap-4">
       {rowData.equipments.map((ownerEquipment) => (
-        <div className="flex items-center gap-4">
+        <div key={ownerEquipment.id} className="flex items-center gap-4">
           {ownerEquipment.equipment.image && (
             <div className="relative h-10 w-10 rounded-full">
               <Image

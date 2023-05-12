@@ -3,6 +3,7 @@ import { CalendarDays, Info } from "lucide-react";
 import Calendar from "react-calendar";
 import { useSession } from "next-auth/react";
 import { useBoundStore } from "@/zustand/store";
+import { useState } from "react";
 
 import {
   Dialog,
@@ -24,9 +25,6 @@ import SelectPickupHour from "./SelectPickupHour";
 import { ROLES } from "@/lib/magic_strings";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
-import DialogWithState from "../DialogWithState";
-import { useState } from "react";
-import { useDateModal } from "@/hooks/useDateModal";
 
 const SelectDateButton = () => {
   const [isOpen, setOpen] = useState(false);

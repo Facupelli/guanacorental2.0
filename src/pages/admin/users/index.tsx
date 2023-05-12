@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { type GetServerSideProps, type NextPage } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,7 +54,7 @@ type PetitionUser = Prisma.UserGetPayload<{
   };
 }>;
 
-type CellProps = {};
+type CellProps = unknown;
 
 const userColumns: Columns<User, CellProps>[] = [
   {
@@ -80,7 +80,7 @@ const userColumns: Columns<User, CellProps>[] = [
 const AdminUsers: NextPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const [userSelected, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [petitionUserSelected, setPetitionUser] = useState<PetitionUser | null>(
     null
   );
@@ -93,7 +93,7 @@ const AdminUsers: NextPage = () => {
 
   const roles = api.role.getAllRoles.useQuery();
   const petitionUsers = api.user.getPetitionUsers.useQuery();
-  const { data, isLoading } = api.user.getAllUsers.useQuery({
+  const { data } = api.user.getAllUsers.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     roleId,
@@ -269,7 +269,7 @@ const UserPetitionInfo = ({
       {
         onSuccess: () => {
           setPetitionUser(null);
-          ctx.user.getPetitionUsers.invalidate();
+          void ctx.user.getPetitionUsers.invalidate();
         },
       }
     );
@@ -280,7 +280,7 @@ const UserPetitionInfo = ({
       { userId: user.id, customerApproved: false },
       {
         onSuccess: () => {
-          ctx.user.getPetitionUsers.invalidate();
+          void ctx.user.getPetitionUsers.invalidate();
         },
       }
     );

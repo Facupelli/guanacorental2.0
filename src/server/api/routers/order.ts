@@ -73,7 +73,7 @@ export const orderRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { ownerEquipment, bookId, orderId, earningId } = input;
 
-      const bookOnEquipment = await prisma.bookOnEquipment.deleteMany({
+      await prisma.bookOnEquipment.deleteMany({
         where: {
           bookId,
           equipmentId: ownerEquipment.id,
@@ -178,9 +178,8 @@ export const orderRouter = createTRPCRouter({
       }));
 
       //UPDATE ORDER WITH THE EQUIPMENONBOOKS IDS
-      let newOrder;
 
-      newOrder = await prisma.order.update({
+      const newOrder = await prisma.order.update({
         where: { id: orderId },
         data: {
           equipments: { connect: equipmentsIds },

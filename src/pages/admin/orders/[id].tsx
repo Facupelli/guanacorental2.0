@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -55,7 +55,7 @@ type Props = {
   };
 };
 
-const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
+const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
   const orderId = router.query.id as string;
@@ -232,7 +232,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
 
       mutate(data, {
         onSuccess: () => {
-          ctx.order.getOrderById.invalidate();
+          void ctx.order.getOrderById.invalidate();
         },
       });
     }
@@ -449,7 +449,7 @@ const AddEquipment = ({
       },
       {
         onSuccess: () => {
-          ctx.order.getOrderById.invalidate();
+          void ctx.order.getOrderById.invalidate();
         },
       }
     );

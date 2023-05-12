@@ -2,10 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Head from "next/head";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import Nav, { FacebookButton, GoogleButton } from "@/components/Nav";
+import Nav from "@/components/Nav";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,12 +54,12 @@ type Props = {
   };
 };
 
-const NewUserPage: NextPage<Props> = ({ user }: Props) => {
+const NewUserPage: NextPage<Props> = ({}: Props) => {
   const { data: session } = useSession();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    // formState: { errors },
   } = useForm<NewUserFormData>({
     resolver: zodResolver(validationAddress),
   });

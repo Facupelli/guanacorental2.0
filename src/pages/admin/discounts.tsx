@@ -1,8 +1,8 @@
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { type NextPage } from "next";
-import { UseFormSetValue, useForm } from "react-hook-form";
-import { Dispatch, SetStateAction, useState, ReactElement } from "react";
+import { type UseFormSetValue, useForm } from "react-hook-form";
+import { type Dispatch, type SetStateAction, useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -235,8 +235,8 @@ const DiscountForm = ({
         usageLimit: data.usageLimit > 0 ? data.usageLimit : null,
       },
       {
-        onSuccess: (data) => {
-          ctx.discount.getAllDiscounts.invalidate();
+        onSuccess: () => {
+          void ctx.discount.getAllDiscounts.invalidate();
           setShowModal(false);
         },
         onError: (err) => {

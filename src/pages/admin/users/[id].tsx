@@ -2,7 +2,7 @@ import superjason from "superjson";
 import { getServerSession } from "next-auth";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { type UseFormSetValue, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -13,13 +13,12 @@ import { useState } from "react";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
-import OrderRow from "@/components/OrderRow";
 import Pagination from "@/components/ui/Pagination";
 import { Input } from "@/components/ui/input";
+import DataTable from "@/components/ui/data-table";
 import { CheckSquare, EditIcon } from "lucide-react";
 
 import { api } from "@/utils/api";
-import DataTable from "@/components/ui/data-table";
 import { equipmentsList, orderColumns } from "@/lib/order";
 
 type UserForm = {

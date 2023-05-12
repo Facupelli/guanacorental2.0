@@ -1,6 +1,4 @@
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
-import { DISCOUNT_TYPES } from "@/lib/magic_strings";
-import { calculateTotalWithDiscount } from "@/lib/utils";
 import { type Prisma } from "@prisma/client";
 
 type CartItem = {

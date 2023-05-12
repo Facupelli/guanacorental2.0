@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 
 import { useBoundStore } from "@/zustand/store";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 
 import Nav from "@/components/Nav";
 import {
@@ -85,7 +85,7 @@ const CartPage: NextPage = () => {
       return total;
     }
     return 0;
-  }, [workingDays, cartItems, discount]);
+  }, [workingDays, discount, subtotal]);
 
   if (!session) return <div>404</div>;
 

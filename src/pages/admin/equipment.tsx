@@ -8,7 +8,7 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import Head from "next/head";
 import { type GetServerSideProps, type NextPage } from "next";
 import { prisma } from "@/server/db";
@@ -58,7 +58,7 @@ type Equipment = Prisma.EquipmentGetPayload<{
   };
 }>;
 
-type CellProps = {};
+type CellProps = unknown;
 export const equipmentColumns: Columns<Equipment, CellProps>[] = [
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
   { title: "Marca", cell: (rowData) => <div>{rowData.brand}</div> },
@@ -94,7 +94,7 @@ export const equipmentColumns: Columns<Equipment, CellProps>[] = [
       );
     },
   },
-  { title: "", cell: (rowData) => <ActionsDropMenu /> },
+  { title: "", cell: () => <ActionsDropMenu /> },
 ];
 
 type Props = {
@@ -102,8 +102,8 @@ type Props = {
   owners: Owner[];
 };
 
-const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
-  const [equipmentSelected, setEquipment] = useState<Equipment | null>(null);
+const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
+  const [, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,7 +111,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
 
   const location = useBoundStore((state) => state.location);
 
-  const { data, isLoading } = api.equipment.adminGetEquipment.useQuery({
+  const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     locationId: location.id,
@@ -167,15 +167,15 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   );
 };
 
-type EquipmentForm = {
-  name: string;
-  brand: string;
-  model: string;
-  image: string;
-  price: number;
-  equipmentId: string;
-  available: string;
-};
+// type EquipmentForm = {
+//   name: string;
+//   brand: string;
+//   model: string;
+//   image: string;
+//   price: number;
+//   equipmentId: string;
+//   available: string;
+// };
 
 type OwnerLocationStockProps = {
   equipment: Equipment;
@@ -423,7 +423,7 @@ const AddEquipment = () => {
   const onSubmit = (data: AddEquipmentForm) => {
     mutate(data, {
       onSuccess: () => {
-        ctx.equipment.adminGetEquipment.invalidate();
+        void ctx.equipment.adminGetEquipment.invalidate();
       },
     });
   };

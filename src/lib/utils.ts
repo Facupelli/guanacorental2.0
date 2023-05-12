@@ -1,6 +1,6 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
 import { type Session } from "next-auth";
-import { Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";

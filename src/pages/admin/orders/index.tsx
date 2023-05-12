@@ -48,7 +48,7 @@ type Order = Prisma.OrderGetPayload<{
 }>;
 
 const AdminOrders: NextPage = () => {
-  const [orderSelected, setOrder] = useState<Order | null>(null);
+  const [, setOrder] = useState<Order | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -60,7 +60,7 @@ const AdminOrders: NextPage = () => {
 
   const locations = api.location.getAllLocations.useQuery();
   const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
-  const { data, isLoading } = api.order.getOrders.useQuery({
+  const { data } = api.order.getOrders.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     location: location.id,

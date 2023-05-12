@@ -1,11 +1,11 @@
-import { useBoundStore } from "@/zustand/store";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useBoundStore } from "@/zustand/store";
 import Image from "next/image";
 import Link from "next/link";
-import { FacebookIcon, ShoppingCart, UserCog } from "lucide-react";
-import { ROLES } from "@/lib/magic_strings";
-import { type Session } from "next-auth";
 import { useRouter } from "next/router";
+
+import { FacebookIcon, ShoppingCart, UserCog } from "lucide-react";
+
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
 const Nav = () => {

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import Calendar from "react-calendar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { useBoundStore } from "@/zustand/store";
 
@@ -45,7 +45,7 @@ type Order = Prisma.OrderGetPayload<{
 const Admin: NextPage = () => {
   const { data: session } = useSession();
 
-  const [orderSelected, setOrder] = useState<Order | null>(null);
+  const [, setOrder] = useState<Order | null>(null);
 
   // const [calendarValue, setCalendarValue] = useState();
   const setLocation = useBoundStore((state) => state.setLocation);
@@ -53,34 +53,37 @@ const Admin: NextPage = () => {
   const [orders, setOrders] = useState<Order[] | null>(null);
 
   const locations = api.location.getAllLocations.useQuery();
-  const { data, isLoading } = api.order.getCalendarOrders.useQuery({
+  const { data } = api.order.getCalendarOrders.useQuery({
     location: location.id,
   });
 
-  const handleClickDay = (day: Date) => {
-    if (data) {
-      const orders = data.filter(
-        (order) =>
-          dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
-          dayjs(order.book.end_date).isSame(dayjs(day), "day")
-      );
+  const handleClickDay = useCallback(
+    (day: Date) => {
+      if (data) {
+        const orders = data.filter(
+          (order) =>
+            dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
+            dayjs(order.book.end_date).isSame(dayjs(day), "day")
+        );
 
-      const filteredOrers = orders.map((order) => ({
-        ...order,
-        equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
-      }));
+        const filteredOrers = orders.map((order) => ({
+          ...order,
+          equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
+        }));
 
-      setOrders(filteredOrers);
-    }
-  };
+        setOrders(filteredOrers);
+      }
+    },
+    [data]
+  );
 
   useEffect(() => {
     handleClickDay(new Date());
-  }, [data]);
+  }, [data, handleClickDay]);
 
-  let isAdmin = getIsAdmin(session);
+  const isAdmin = getIsAdmin(session);
 
-  let calendarMinDate = isAdmin
+  const calendarMinDate = isAdmin
     ? dayjs().subtract(1, "month").startOf("day").toDate()
     : dayjs().startOf("day").toDate();
 

@@ -1,8 +1,8 @@
-import { UseFormSetValue, useForm } from "react-hook-form";
+import { type UseFormSetValue, useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
-import { GetServerSideProps, NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 import Head from "next/head";
 
 import {
@@ -17,11 +17,11 @@ import {
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 import { api } from "@/utils/api";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
 import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
-import { Button } from "@/components/ui/button";
 
 type RentForm = { month: string; year: string };
 

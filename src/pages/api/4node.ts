@@ -1,3 +1,4 @@
+/* eslint-disable */
 const xl = require("excel4node");
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { prisma } from "@/server/db";

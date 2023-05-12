@@ -9,12 +9,7 @@ import {
 import { useRowExpansion } from "@/hooks/useRowExpansion";
 
 import type { CellFunctions, Columns } from "@/types/table";
-import {
-  type ReactNode,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from "react";
+import { type ReactNode, type Dispatch, type SetStateAction } from "react";
 
 type TableProps<T, P> = {
   columns: Columns<T, P>[];
