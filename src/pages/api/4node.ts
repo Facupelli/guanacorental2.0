@@ -1,8 +1,10 @@
 const xl = require("excel4node");
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { prisma } from "@/server/db";
-import { Prisma } from "@prisma/client";
 import dayjs from "dayjs";
+import "dayjs/locale/es";
+
+dayjs.locale("es");
 
 type Query = {
   where?: {
@@ -65,6 +67,22 @@ export default async function handler(
     const workbook = new xl.Workbook();
     const worksheet = workbook.addWorksheet("Sheet 1");
 
+    const titleStyle = workbook.createStyle({
+      alignment: {
+        horizontal: ["center"],
+        vertical: ["center"],
+      },
+      font: {
+        bold: true,
+        size: 18,
+      },
+      fill: {
+        type: "pattern",
+        patternType: "solid",
+        fgColor: "#e37a2c",
+      },
+    });
+
     const headerStyle = workbook.createStyle({
       font: {
         bold: true,
@@ -74,7 +92,15 @@ export default async function handler(
       fill: {
         type: "pattern",
         patternType: "solid",
-        fgColor: "#f67127",
+        fgColor: "#e8974f",
+      },
+    });
+
+    const bodyStyle = workbook.createStyle({
+      fill: {
+        type: "pattern",
+        patternType: "solid",
+        fgColor: "#f0bc81",
       },
     });
 
@@ -93,15 +119,25 @@ export default async function handler(
       "Sub",
     ];
 
+    worksheet
+      .cell(1, 1, 1, 8, true)
+      .string(
+        `Resumen rental ${dayjs()
+          .month(Number(month) - 1)
+          .format("MMMM")} ${year}`
+      )
+      .style(titleStyle);
+
     headers.forEach((header, index) => {
       worksheet
-        .cell(1, index + 1)
+        .cell(2, index + 1)
         .string(header)
         .style(headerStyle);
     });
 
     worksheet.column(1).setWidth(20);
-    worksheet.row(1).setHeight(20);
+    worksheet.row(1).setHeight(30);
+    worksheet.row(2).setHeight(20);
 
     const ordersData: (string | number | null | undefined)[][] = [];
     orders.map((order) => {
@@ -128,12 +164,16 @@ export default async function handler(
       rowOrder.forEach((cellValue, columnIndex) => {
         if (typeof cellValue === "number") {
           worksheet
-            .cell(rowIndex + 2, columnIndex + 1)
+            .cell(rowIndex + 3, columnIndex + 1)
             .number(cellValue)
-            .style(priceStyle);
+            .style(priceStyle)
+            .style(bodyStyle);
         }
         if (typeof cellValue === "string") {
-          worksheet.cell(rowIndex + 2, columnIndex + 1).string(cellValue);
+          worksheet
+            .cell(rowIndex + 3, columnIndex + 1)
+            .string(cellValue)
+            .style(bodyStyle);
         }
       });
     });

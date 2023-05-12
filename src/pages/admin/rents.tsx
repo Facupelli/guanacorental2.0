@@ -60,7 +60,7 @@ const AdminRents: NextPage = () => {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `archivo.xlsx`;
+          link.download = `resumen rentas ${month}-${year}.xlsx`;
           link.click();
           URL.revokeObjectURL(url);
         }
