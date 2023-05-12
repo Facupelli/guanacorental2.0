@@ -15,7 +15,7 @@ import {
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getIsAdmin } from "@/lib/utils";
 import { api } from "@/utils/api";
 import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
 import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
@@ -171,6 +171,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       redirect: {
         destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const isAdmin = getIsAdmin(session);
+
+  if (!isAdmin) {
+    return {
+      redirect: {
+        destination: "/",
         permanent: false,
       },
     };

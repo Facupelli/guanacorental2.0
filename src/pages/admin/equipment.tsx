@@ -53,6 +53,7 @@ import { api } from "@/utils/api";
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { getIsAdmin } from "@/lib/utils";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -508,6 +509,17 @@ const SelectEquipmentCategory = ({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerSession(context.req, context.res, authOptions);
 
+  const isAdmin = getIsAdmin(session);
+
+  if (!isAdmin) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: { prisma, session },
@@ -529,117 +541,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default EquipmentAdmin;
-
-// const EquipmentRow = ({
-//   equipment,
-//   owners,
-//   locations,
-// }: {
-//   equipment: Equipment;
-//   owners: Owner[];
-//   locations: Location[];
-// }) => {
-//   const { register, getValues } = useForm<EquipmentForm>();
-//   const ctx = api.useContext();
-
-//   const { mutate, isLoading } = api.equipment.putEquipment.useMutation();
-
-//   const handleUpdate = () => {
-//     const data = getValues();
-
-//     mutate(
-//       { ...data, equipmentId: equipment.id },
-//       {
-//         onSuccess: () => {
-//           void ctx.equipment.adminGetEquipment.invalidate();
-//         },
-//         onError: (err) => {
-//           console.log(err.message);
-//         },
-//       }
-//     );
-//   };
-
-//   return (
-//     <tr key={equipment.id} className="center border-b border-app-bg text-sm">
-//       <td className="py- w-14">
-//         {equipment.image && (
-//           <div className="relative h-14 w-14">
-//             <Image
-//               src={equipment.image}
-//               fill
-//               style={{ objectFit: "cover" }}
-//               alt="equipment picture"
-//             />
-//           </div>
-//         )}
-//       </td>
-//       <td className="grid gap-1 py-4">
-//         <div className="flex items-center gap-1">
-//           <Input
-//             type="text"
-//             defaultValue={equipment.name}
-//             className="h-6"
-//             {...register("name")}
-//           />
-//           <Input
-//             type="text"
-//             defaultValue={equipment.brand}
-//             className="h-6"
-//             {...register("brand")}
-//           />
-//         </div>
-//         <Input
-//           type="text"
-//           defaultValue={equipment.model}
-//           className="h-6"
-//           {...register("model")}
-//         />
-//       </td>
-//       <td className="py-4">
-//         <div className="grid gap-1">
-//           <Input
-//             type="text"
-//             defaultValue={equipment.price}
-//             className="h-6"
-//             {...register("price", { valueAsNumber: true })}
-//           />
-//           <Input
-//             type="text"
-//             defaultValue={equipment.image as string}
-//             className="h-6"
-//             {...register("image")}
-//           />
-//         </div>
-//       </td>
-//       <td className="py-4">
-//         <div className="grid  gap-2 ">
-//           <OwnerLocationStockModal
-//             owners={owners}
-//             owner={equipment.owner}
-//             equipment={equipment}
-//             locations={locations}
-//           />
-//           <div className="flex h-6 items-center justify-center">
-//             <Switch
-//               defaultChecked={equipment.available}
-//               title="habilitado"
-//               {...register("available")}
-//             />
-//           </div>
-//         </div>
-//       </td>
-//       <td className="py-4">
-//         <Button
-//           className="h-12 px-2"
-//           title="actualizar"
-//           type="button"
-//           onClick={handleUpdate}
-//           disabled={isLoading}
-//         >
-//           <RotateCw className="h-4 w-4" />
-//         </Button>
-//       </td>
-//     </tr>
-//   );
-// };
