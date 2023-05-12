@@ -159,9 +159,9 @@ const AdminUsers: NextPage = () => {
                   <div className="col-span-1 overflow-y-auto">
                     {petitionUsers.data?.map((user) => (
                       <div
-                        className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg p-4 ${
+                        className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg p-4 hover:bg-white/40 ${
                           petitionUserSelected?.id === user.id
-                            ? "border-secondary bg-white"
+                            ? "border-secondary bg-white/90"
                             : ""
                         }`}
                         onClick={() => setPetitionUser(user)}
