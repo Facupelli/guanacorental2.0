@@ -64,10 +64,14 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
     resolver: zodResolver(validationAddress),
   });
 
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const { isLoading, mutate } = api.user.createUserAddress.useMutation();
+
+  useEffect(() => {
+    setShowModal(true);
+  }, []);
 
   const onSubmit = (data: NewUserFormData) => {
     if (!session?.user.id) return;
@@ -95,7 +99,7 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
         <link rel="icon" href="/logo-favicon.ico" />
       </Head>
 
-      {/* <ImportanModal showModal={showModal} setShowModal={setShowModal} />*/}
+      <ImportanModal showModal={showModal} setShowModal={setShowModal} />
 
       <SuccessModal
         showSuccessModal={showSuccessModal}
@@ -106,7 +110,6 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
 
       <main className="min-h-screen bg-app-bg px-10 pt-[70px]">
         <h1 className="mt-12 text-3xl font-bold">Formulario Alta de Cliente</h1>
-        {/* <ImportanModal showModal={showModal} setShowModal={setShowModal} /> */}
 
         <section className="max-w-xl py-10">
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">

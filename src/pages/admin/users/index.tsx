@@ -312,12 +312,16 @@ const UserPetitionInfo = ({ user }: { user: PetitionUser }) => {
 
           <div>
             <p className="text-sm text-primary/60">Estudiante</p>
-            <p className="font-semibold">{user.address?.student}</p>
+            <p className="font-semibold">
+              {user.address?.student ? "Si" : "No"}
+            </p>
           </div>
 
           <div>
             <p className="text-sm text-primary/60">Empleado</p>
-            <p className="font-semibold">{user.address?.employee}</p>
+            <p className="font-semibold">
+              {user.address?.employee ? "Si" : "No"}
+            </p>
           </div>
 
           <div>
