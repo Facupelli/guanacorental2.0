@@ -94,6 +94,10 @@ export const getIsAdmin = (session: Session | null) => {
   return session?.user.role.map((role) => role.name).includes(ROLES.ADMIN);
 };
 
+export const getIsEmployee = (session: Session | null) => {
+  return session?.user.role.map((role) => role.name).includes(ROLES.EMPLOYEE);
+};
+
 export const calcaulateCartTotal = (
   cartItems: Equipment[],
   workingDays: number | undefined

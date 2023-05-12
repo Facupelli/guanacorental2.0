@@ -29,11 +29,12 @@ import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { getDiscountStatus } from "@/lib/utils";
+import { getDiscountStatus, getIsAdmin } from "@/lib/utils";
 import { discountStatusClass } from "@/lib/magic_strings";
 
 import type { DiscountType, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { useSession } from "next-auth/react";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {
@@ -49,6 +50,7 @@ type Discount = Prisma.DiscountGetPayload<{
 type CellProps = {
   setShowModal: Dispatch<SetStateAction<boolean>>;
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
+  isAdmin: boolean | undefined;
 };
 
 const columns: Columns<Discount, CellProps>[] = [
@@ -108,13 +110,19 @@ const columns: Columns<Discount, CellProps>[] = [
   },
   {
     title: "",
-    cell: (rowData, cellData) => (
-      <ActionsDropMenu
-        discount={rowData}
-        setShowModal={cellData.cellProps?.setShowModal}
-        setDiscount={cellData.cellProps?.setDiscount}
-      />
-    ),
+    cell: (rowData, cellData) => {
+      if (!cellData.cellProps?.isAdmin) {
+        return <div />;
+      }
+
+      return (
+        <ActionsDropMenu
+          discount={rowData}
+          setShowModal={cellData.cellProps?.setShowModal}
+          setDiscount={cellData.cellProps?.setDiscount}
+        />
+      );
+    },
   },
 ];
 
@@ -131,14 +139,18 @@ type DiscountForm = {
 };
 
 const AdminDiscounts: NextPage = () => {
+  const { data: session } = useSession();
   const [discountSelected, setDiscount] = useState<Discount | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const { data } = api.discount.getAllDiscounts.useQuery();
 
+  const isAdmin = getIsAdmin(session);
+
   const cellProps = {
     setShowModal,
     setDiscount,
+    isAdmin,
   };
 
   return (
@@ -175,6 +187,7 @@ const AdminDiscounts: NextPage = () => {
                     setShowModal(true);
                   }}
                   size="sm"
+                  disabled={!isAdmin}
                 >
                   Crear descuento
                 </Button>

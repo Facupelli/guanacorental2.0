@@ -6,7 +6,7 @@ import { FacebookIcon, ShoppingCart, UserCog } from "lucide-react";
 import { ROLES } from "@/lib/magic_strings";
 import { type Session } from "next-auth";
 import { useRouter } from "next/router";
-import { getIsAdmin } from "@/lib/utils";
+import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
 const Nav = () => {
   const router = useRouter();
@@ -16,6 +16,7 @@ const Nav = () => {
   const showCartModal = useBoundStore((state) => state.showCartModal);
 
   const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
 
   const handleOpenCart = () => {
     if (showCartModal) {
@@ -49,7 +50,7 @@ const Nav = () => {
             </p>
           </li>
 
-          {isAdmin && (
+          {(isAdmin || isEmployee) && (
             <li className="cursor-pointer  text-white">
               <button
                 className="flex items-center gap-2"

@@ -36,6 +36,8 @@ import type { Columns } from "@/types/table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { getIsAdmin } from "@/lib/utils";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -75,6 +77,7 @@ const userColumns: Columns<User, CellProps>[] = [
 ];
 
 const AdminUsers: NextPage = () => {
+  const { data: session } = useSession();
   const router = useRouter();
   const [userSelected, setUser] = useState<User | null>(null);
   const [petitionUserSelected, setPetitionUser] = useState<PetitionUser | null>(
@@ -94,6 +97,8 @@ const AdminUsers: NextPage = () => {
     skip: (currentPage - 1) * pageSize,
     roleId,
   });
+
+  const isAdmin = getIsAdmin(session);
 
   const handleCreateUser = () => {
     void router.push("/new-user");
@@ -134,7 +139,9 @@ const AdminUsers: NextPage = () => {
                       )}
                     </div>
                     <div className="ml-auto">
-                      <Button onClick={handleCreateUser}>Crear Cliente</Button>
+                      <Button onClick={handleCreateUser} disabled={!isAdmin}>
+                        Crear Cliente
+                      </Button>
                     </div>
                   </div>
 

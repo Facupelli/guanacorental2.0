@@ -9,6 +9,8 @@ import {
   ShoppingBag,
   Users,
 } from "lucide-react";
+import { getIsEmployee } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 type Props = {
   children: ReactNode;
@@ -61,22 +63,33 @@ const adminRoutes = [
 ];
 
 const AdminNav = () => {
+  const { data: session } = useSession();
+  const isEmployee = getIsEmployee(session);
+
   return (
     <nav className="h-screen w-[180px] bg-primary/90">
       <ul className="grid gap-2 p-4">
-        {adminRoutes.map((route, i) => (
-          <li key={i} className="">
-            <Link
-              href={route.route}
-              className={`${buttonVariants({
-                variant: "link",
-              })} flex items-center gap-2`}
-            >
-              {route.name}
-              {route.icon}
-            </Link>
-          </li>
-        ))}
+        {adminRoutes.map((route, i) => {
+          if (
+            isEmployee &&
+            (route.name === "Rentas" || route.name === "Equipos")
+          )
+            return null;
+
+          return (
+            <li key={i} className="">
+              <Link
+                href={route.route}
+                className={`${buttonVariants({
+                  variant: "link",
+                })} flex items-center gap-2`}
+              >
+                {route.name}
+                {route.icon}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
