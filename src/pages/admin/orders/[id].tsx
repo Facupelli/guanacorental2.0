@@ -295,19 +295,20 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
         </div>
 
         <div className="grid gap-3">
-          <div className="grid grid-cols-9 text-sm text-primary/60">
+          <div className="grid grid-cols-9 items-baseline gap-x-2 text-sm text-primary/60">
             <div className="col-span-1" />
             <p className="col-span-3">Equipo</p>
             <p className="col-span-1">Cantidad</p>
-            <p className="col-span-1">Precio</p>
-            <p className="col-span-2">Precio * Días de renta</p>
+            <p className="col-span-1 text-xs">Precio</p>
+            <p className="col-span-1 text-xs">Precio * Días</p>
+            <p className="col-span-2 text-xs">Precio * Días * Cantidad</p>
           </div>
 
           <div className="grid gap-4">
             {equipments.map((ownerEquipment) => (
               <div
                 key={ownerEquipment.id}
-                className="grid grid-cols-9 items-center"
+                className="grid grid-cols-9 items-center gap-x-2"
               >
                 {ownerEquipment.equipment.image && (
                   <div className="relative col-span-1 h-12 w-12">
@@ -329,23 +330,32 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                   </p>
                 </div>
 
-                <p className="pl-6 font-semibold">
+                <p className=" pl-6 font-semibold">
                   x
                   {ownerEquipment.books.reduce((acc, curr) => {
                     return acc + curr.quantity;
                   }, 0)}
                 </p>
 
-                <p className="text-sm">
+                <p className="text-xs">
                   {formatPrice(ownerEquipment.equipment.price)}
                 </p>
-                <p className="text-sm">
+                <p className="col-span-1 text-xs">
                   {formatPrice(
                     ownerEquipment.equipment.price *
                       ownerEquipment.books.reduce((acc, curr) => {
                         return acc + curr.quantity;
                       }, 0) *
                       order.book.working_days
+                  )}
+                </p>
+                <p className="text-sm">
+                  {formatPrice(
+                    ownerEquipment.equipment.price *
+                      order.book.working_days *
+                      ownerEquipment.books.reduce((acc, curr) => {
+                        return acc + curr.quantity;
+                      }, 0)
                   )}
                 </p>
 
