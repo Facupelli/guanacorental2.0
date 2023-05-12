@@ -2,8 +2,17 @@ const xl = require("excel4node");
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { prisma } from "@/server/db";
 import { Prisma } from "@prisma/client";
+import dayjs from "dayjs";
 
-type Order = Prisma.OrderGetPayload<{
+type Query = {
+  where?: {
+    book: {
+      start_date: {
+        gte: Date;
+        lte: Date;
+      };
+    };
+  };
   include: {
     customer: {
       include: { address: true };
@@ -12,22 +21,17 @@ type Order = Prisma.OrderGetPayload<{
     book: true;
     earnings: true;
   };
-}>;
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "GET") {
+  if (req.method === "POST") {
     // Process a POST request
-    const orders = await prisma.order.findMany({
-      where: {
-        book: {
-          start_date: {
-            gte: new Date("01/05/2023"),
-          },
-        },
-      },
+    const { year, month }: { year: string; month: string } = req.body;
+
+    const query: Query = {
       include: {
         customer: {
           include: { address: true },
@@ -36,7 +40,27 @@ export default async function handler(
         book: true,
         earnings: true,
       },
-    });
+    };
+
+    if (month === "all" && year) {
+      const firstMonthDay = dayjs(`${year}-01`).startOf("month").toDate();
+      const lastMonthDay = dayjs(`${year}-12`).endOf("month").toDate();
+
+      query.where = {
+        book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
+      };
+    }
+
+    if (month !== "all" && year) {
+      const firstMonthDay = dayjs(`${year}-${month}`).startOf("month").toDate();
+      const lastMonthDay = dayjs(`${year}-${month}`).endOf("month").toDate();
+
+      query.where = {
+        book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
+      };
+    }
+
+    const orders = await prisma.order.findMany(query);
 
     const workbook = new xl.Workbook();
     const worksheet = workbook.addWorksheet("Sheet 1");

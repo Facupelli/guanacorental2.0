@@ -41,10 +41,18 @@ const AdminRents: NextPage = () => {
     month,
   });
 
-  const fetchXlBuffer = () => fetch(`http://localhost:3000/api/excel`);
-  const fetch4nodeBuffer = () => fetch(`http://localhost:3000/api/4node`);
-
   const handleDownloadExcel = () => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Tipo de contenido que se enviará
+      },
+      body: JSON.stringify({ year, month }),
+    };
+
+    const fetch4nodeBuffer = () =>
+      fetch(`http://localhost:3000/api/4node`, options);
+
     fetch4nodeBuffer()
       .then((res) => res.blob())
       .then((blob) => {
