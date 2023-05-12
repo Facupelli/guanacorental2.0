@@ -92,6 +92,18 @@ const CartPage: NextPage = () => {
   const isAdmin = getIsAdmin(session?.user.role);
 
   const handleBookOrder = () => {
+    if (!startDate || !endDate || !session?.user || !workingDays) {
+      return;
+    }
+
+    if (!session.user.customerApproved) {
+      setError(
+        "No has enviado el alta de cliente o tu alta todavía no fue aprobada"
+      );
+      setErrorModal(true);
+      return;
+    }
+
     const message = getValues("message");
     const email = getValues("email");
 
@@ -108,33 +120,31 @@ const CartPage: NextPage = () => {
       })),
     }));
 
-    if (startDate && endDate && session?.user && workingDays) {
-      mutate(
-        {
-          discount,
-          startDate,
-          endDate,
-          locationId: location.id,
-          customerId: session.user.id,
-          pickupHour,
-          subtotal,
-          total: cartTotal,
-          message,
-          cart,
-          workingDays,
-          email: email ? email : null,
+    mutate(
+      {
+        discount,
+        startDate,
+        endDate,
+        locationId: location.id,
+        customerId: session.user.id,
+        pickupHour,
+        subtotal,
+        total: cartTotal,
+        message,
+        cart,
+        workingDays,
+        email: email ? email : null,
+      },
+      {
+        onSuccess: (data) => {
+          console.log(data);
         },
-        {
-          onSuccess: (data) => {
-            console.log(data);
-          },
-          onError: (err) => {
-            setErrorModal(true);
-            setError(err.message);
-          },
-        }
-      );
-    }
+        onError: (err) => {
+          setError(err.message);
+          setErrorModal(true);
+        },
+      }
+    );
   };
 
   return (
@@ -295,13 +305,15 @@ const RightBar = ({
             <div className="flex w-full justify-between ">
               <p className="font-semibold">Retiro:</p>
               <p className="font-bold">
-                {new Date(startDate).toLocaleDateString()} {pickupHour}hs
+                {new Date(startDate).toLocaleDateString()}{" "}
+                <span className="font-semibold">{pickupHour}hs</span>
               </p>
             </div>
             <div className="flex justify-between">
               <p className="font-semibold">Devolución: </p>
               <p className="font-bold">
-                {new Date(endDate).toLocaleDateString()} 09:00hs
+                {new Date(endDate).toLocaleDateString()}{" "}
+                <span className="font-semibold">09:00hs</span>
               </p>
             </div>
           </div>

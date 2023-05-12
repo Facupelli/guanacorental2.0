@@ -22,6 +22,7 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       role: Role[];
+      customerApproved: boolean;
     } & DefaultSession["user"];
   }
 
@@ -41,7 +42,7 @@ export const authOptions: NextAuthOptions = {
     session: async ({ session, user }) => {
       const userRole = await prisma.user.findUnique({
         where: { id: user.id },
-        select: { role: { select: { name: true } } },
+        select: { role: { select: { name: true } }, customer_approved: true },
       });
 
       return {
@@ -50,6 +51,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: user.id,
           role: userRole?.role,
+          customerApproved: userRole?.customer_approved,
         },
       };
     },
