@@ -89,7 +89,7 @@ const CartPage: NextPage = () => {
 
   if (!session) return <div>404</div>;
 
-  const isAdmin = getIsAdmin(session?.user.role);
+  const isAdmin = getIsAdmin(session);
 
   const handleBookOrder = () => {
     if (!startDate || !endDate || !session?.user || !workingDays) {
@@ -271,7 +271,7 @@ type RightBarProps = {
   handleBookOrder: () => void;
   isLoading: boolean;
   cart: Equipment[];
-  isAdmin: boolean;
+  isAdmin: boolean | undefined;
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
   discount: Discount | null;
   subtotal: number;

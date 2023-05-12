@@ -1,9 +1,10 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
-import { Prisma, type Role } from "@prisma/client";
+import { type Session } from "next-auth";
+import { Prisma } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
-import { COUPON_STATUS, DISCOUNT_TYPES } from "./magic_strings";
+import { COUPON_STATUS, DISCOUNT_TYPES, ROLES } from "./magic_strings";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -89,11 +90,8 @@ export const handleAdminLocationChange = (
   }
 };
 
-export const getIsAdmin = (roles: Role[]) => {
-  if (roles.map((role) => role.name).includes("Admin")) {
-    return true;
-  }
-  return false;
+export const getIsAdmin = (session: Session | null) => {
+  return session?.user.role.map((role) => role.name).includes(ROLES.ADMIN);
 };
 
 export const calcaulateCartTotal = (

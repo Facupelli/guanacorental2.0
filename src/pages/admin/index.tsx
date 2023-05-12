@@ -73,7 +73,7 @@ const Admin: NextPage = () => {
     handleClickDay(new Date());
   }, [data]);
 
-  let isAdmin = session ? getIsAdmin(session.user.role) : false;
+  let isAdmin = getIsAdmin(session);
 
   let calendarMinDate = isAdmin
     ? dayjs().subtract(1, "month").startOf("day").toDate()

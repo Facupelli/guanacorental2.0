@@ -89,7 +89,7 @@ const NewUserPage: NextPage<Props> = ({ user }: Props) => {
     );
   };
 
-  const isAdmin = getIsAdmin(user.role);
+  const isAdmin = getIsAdmin(session);
 
   return (
     <>

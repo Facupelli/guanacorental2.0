@@ -26,6 +26,7 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import { type Prisma, type Role } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -55,6 +56,7 @@ type Props = {
 };
 
 const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
+  const { data: session } = useSession();
   const router = useRouter();
 
   const { data, isLoading } = api.order.getOrderById.useQuery({
@@ -70,7 +72,7 @@ const AdminOrderDetail: NextPage<Props> = ({ user }: Props) => {
     };
   }
 
-  const isAdmin = getIsAdmin(user.role);
+  const isAdmin = getIsAdmin(session);
 
   return (
     <>
