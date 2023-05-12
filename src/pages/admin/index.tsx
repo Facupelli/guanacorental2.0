@@ -153,7 +153,7 @@ const Admin: NextPage = () => {
                   return "";
                 }}
               />
-              <div className="flex w-[300px] flex-col gap-2 rounded-md bg-white p-4 text-sm font-semibold">
+              <div className="flex w-[300px] flex-col gap-2 rounded-md bg-white/50 p-4 text-sm font-semibold">
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full bg-green-400" />
                   <p>Retiro de equipos</p>

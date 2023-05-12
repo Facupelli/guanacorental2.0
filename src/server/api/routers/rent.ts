@@ -39,7 +39,21 @@ export const rentRouter = createTRPCRouter({
       const orderQuery: OrderQuery = {};
       const earningQuery: EarningQuery = {};
 
-      if (month !== "all" || year !== "all") {
+      if (month === "all" && year !== "all") {
+        const firstMonthDay = dayjs(`${year}-01`).startOf("month").toDate();
+        const lastMonthDay = dayjs(`${year}-12`).endOf("month").toDate();
+
+        orderQuery.where = {
+          book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
+        };
+        earningQuery.where = {
+          order: {
+            book: {
+              start_date: { gte: firstMonthDay, lte: lastMonthDay },
+            },
+          },
+        };
+      } else if (month !== "all" || year !== "all") {
         const firstMonthDay = dayjs(`${year}-${month}`)
           .startOf("month")
           .toDate();
