@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/utils/api";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
 import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
+import { Button } from "@/components/ui/button";
 
 type RentForm = { month: string; year: string };
 
@@ -40,6 +41,25 @@ const AdminRents: NextPage = () => {
     month,
   });
 
+  const fetchXlBuffer = () => fetch(`http://localhost:3000/api/excel`);
+  const fetch4nodeBuffer = () => fetch(`http://localhost:3000/api/4node`);
+
+  const handleDownloadExcel = () => {
+    fetch4nodeBuffer()
+      .then((res) => res.blob())
+      .then((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `archivo.xlsx`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <Head>
@@ -54,16 +74,21 @@ const AdminRents: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">RENTAS</h1>
           <div className="grid gap-6 pt-6">
-            <div className="flex w-1/2 items-center gap-6 rounded-md bg-white p-4">
-              <div className="flex w-full items-center gap-2">
-                <Label>Mes</Label>
-                <SelectMonth setValue={setValue} />
+            <section className="flex items-center">
+              <div className="flex w-1/2 items-center gap-6 rounded-md bg-white p-4">
+                <div className="flex w-full items-center gap-2">
+                  <Label>Mes</Label>
+                  <SelectMonth setValue={setValue} />
+                </div>
+                <div className="flex w-full items-center gap-2">
+                  <Label>Año</Label>
+                  <SelectYear setValue={setValue} />
+                </div>
               </div>
-              <div className="flex w-full items-center gap-2">
-                <Label>Año</Label>
-                <SelectYear setValue={setValue} />
+              <div className="ml-auto">
+                <Button onClick={handleDownloadExcel}>Descargar Excel</Button>
               </div>
-            </div>
+            </section>
 
             <div className="w-fit rounded-md bg-white px-8 py-4">
               <p className="font-semibold text-primary/70">Total</p>
