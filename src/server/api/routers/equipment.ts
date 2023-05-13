@@ -11,7 +11,10 @@ import { SORT_TYPES } from "@/lib/magic_strings";
 type WherePipe = {
   available?: boolean;
   categoryId?: string;
-  owner?: { some: { location: { id: string } } };
+  owner?: {
+    some?: { location: { id: string } };
+    none?: { location: { id: { not: undefined } } };
+  };
   OR?: [
     {
       name: {
@@ -132,15 +135,37 @@ export const equipmentRouter = createTRPCRouter({
   adminGetEquipment: protectedProcedure
     .input(
       z.object({
+        search: z.string().optional(),
         locationId: z.string().optional(),
         take: z.number(),
         skip: z.number(),
       })
     )
     .query(async ({ input }) => {
+      const { search, locationId, take, skip } = input;
+
+      const wherePipe: WherePipe = {};
+
+      if (search) {
+        wherePipe.OR = [
+          { name: { search } },
+          { brand: { search } },
+          { model: { search } },
+        ];
+      }
+
+      if (locationId && locationId !== "all") {
+        if (locationId === "none") {
+          wherePipe.owner = { none: { location: { id: { not: undefined } } } };
+        } else {
+          wherePipe.owner = { some: { location: { id: locationId } } };
+        }
+      }
+
       const equipment = await prisma.equipment.findMany({
-        take: input.take,
-        skip: input.skip,
+        where: wherePipe,
+        take,
+        skip,
         include: {
           owner: { include: { owner: true, location: true } },
           category: true,

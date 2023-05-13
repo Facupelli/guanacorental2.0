@@ -51,6 +51,7 @@ import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
 import { OwnerequipmentForm } from "@/types/ownerEquipment";
+import useDebounce from "@/hooks/useDebounce";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -119,6 +120,11 @@ type Props = {
 };
 
 const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+  const { register, setValue, watch } = useForm<{
+    search: string;
+    location: string;
+  }>();
+
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
@@ -126,12 +132,16 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
-  const location = useBoundStore((state) => state.location);
+  // const location = useBoundStore((state) => state.location);
+
+  const search = useDebounce(watch("search"), 500);
+  const location = watch("location");
 
   const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
-    locationId: location.id,
+    locationId: location,
+    search,
   });
 
   const cellProps = {
@@ -174,9 +184,28 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">Equipos</h1>
-          <div className="flex">
+          <div className="flex items-start gap-4 pt-6">
+            <div className="flex w-2/3 items-center gap-4 rounded-md bg-white p-4">
+              <Input
+                type="search"
+                placeholder="buscar por nombre, marca o modelo"
+                {...register("search")}
+              />
+              <Label>Sucursal</Label>
+              <AdminSelectLocation
+                locations={locations}
+                setValue={(e) => setValue("location", e)}
+              >
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="none">Sin sucursal</SelectItem>
+              </AdminSelectLocation>
+            </div>
             <div className="ml-auto">
-              <Button onClick={() => setShowAddEquipmentModal(true)} size="sm">
+              <Button
+                onClick={() => setShowAddEquipmentModal(true)}
+                size="sm"
+                className="whitespace-nowrap"
+              >
                 Agregar equipo
               </Button>
             </div>
@@ -343,9 +372,9 @@ const FieldArray = ({
       </div>
       <div className="col-span-2">
         <AdminSelectLocation
-          index={index}
           locations={locations}
-          setValue={setValue}
+          setValue={(e) => setValue(`owner.${index}.locationId` as const, e)}
+          className="h-6"
         />
       </div>
       <Input

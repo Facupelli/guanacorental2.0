@@ -7,10 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type Form } from "@/pages/admin/equipment";
 import type { Location } from "@/types/models";
-import { type ReactNode } from "react";
-import { type UseFormSetValue } from "react-hook-form";
+import { ChangeEvent, type ReactNode } from "react";
 
 type SelectLocationProps = {
   locations: Location[];
@@ -50,25 +48,26 @@ const SelectLocation = ({
 };
 
 type AdminSelectLocationProps = {
-  index: number;
   locations: Location[];
-  setValue: UseFormSetValue<Form>;
+  setValue: (e: string) => void;
+  className?: string;
+  children?: ReactNode;
 };
 export const AdminSelectLocation = ({
-  index,
   setValue,
   locations,
+  className,
+  children,
 }: AdminSelectLocationProps) => {
   return (
-    <Select
-      onValueChange={(e) => setValue(`owner.${index}.locationId` as const, e)}
-    >
-      <SelectTrigger className="h-6">
+    <Select onValueChange={setValue}>
+      <SelectTrigger className={className}>
         <SelectValue placeholder="elegir" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Sucursales</SelectLabel>
+          {children}
           {locations.map((location) => (
             <SelectItem value={location.id} key={location.id}>
               {location.name}
