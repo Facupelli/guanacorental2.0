@@ -50,6 +50,7 @@ import { api } from "@/utils/api";
 import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { OwnerequipmentForm } from "@/types/ownerEquipment";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -58,8 +59,13 @@ type Equipment = Prisma.EquipmentGetPayload<{
   };
 }>;
 
-type CellProps = unknown;
-export const equipmentColumns: Columns<Equipment, CellProps>[] = [
+type CellProps = {
+  setShowAddEquipmentModal: Dispatch<SetStateAction<boolean>>;
+  setEquipment: Dispatch<SetStateAction<Equipment | null>>;
+  setShowStockModal: Dispatch<SetStateAction<boolean>>;
+};
+
+const equipmentColumns: Columns<Equipment, CellProps>[] = [
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
   { title: "Marca", cell: (rowData) => <div>{rowData.brand}</div> },
   { title: "Model", cell: (rowData) => <div>{rowData.model}</div> },
@@ -94,7 +100,17 @@ export const equipmentColumns: Columns<Equipment, CellProps>[] = [
       );
     },
   },
-  { title: "", cell: () => <ActionsDropMenu /> },
+  {
+    title: "",
+    cell: (rowData, cellData) => (
+      <ActionsDropMenu
+        equipment={rowData}
+        setShowAddEquipmentModal={cellData.cellProps?.setShowAddEquipmentModal}
+        setEquipment={cellData.cellProps?.setEquipment}
+        setShowStockModal={cellData.cellProps?.setShowStockModal}
+      />
+    ),
+  },
 ];
 
 type Props = {
@@ -102,9 +118,10 @@ type Props = {
   owners: Owner[];
 };
 
-const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
-  const [, setEquipment] = useState<Equipment | null>(null);
+const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+  const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
+  const [showStockModal, setShowStockModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
@@ -117,6 +134,12 @@ const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
     locationId: location.id,
   });
 
+  const cellProps = {
+    setShowAddEquipmentModal,
+    setEquipment,
+    setShowStockModal,
+  };
+
   return (
     <>
       <Head>
@@ -125,12 +148,25 @@ const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      {equipment && (
+        <OwnerLocationStockModal
+          isOpen={showStockModal}
+          setOpen={setShowStockModal}
+          equipment={equipment}
+          locations={locations}
+          owners={owners}
+        />
+      )}
+
       <DialogWithState
         isOpen={showAddEquipmentModal}
         setOpen={setShowAddEquipmentModal}
         title="Agregar equipo"
       >
-        <AddEquipment />
+        <AddEquipment
+          equipment={equipment}
+          setShowAddEquipmentModal={setShowAddEquipmentModal}
+        />
       </DialogWithState>
 
       <Nav />
@@ -151,6 +187,7 @@ const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
                 columns={equipmentColumns}
                 data={data.equipment}
                 setRowData={setEquipment}
+                cellProps={cellProps}
               />
             )}
 
@@ -167,37 +204,17 @@ const EquipmentAdmin: NextPage<Props> = ({}: Props) => {
   );
 };
 
-// type EquipmentForm = {
-//   name: string;
-//   brand: string;
-//   model: string;
-//   image: string;
-//   price: number;
-//   equipmentId: string;
-//   available: string;
-// };
-
 type OwnerLocationStockProps = {
   equipment: Equipment;
   locations: Location[];
-  owner: EquipmentOnOwner[] | undefined;
   owners: Owner[];
   isOpen: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export type Form = {
-  owner: {
-    ownerId: string;
-    locationId: string;
-    stock: number;
-  }[];
-};
-
 const OwnerLocationStockModal = ({
   equipment,
   locations,
-  owner,
   owners,
   isOpen,
   setOpen,
@@ -208,7 +225,7 @@ const OwnerLocationStockModal = ({
     handleSubmit,
     setValue,
     // formState: { errors },
-  } = useForm<Form>();
+  } = useForm<OwnerequipmentForm>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "owner",
@@ -217,7 +234,7 @@ const OwnerLocationStockModal = ({
   const { mutate, isLoading } =
     api.equipment.createEquipmentOnOwner.useMutation();
 
-  const onSubmit = (data: Form) => {
+  const onSubmit = (data: OwnerequipmentForm) => {
     const mutateData = {
       owner: data.owner.map((owner) => ({
         ...owner,
@@ -249,7 +266,7 @@ const OwnerLocationStockModal = ({
           <Label className="col-span-2">Stock</Label>
         </div>
         <div>
-          {owner?.map((owner) => (
+          {equipment.owner?.map((owner) => (
             <div key={owner.id} className="grid grid-cols-7 items-center gap-2">
               <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
                 {owner.owner?.name}
@@ -305,9 +322,9 @@ const OwnerLocationStockModal = ({
 type FieldArrayProps = {
   owners: Owner[];
   locations: Location[];
-  register: UseFormRegister<Form>;
+  register: UseFormRegister<OwnerequipmentForm>;
   index: number;
-  setValue: UseFormSetValue<Form>;
+  setValue: UseFormSetValue<OwnerequipmentForm>;
   remove: UseFieldArrayRemove;
 };
 
@@ -353,7 +370,7 @@ type SelectOwnerProps = {
   defaultValue?: string;
   owners: Owner[];
   index: number;
-  setValue: UseFormSetValue<Form>;
+  setValue: UseFormSetValue<OwnerequipmentForm>;
 };
 
 const SelectOwner = ({
@@ -384,7 +401,19 @@ const SelectOwner = ({
   );
 };
 
-const ActionsDropMenu = () => {
+type ActionsProps = {
+  equipment: Equipment;
+  setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
+  setEquipment?: Dispatch<SetStateAction<Equipment | null>>;
+  setShowStockModal?: Dispatch<SetStateAction<boolean>>;
+};
+
+const ActionsDropMenu = ({
+  setEquipment,
+  setShowAddEquipmentModal,
+  equipment,
+  setShowStockModal,
+}: ActionsProps) => {
   return (
     <>
       <DropdownMenu>
@@ -396,8 +425,22 @@ const ActionsDropMenu = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-          <DropdownMenuItem>Editar equipo</DropdownMenuItem>
-          <DropdownMenuItem>Editar stock</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setEquipment && setEquipment(equipment);
+              setShowAddEquipmentModal && setShowAddEquipmentModal(true);
+            }}
+          >
+            Editar equipo
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setEquipment && setEquipment(equipment);
+              setShowStockModal && setShowStockModal(true);
+            }}
+          >
+            Editar stock
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
@@ -414,7 +457,15 @@ type AddEquipmentForm = {
   accessories: string;
 };
 
-const AddEquipment = () => {
+type AddEquipmentProps = {
+  equipment: Equipment | null;
+  setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
+};
+
+const AddEquipment = ({
+  equipment,
+  setShowAddEquipmentModal,
+}: AddEquipmentProps) => {
   const { register, handleSubmit } = useForm<AddEquipmentForm>();
 
   const ctx = api.useContext();
@@ -432,17 +483,32 @@ const AddEquipment = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Label htmlFor="name">Nombre</Label>
-        <Input type="text" id="name" {...register("name")} />
+        <Input
+          type="text"
+          id="name"
+          {...register("name")}
+          defaultValue={equipment?.name}
+        />
       </div>
 
       <div>
         <Label htmlFor="brand">Marca</Label>
-        <Input type="text" id="brand" {...register("brand")} />
+        <Input
+          type="text"
+          id="brand"
+          {...register("brand")}
+          defaultValue={equipment?.brand}
+        />
       </div>
 
       <div>
         <Label htmlFor="model">Modelo</Label>
-        <Input type="text" id="model" {...register("model")} />
+        <Input
+          type="text"
+          id="model"
+          {...register("model")}
+          defaultValue={equipment?.model}
+        />
       </div>
 
       <div>
@@ -451,17 +517,26 @@ const AddEquipment = () => {
           type="text"
           id="price"
           {...register("price", { valueAsNumber: true })}
+          defaultValue={equipment?.price}
         />
       </div>
 
       <div>
         <Label>Categoría</Label>
-        <SelectEquipmentCategory register={register} />
+        <SelectEquipmentCategory
+          register={register}
+          defaultValue={equipment?.categoryId}
+        />
       </div>
 
       <div>
         <Label htmlFor="image">Imagen</Label>
-        <Input type="text" id="image" {...register("image")} />
+        <Input
+          type="text"
+          id="image"
+          {...register("image")}
+          defaultValue={equipment?.image ?? undefined}
+        />
       </div>
 
       <div>
@@ -478,13 +553,15 @@ const AddEquipment = () => {
 
 const SelectEquipmentCategory = ({
   register,
+  defaultValue,
 }: {
   register: UseFormRegister<AddEquipmentForm>;
+  defaultValue?: string;
 }) => {
   const { data } = api.category.getAllCategories.useQuery();
 
   return (
-    <Select {...register("categoryId")}>
+    <Select {...register("categoryId")} defaultValue={defaultValue}>
       <SelectTrigger>
         <SelectValue placeholder="seleccionar categoría" />
       </SelectTrigger>
