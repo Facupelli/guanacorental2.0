@@ -202,7 +202,10 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
             </div>
             <div className="ml-auto">
               <Button
-                onClick={() => setShowAddEquipmentModal(true)}
+                onClick={() => {
+                  setEquipment(null);
+                  setShowAddEquipmentModal(true);
+                }}
                 size="sm"
                 className="whitespace-nowrap"
               >
