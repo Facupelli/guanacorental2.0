@@ -381,12 +381,6 @@ export const orderRouter = createTRPCRouter({
           where: { email },
         });
 
-        console.log(
-          "0----------------------------------->",
-          customer,
-          !!customer
-        );
-
         if (!customer) {
           throw new TRPCError({
             code: "BAD_REQUEST",

@@ -11,7 +11,7 @@ type Props = {
   children: ReactNode;
   isOpen: boolean;
   title: string;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
   description?: string;
 };
 

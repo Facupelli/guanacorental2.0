@@ -132,7 +132,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 </div>
                 <SelectOrder setSort={setSort} />
               </section>
-              <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8">
+              <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8 pb-10">
                 {isLoading && <div>Cargando...</div>}
                 {equipments?.length === 0 ? (
                   <p>
