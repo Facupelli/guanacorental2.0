@@ -55,10 +55,6 @@ export const orderColumns: Columns<Order, CellProps>[] = [
     cell: (rowData) => <div>{rowData.location.name}</div>,
   },
   {
-    title: "Sucursal",
-    cell: (rowData) => <div>{rowData.location.name}</div>,
-  },
-  {
     title: "",
     cell: (rowData, cellData) => {
       const handleClickExpand = (e: MouseEvent<HTMLButtonElement>) => {

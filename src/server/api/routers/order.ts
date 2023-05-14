@@ -18,6 +18,7 @@ type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
   where?: {
     locationId?: string;
+    number?: number;
   };
   take: number;
   skip: number;
@@ -278,10 +279,11 @@ export const orderRouter = createTRPCRouter({
         skip: z.number(),
         location: z.string(),
         sort: z.string(),
+        search: z.string().optional(),
       })
     )
     .query(async ({ input }) => {
-      const { skip, take, location, sort } = input;
+      const { skip, take, location, sort, search } = input;
 
       const query: Query = {
         take,
@@ -299,8 +301,19 @@ export const orderRouter = createTRPCRouter({
         },
       };
 
-      if (location !== "all") {
-        query.where = { locationId: location };
+      if (location !== "all" && search) {
+        query.where = {
+          locationId: location,
+          number: Number(search),
+        };
+      } else {
+        if (location !== "all") {
+          query.where = { locationId: location };
+        }
+
+        if (search) {
+          query.where = { number: Number(search) };
+        }
       }
 
       if (sort === ADMIN_ORDERS_SORT["NEXT ORDERS"]) {

@@ -32,6 +32,8 @@ import { authOptions } from "@/server/auth";
 
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
+import { Input } from "@/components/ui/input";
+import useDebounce from "@/hooks/useDebounce";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -53,18 +55,25 @@ const AdminOrders: NextPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  const { setValue, watch } = useForm<{ sort: string }>();
+  const { setValue, watch, register } = useForm<{
+    sort: string;
+    search: string;
+  }>();
 
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
 
   const locations = api.location.getAllLocations.useQuery();
+
   const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
+  const search = useDebounce(watch("search", undefined), 500);
+
   const { data } = api.order.getOrders.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     location: location.id,
     sort,
+    search,
   });
 
   const filteredOrers = data?.orders.map((order) => ({
@@ -102,6 +111,12 @@ const AdminOrders: NextPage = () => {
               )}
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
               <SelectSortOrders setValue={setValue} />
+              <Input
+                type="search"
+                placeholder="buscar por número"
+                {...register("search")}
+                defaultValue={undefined}
+              />
             </div>
             {filteredOrers && (
               <DataTable
@@ -131,7 +146,7 @@ const AdminOrders: NextPage = () => {
 };
 
 type SelectSortOrdersProps = {
-  setValue: UseFormSetValue<{ sort: string }>;
+  setValue: UseFormSetValue<{ sort: string; search: string }>;
 };
 
 const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {

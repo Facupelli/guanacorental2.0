@@ -522,17 +522,17 @@ const OrderInfo = ({ info }: OrderInfoProps) => {
 
         <div className="col-span-3 grid gap-1">
           <p className="text-xs text-primary/60">Mensaje</p>
-          <p>{info.message}</p>
+          <p>{info.message ?? "-"}</p>
         </div>
 
         <div className="col-span-1 grid gap-1">
           <p className="text-xs text-primary/60">Código</p>
-          <p>{info.discount?.code}</p>
+          <p>{info.discount?.code ?? "-"}</p>
         </div>
 
         <div className="col-span-2 grid gap-1">
           <p className="text-xs text-primary/60">Descuento</p>
-          <p>{info.discount?.rule.value}</p>
+          <p>{info.discount?.rule.value ?? "-"}</p>
         </div>
 
         <div className="grid gap-1">
