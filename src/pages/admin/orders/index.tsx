@@ -18,6 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DataTable from "@/components/ui/data-table";
+import { Input } from "@/components/ui/input";
 
 import { api } from "@/utils/api";
 import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
@@ -29,11 +30,10 @@ import {
 } from "@/lib/utils";
 import { orderColumns, equipmentsList } from "@/lib/order";
 import { authOptions } from "@/server/auth";
+import useDebounce from "@/hooks/useDebounce";
 
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
-import { Input } from "@/components/ui/input";
-import useDebounce from "@/hooks/useDebounce";
 
 type Order = Prisma.OrderGetPayload<{
   include: {

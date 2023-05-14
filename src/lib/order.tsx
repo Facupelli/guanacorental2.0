@@ -1,7 +1,19 @@
-import { orderStatusClass } from "./magic_strings";
-import ActionsDropMenu from "@/components/order/ActionDropMenu";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
+
+import { orderStatusClass } from "./magic_strings";
+
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
 import { type MouseEvent } from "react";
@@ -85,7 +97,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
   },
   {
     title: "",
-    cell: (rowData) => <ActionsDropMenu order={rowData} />,
+    cell: (rowData) => <OrderActionsDropMenu order={rowData} />,
   },
 ];
 
@@ -120,5 +132,33 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
         </div>
       ))}
     </div>
+  );
+};
+
+const DynamicButton = dynamic<{ order: Order }>(() =>
+  import("../components/remito/DownloadRemitoButton").then(
+    (mod) => mod.DownloadRemitoButton
+  )
+);
+
+const OrderActionsDropMenu = ({ order }: { order: Order }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuItem>
+          <Link href={`/admin/orders/${order.id}`}>Ver detalle</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <DynamicButton order={order} />
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
