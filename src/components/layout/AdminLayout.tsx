@@ -23,7 +23,7 @@ const AdminLayout = ({ children }: Props) => {
         <AdminNav />
       </section>
       <section className="ml-[180px] min-h-[calc(100vh_-_70px)] bg-app-bg px-10 py-6">
-        {children}
+        <div className="mx-auto max-w-7xl">{children}</div>
       </section>
     </div>
   );

@@ -176,33 +176,35 @@ const CartPage: NextPage = () => {
       <Nav />
 
       <main className="min-h-screen bg-app-bg px-6 pt-[70px]">
-        <section className="mt-12 grid grid-cols-12 gap-8">
-          <section className="col-span-8 ">
-            <div className="grid grid-cols-12 pb-6">
-              <p className="col-span-7">Equipos</p>
-              <p className="col-span-2">Cantidad</p>
-              <p className="col-span-2">Precio</p>
-            </div>
-            <ItemsList
-              items={cartItems}
-              startDate={startDate}
-              endDate={endDate}
+        <div className="mx-auto max-w-7xl">
+          <section className="mt-12 grid grid-cols-12 gap-8">
+            <section className="col-span-8 ">
+              <div className="grid grid-cols-12 pb-6">
+                <p className="col-span-7">Equipos</p>
+                <p className="col-span-2">Cantidad</p>
+                <p className="col-span-2">Precio</p>
+              </div>
+              <ItemsList
+                items={cartItems}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </section>
+            <RightBar
+              location={location}
+              pickupHour={pickupHour}
+              cartTotal={cartTotal}
+              register={register}
+              handleBookOrder={handleBookOrder}
+              isLoading={isLoading}
+              cart={cartItems}
+              isAdmin={isAdmin}
+              setDiscount={setDiscount}
+              discount={discount}
+              subtotal={subtotal}
             />
           </section>
-          <RightBar
-            location={location}
-            pickupHour={pickupHour}
-            cartTotal={cartTotal}
-            register={register}
-            handleBookOrder={handleBookOrder}
-            isLoading={isLoading}
-            cart={cartItems}
-            isAdmin={isAdmin}
-            setDiscount={setDiscount}
-            discount={discount}
-            subtotal={subtotal}
-          />
-        </section>
+        </div>
       </main>
     </>
   );
