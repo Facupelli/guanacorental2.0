@@ -66,7 +66,7 @@ const AdminOrders: NextPage = () => {
   const locations = api.location.getAllLocations.useQuery();
 
   const sort = watch("sort", ADMIN_ORDERS_SORT["NEXT ORDERS"]);
-  const search = useDebounce(watch("search", undefined), 500);
+  const search = useDebounce(watch("search", ""), 500);
 
   const { data } = api.order.getOrders.useQuery({
     take: pageSize,

@@ -52,7 +52,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
   const { register, watch } = useForm<{ search: string }>();
 
-  const search = useDebounce(watch("search"), 500);
+  const search = useDebounce(watch("search", ""), 500);
 
   const location = useBoundStore((state) => state.location);
   const showLocationModal = useBoundStore((state) => state.showLocationModal);

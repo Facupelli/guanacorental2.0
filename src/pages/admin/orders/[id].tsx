@@ -203,7 +203,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
 
   const { register, watch } = useForm<{ search: string }>();
 
-  const search = useDebounce(watch("search"), 500);
+  const search = useDebounce(watch("search", ""), 500);
 
   const { data } = api.equipment.getAllEquipment.useQuery({
     limit: 5,

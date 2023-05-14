@@ -134,7 +134,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
 
   // const location = useBoundStore((state) => state.location);
 
-  const search = useDebounce(watch("search"), 500);
+  const search = useDebounce(watch("search", ""), 500);
   const location = watch("location");
 
   const { data } = api.equipment.adminGetEquipment.useQuery({
