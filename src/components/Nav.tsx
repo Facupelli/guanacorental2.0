@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { FacebookIcon, ShoppingCart, UserCog } from "lucide-react";
+import { FacebookIcon, Menu, ShoppingCart, UserCog } from "lucide-react";
 
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
@@ -26,30 +26,40 @@ const Nav = () => {
   };
   return (
     <header>
-      <nav className="fixed z-30 w-full bg-primary px-6 ">
-        <ul className="flex h-[70px] items-center gap-6">
-          <li>
-            <Link href="/">
-              <div className="relative aspect-square w-14">
-                <Image
-                  src="/guanaco-rental-logo.svg"
-                  alt="guanaco rental logo"
-                  fill
-                />
-              </div>
-            </Link>
-          </li>
+      <nav className="fixed z-30 flex h-[70px] w-full items-center gap-6 bg-primary px-6">
+        <div>
+          <Link href="/">
+            <div className="relative aspect-square w-14">
+              <Image
+                src="/guanaco-rental-logo.svg"
+                alt="guanaco rental logo"
+                fill
+              />
+            </div>
+          </Link>
+        </div>
 
-          <li className="ml-auto">
-            <p
-              className="flex cursor-pointer items-center gap-2 text-white"
-              onClick={handleOpenCart}
-            >
-              CARRITO
-              <ShoppingCart className="h-4 w-4" />
-            </p>
-          </li>
+        <div className="ml-auto">
+          <p
+            className="flex cursor-pointer items-center gap-2 text-white"
+            onClick={handleOpenCart}
+          >
+            <span className="hidden sm:block">CARRITO</span>
+            <ShoppingCart className="h-5 w-5 sm:h-4 sm:w-4" />
+          </p>
+        </div>
 
+        <input
+          type="checkbox"
+          name="click"
+          className="peer hidden"
+          id="click"
+        />
+        <label htmlFor="click" className="text-white sm:hidden">
+          <Menu className="h-5 w-5" />
+        </label>
+
+        <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:justify-end">
           {(isAdmin || isEmployee) && (
             <li className="cursor-pointer  text-white">
               <button

@@ -1,11 +1,13 @@
+import { useForm } from "react-hook-form";
 import superjason from "superjson";
+import { getServerSession } from "next-auth";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
 import { prisma } from "@/server/db";
 import Head from "next/head";
 import Image from "next/image";
-
+import { authOptions } from "@/server/auth";
 import { useBoundStore } from "@/zustand/store";
 import { type Dispatch, type SetStateAction, useState } from "react";
 
@@ -34,12 +36,9 @@ import {
   handleLocationChange,
   isEquipmentAvailable,
 } from "@/lib/utils";
+import useDebounce from "@/hooks/useDebounce";
 
 import type { Category, Equipment, Location } from "@/types/models";
-import { useForm } from "react-hook-form";
-import useDebounce from "@/hooks/useDebounce";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
 
 type Props = {
   locations: Location[];
