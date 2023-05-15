@@ -18,11 +18,11 @@ type Props = {
 
 const AdminLayout = ({ children }: Props) => {
   return (
-    <div className="pt-[70px]">
-      <section className="fixed top-[70px] w-[180px]">
+    <div className="bg-app-bg pt-[70px]">
+      <section className="fixed top-[70px] w-full sm:w-[180px]">
         <AdminNav />
       </section>
-      <section className="ml-[180px] min-h-[calc(100vh_-_70px)] bg-app-bg px-10 py-6">
+      <section className="min-h-[calc(100vh_-_70px)] px-10  py-6 sm:ml-[180px]">
         <div className="mx-auto max-w-7xl">{children}</div>
       </section>
     </div>
@@ -67,8 +67,8 @@ const AdminNav = () => {
   const isEmployee = getIsEmployee(session);
 
   return (
-    <nav className="h-screen w-[180px] bg-primary/90">
-      <ul className="grid gap-2 p-4">
+    <nav className="h-fit w-full bg-primary/90 sm:h-screen sm:w-[180px]">
+      <ul className="flex items-center gap-2 overflow-x-auto p-2 sm:grid sm:p-4">
         {adminRoutes.map((route, i) => {
           if (
             isEmployee &&
