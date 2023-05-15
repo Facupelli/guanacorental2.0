@@ -28,7 +28,7 @@ type Order = Prisma.OrderGetPayload<{
     equipments: {
       include: { books: true; equipment: true; owner: true };
     };
-    earnings: true;
+    earning: true;
   };
 }>;
 

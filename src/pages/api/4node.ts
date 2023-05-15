@@ -22,7 +22,7 @@ type Query = {
     };
     location: true;
     book: true;
-    earnings: true;
+    earning: true;
   };
 };
 
@@ -41,7 +41,7 @@ export default async function handler(
         },
         location: true,
         book: true,
-        earnings: true,
+        earning: true,
       },
     };
 
@@ -154,9 +154,9 @@ export default async function handler(
         }),
         order?.subtotal,
         order?.total,
-        order.earnings[0]?.federico,
-        order.earnings[0]?.oscar,
-        order.earnings[0]?.sub,
+        order.earning?.federico,
+        order.earning?.oscar,
+        order.earning?.sub,
       ];
       ordersData.push(rowData);
     });

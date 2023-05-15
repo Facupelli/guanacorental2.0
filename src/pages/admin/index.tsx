@@ -38,7 +38,7 @@ type Order = Prisma.OrderGetPayload<{
       };
     };
     location: true;
-    earnings: true;
+    earning: true;
   };
 }>;
 
