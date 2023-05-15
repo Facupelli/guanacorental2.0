@@ -105,10 +105,10 @@ const AdminRents: NextPage = () => {
               </p>
             </div>
 
-            <section className="grid w-fit gap-4 rounded-md bg-white px-8 py-4">
+            <section className="grid gap-4 rounded-md bg-white px-8 py-4 sm:w-fit">
               <div className="grid gap-4">
                 <p className="font-semibold text-primary/70">Divisón</p>
-                <div className="flex gap-12">
+                <div className="flex flex-wrap gap-12 gap-y-6">
                   <div>
                     <p className="text-sm text-primary/70">Federico:</p>
                     <p className="text-xl font-semibold">
