@@ -201,11 +201,11 @@ const CartPage: NextPage = () => {
 
       <Nav />
 
-      <main className="min-h-screen bg-app-bg px-6 pt-[70px]">
+      <main className="min-h-screen bg-app-bg px-2 pt-[70px] sm:px-6">
         <div className="mx-auto max-w-7xl">
-          <section className="mt-12 grid grid-cols-12 gap-8">
-            <section className="col-span-8 ">
-              <div className="grid grid-cols-12 pb-6">
+          <section className="mt-8 grid grid-cols-12 gap-8 gap-y-12 pb-8 sm:mt-12 sm:gap-y-0">
+            <section className="col-span-12 sm:col-span-8">
+              <div className="hidden grid-cols-12 pb-6 sm:grid">
                 <p className="col-span-7">Equipos</p>
                 <p className="col-span-2">Cantidad</p>
                 <p className="col-span-2">Precio</p>
@@ -268,25 +268,34 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
   const available = isEquipmentAvailable(item, { startDate, endDate });
 
   return (
-    <div className="grid grid-cols-12 items-center">
-      <p className="col-span-7">
-        <strong className="font-extrabold">
-          {item.name} {item.brand}
-        </strong>{" "}
-        <strong className="font-semibold">{item.model}</strong>
-      </p>
-      <div className="col-span-2">
+    <div className="grid grid-cols-12 items-center gap-y-2 border-b-2 border-primary-foreground pb-4 sm:gap-y-0">
+      <div className="col-span-12 sm:col-span-7">
+        <p>
+          <strong className="font-extrabold">
+            {item.name} {item.brand}
+          </strong>{" "}
+          <strong className="font-semibold">{item.model}</strong>
+        </p>
+        <p
+          className={`col-span-12 text-sm ${
+            available ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          {available ? "Disponible" : "Reservado"}
+        </p>
+      </div>
+      <div className="col-span-5 sm:col-span-2">
         <CartItemCounter item={item} />
       </div>
-      <p className="col-span-2 text-lg font-semibold">
+      <p className="col-span-5 text-lg font-semibold sm:col-span-2">
         {formatPrice(item.price * item.quantity)}
       </p>
-      <button onClick={() => deleteFromCart(item.id)}>
-        <X className="col-span-1 h-4 w-4" />
+      <button
+        className="col-span-2 flex justify-end sm:col-span-1 "
+        onClick={() => deleteFromCart(item.id)}
+      >
+        <X className=" h-4 w-4 " />
       </button>
-      <p className={`text-sm ${available ? "text-green-500" : "text-red-500"}`}>
-        {available ? "Disponible" : "Reservado"}
-      </p>
     </div>
   );
 };
@@ -336,7 +345,7 @@ const RightBar = ({
         showCouponModal={showCouponModal}
         setShowCouponModal={setShowCouponModal}
       />
-      <section className="col-span-4 rounded-md bg-white p-4">
+      <section className="col-span-12 rounded-md bg-white p-4 sm:col-span-4">
         <div className="grid gap-6">
           {startDate && endDate && (
             <div className="grid w-full gap-2">
