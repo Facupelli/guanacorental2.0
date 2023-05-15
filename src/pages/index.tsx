@@ -107,7 +107,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
       <Nav />
 
-      <main className="min-h-screen bg-app-bg px-6 pt-[70px] font-panton">
+      <main className="min-h-screen bg-app-bg px-4 pt-[70px] sm:px-6">
         <div className="mx-auto max-w-7xl">
           <section className="mt-8 grid grid-cols-12 gap-x-6 gap-y-2 md:mt-12">
             <LeftBar

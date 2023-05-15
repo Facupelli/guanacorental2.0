@@ -201,9 +201,9 @@ const CartPage: NextPage = () => {
 
       <Nav />
 
-      <main className="min-h-screen bg-app-bg px-2 pt-[70px] sm:px-6">
-        <div className="mx-auto max-w-7xl">
-          <section className="mt-8 grid grid-cols-12 gap-8 gap-y-12 pb-8 sm:mt-12 sm:gap-y-0">
+      <main className="min-h-screen bg-app-bg px-4 pt-[70px] sm:px-6">
+        <div className="mx-auto max-w-7xl py-8 sm:pt-12">
+          <section className="grid grid-cols-12 gap-y-12 sm:gap-x-8 sm:gap-y-0">
             <section className="col-span-12 sm:col-span-8">
               <div className="hidden grid-cols-12 pb-6 sm:grid">
                 <p className="col-span-7">Equipos</p>
