@@ -94,8 +94,8 @@ const AdminOrders: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">PEDIDOS</h1>
-          <div className="grid gap-6 pt-6">
-            <div className="flex flex-wrap items-center gap-2 rounded-md bg-white p-4 md:flex-nowrap md:gap-6">
+          <div className="grid grid-cols-12 gap-6 pt-6">
+            <div className="col-span-12 flex flex-wrap items-center gap-2 rounded-md bg-white p-4 md:flex-nowrap md:gap-6">
               <Label className="col-span-2">Sucursal:</Label>
               {locations?.data && (
                 <SelectLocation
@@ -118,15 +118,18 @@ const AdminOrders: NextPage = () => {
                 defaultValue={undefined}
               />
             </div>
-            {filteredOrers && (
-              <DataTable
-                data={filteredOrers}
-                columns={orderColumns}
-                setRowData={setOrder}
-                expandedComponent={equipmentsList}
-              />
-            )}
+            <div className="col-span-12">
+              {filteredOrers && (
+                <DataTable
+                  data={filteredOrers}
+                  columns={orderColumns}
+                  setRowData={setOrder}
+                  expandedComponent={equipmentsList}
+                />
+              )}
+            </div>
           </div>
+
           <Pagination
             totalCount={data?.totalCount ?? 0}
             currentPage={currentPage}

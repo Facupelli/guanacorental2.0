@@ -27,29 +27,31 @@ const DataTable = <T, P>({
   expandedComponent,
 }: TableProps<T, P>) => {
   return (
-    <Table className="rounded-md bg-white">
-      <TableHeader>
-        <TableRow>
-          {columns.map((column, i) => (
-            <TableHead className="font-semibold text-black" key={i}>
-              {column.title}
-            </TableHead>
+    <div className="rounded-md bg-white">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column, i) => (
+              <TableHead className="font-semibold text-black" key={i}>
+                {column.title}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.map((data, i) => (
+            <Row
+              data={data}
+              columns={columns}
+              setRowData={setRowData}
+              cellProps={cellProps}
+              expandedComponent={expandedComponent}
+              key={i}
+            />
           ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((data, i) => (
-          <Row
-            data={data}
-            columns={columns}
-            setRowData={setRowData}
-            cellProps={cellProps}
-            expandedComponent={expandedComponent}
-            key={i}
-          />
-        ))}
-      </TableBody>
-    </Table>
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
