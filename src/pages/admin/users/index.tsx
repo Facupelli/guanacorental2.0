@@ -120,7 +120,10 @@ const AdminUsers: NextPage = () => {
           <h1 className="text-lg font-bold">CLIENTES</h1>
           <div className=" pt-6">
             <Tabs defaultValue="customers">
-              <TabsList className="mb-4 w-1/3" defaultValue="customers">
+              <TabsList
+                className="mb-4 w-full md:w-1/3"
+                defaultValue="customers"
+              >
                 <TabsTrigger value="customers" className="w-full">
                   Clientes
                 </TabsTrigger>
@@ -131,7 +134,7 @@ const AdminUsers: NextPage = () => {
               <TabsContent value="customers">
                 <div className="grid gap-6">
                   <div className="flex">
-                    <div className="flex w-1/2 items-center gap-4 rounded-md bg-white p-4">
+                    <div className="flex items-center gap-4 rounded-md bg-white p-4 md:w-1/2">
                       <Label className="whitespace-nowrap">
                         Rol del cliente
                       </Label>
@@ -218,7 +221,7 @@ const SelectRole = ({
   return (
     <Select onValueChange={(e) => setValue("roleId", e)}>
       <SelectTrigger>
-        <SelectValue placeholder="seleccionar rol" />
+        <SelectValue placeholder="seleccionar" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
