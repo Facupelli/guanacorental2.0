@@ -59,9 +59,9 @@ const Nav = () => {
           <Menu className="h-5 w-5" />
         </label>
 
-        <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:justify-end">
+        <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
           {(isAdmin || isEmployee) && (
-            <li className="cursor-pointer  text-white">
+            <li className="cursor-pointer">
               <button
                 className="flex items-center gap-2"
                 onClick={() => void router.push("/admin")}
@@ -73,7 +73,7 @@ const Nav = () => {
           )}
 
           {session ? (
-            <li className="text-white">
+            <li className="">
               <button onClick={() => void signOut()}>SALIR</button>
             </li>
           ) : (

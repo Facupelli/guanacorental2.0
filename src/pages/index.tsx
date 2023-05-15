@@ -109,15 +109,15 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
       <main className="min-h-screen bg-app-bg px-6 pt-[70px] font-panton">
         <div className="mx-auto max-w-7xl">
-          <section className="mt-8 grid grid-cols-12 gap-x-6 gap-y-2 sm:mt-12">
+          <section className="mt-8 grid grid-cols-12 gap-x-6 gap-y-2 md:mt-12">
             <LeftBar
               locations={locations}
               categories={categories}
               setCategory={setCategory}
               selectedCategory={category}
             />
-            <div className="col-span-12 flex flex-col gap-4 sm:col-span-9">
-              <section className="grid gap-4 rounded-sm bg-white p-4 shadow-sm sm:flex">
+            <div className="col-span-12 flex flex-col gap-4 md:col-span-9">
+              <section className="grid gap-4 rounded-sm bg-white p-4 shadow-sm md:flex">
                 <div className="flex items-center">
                   <Input
                     type="search"
@@ -180,12 +180,12 @@ const LeftBar = ({
       <input className="peer hidden" id="filters" type="checkbox" />
       <label
         htmlFor="filters"
-        className="col-span-3 col-start-10 flex justify-end gap-2 pb-2 peer-checked:text-secondary-foreground sm:hidden"
+        className="col-span-3 col-start-10 flex justify-end gap-2 pb-2 peer-checked:text-secondary-foreground md:hidden"
       >
         Filtros
         <FilterIcon className="h-5 w-5" />
       </label>
-      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:col-span-3 sm:flex sm:h-[calc(100vh_-_148px)] sm:w-full sm:flex-col sm:gap-4 sm:bg-white sm:p-4 sm:text-primary sm:shadow-sm">
+      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 md:relative md:left-0 md:top-0 md:col-span-3 md:flex md:h-[calc(100vh_-_148px)] md:w-full md:flex-col md:gap-4 md:bg-white md:p-4 md:text-primary md:shadow-sm">
         <SelectLocation
           locations={locations}
           placeholder="Elegir sucursal"
@@ -258,7 +258,7 @@ const SelectOrder = ({
     <div className="ml-auto flex items-center gap-2">
       {/* <Label htmlFor="location">Sucursal:</Label> */}
       <Select onValueChange={(e) => setSort(e)}>
-        <SelectTrigger className="h-8 w-[180px] sm:h-10">
+        <SelectTrigger className="h-8 w-[180px] md:h-10">
           <SelectValue placeholder="Ordenar por precio" />
         </SelectTrigger>
         <SelectContent>
