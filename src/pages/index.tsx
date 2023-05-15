@@ -28,7 +28,7 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { Label } from "@/components/ui/label";
 import DialogWithState from "@/components/DialogWithState";
-import { SearchIcon, ShoppingCart } from "lucide-react";
+import { FilterIcon, SearchIcon, ShoppingCart } from "lucide-react";
 
 import { api } from "@/utils/api";
 import {
@@ -109,16 +109,16 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
       <main className="min-h-screen bg-app-bg px-6 pt-[70px] font-panton">
         <div className="mx-auto max-w-7xl">
-          <section className="mt-12 grid grid-cols-12 gap-4">
+          <section className="mt-8 grid grid-cols-12 gap-x-6 gap-y-2 sm:mt-12">
             <LeftBar
               locations={locations}
               categories={categories}
               setCategory={setCategory}
               selectedCategory={category}
             />
-            <div className="col-span-9 flex flex-col gap-4">
-              <section className="flex gap-4 rounded-sm bg-white p-4 shadow-sm">
-                <div className="flex w-full items-center">
+            <div className="col-span-12 flex flex-col gap-4 sm:col-span-9">
+              <section className="grid gap-4 rounded-sm bg-white p-4 shadow-sm sm:flex">
+                <div className="flex items-center">
                   <Input
                     type="search"
                     placeholder="Buscar equipos por nombre, marca o modelo"
@@ -176,66 +176,76 @@ const LeftBar = ({
   const location = useBoundStore((state) => state.location);
 
   return (
-    <section className="col-span-3 flex h-[calc(100vh_-_148px)] flex-col gap-4 rounded bg-white p-4 shadow-sm">
-      <SelectLocation
-        locations={locations}
-        placeholder="Elegir sucursal"
-        defaultValue={
-          location.id ? `${location.id}-${location.name}` : undefined
-        }
-        onValueChange={(e) => handleLocationChange(e, setLocation)}
-      />
+    <>
+      <input className="peer hidden" id="filters" type="checkbox" />
+      <label
+        htmlFor="filters"
+        className="col-span-3 col-start-10 flex justify-end gap-2 pb-2 peer-checked:text-secondary-foreground sm:hidden"
+      >
+        Filtros
+        <FilterIcon className="h-5 w-5" />
+      </label>
+      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:col-span-3 sm:flex sm:h-[calc(100vh_-_148px)] sm:w-full sm:flex-col sm:gap-4 sm:bg-white sm:p-4 sm:text-primary sm:shadow-sm">
+        <SelectLocation
+          locations={locations}
+          placeholder="Elegir sucursal"
+          defaultValue={
+            location.id ? `${location.id}-${location.name}` : undefined
+          }
+          onValueChange={(e) => handleLocationChange(e, setLocation)}
+        />
 
-      <SelectDateButton />
+        <SelectDateButton />
 
-      <div>
-        <div className="flex items-center justify-between">
-          <p>Retiro:</p>
-          <p className="font-semibold">
-            {(startDate && new Date(startDate).toLocaleDateString()) ?? (
-              <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
-            )}
-          </p>
+        <div>
+          <div className="flex items-center justify-between">
+            <p>Retiro:</p>
+            <p className="font-semibold">
+              {(startDate && new Date(startDate).toLocaleDateString()) ?? (
+                <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
+              )}
+            </p>
+          </div>
+          <div className="flex items-center justify-between">
+            <p>Devolución:</p>
+            <p className="font-semibold">
+              {(endDate && new Date(endDate).toLocaleDateString()) ?? (
+                <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
+              )}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-          <p>Devolución:</p>
-          <p className="font-semibold">
-            {(endDate && new Date(endDate).toLocaleDateString()) ?? (
-              <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
-            )}
-          </p>
-        </div>
-      </div>
 
-      <div className="grid gap-2">
-        <p className="font-bold">Categorías:</p>
-        <ul className="grid">
-          <li
-            onClick={() => setCategory("")}
-            className={`cursor-pointer rounded-sm px-2 py-1 ${
-              !selectedCategory
-                ? "bg-secondary font-bold text-secondary-foreground"
-                : ""
-            }`}
-          >
-            Todos
-          </li>
-          {categories.map((category) => (
+        <div className="grid gap-2">
+          <p className="font-bold">Categorías:</p>
+          <ul className="grid">
             <li
-              key={category.id}
-              onClick={() => setCategory(category.id)}
+              onClick={() => setCategory("")}
               className={`cursor-pointer rounded-sm px-2 py-1 ${
-                selectedCategory === category.id
+                !selectedCategory
                   ? "bg-secondary font-bold text-secondary-foreground"
                   : ""
               }`}
             >
-              {category.name}
+              Todos
             </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+            {categories.map((category) => (
+              <li
+                key={category.id}
+                onClick={() => setCategory(category.id)}
+                className={`cursor-pointer rounded-sm px-2 py-1 ${
+                  selectedCategory === category.id
+                    ? "bg-secondary font-bold text-secondary-foreground"
+                    : ""
+                }`}
+              >
+                {category.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </>
   );
 };
 
@@ -245,10 +255,10 @@ const SelectOrder = ({
   setSort: Dispatch<SetStateAction<string>>;
 }) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="ml-auto flex items-center gap-2">
       {/* <Label htmlFor="location">Sucursal:</Label> */}
       <Select onValueChange={(e) => setSort(e)}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="h-8 w-[180px] sm:h-10">
           <SelectValue placeholder="Ordenar por precio" />
         </SelectTrigger>
         <SelectContent>
