@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -25,8 +25,9 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 
 import useDebounce from "@/hooks/useDebounce";
 
-import { type Prisma, type Role } from "@prisma/client";
+import { Location, type Prisma, type Role } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import AddCoupon from "@/components/AddCoupon";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -38,7 +39,7 @@ type Order = Prisma.OrderGetPayload<{
     equipments: {
       include: { books: true; equipment: true; owner: true };
     };
-    earnings: true;
+    earning: true;
     discount: {
       include: {
         rule: true;
@@ -59,6 +60,8 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
   const orderId = router.query.id as string;
+
+  const [discount, setDiscount] = useState<DiscountState | null>(null);
 
   const { data, isLoading } = api.order.getOrderById.useQuery({
     orderId,
@@ -104,7 +107,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                   }}
                 />
 
-                {order.earnings[0] && (
+                {order.earning && (
                   <EquipmentsBooked
                     equipments={order.equipments}
                     order={order}
@@ -121,13 +124,18 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                     workingDays: order.book.working_days,
                     discount: order.discount,
                   }}
+                  discount={discount}
+                  setDiscount={setDiscount}
+                  total={order.subtotal}
+                  location={order.location}
+                  orderId={order.id}
                 />
 
                 {isAdmin && (
                   <EarningsInfo
-                    oscar={order.earnings[0]?.oscar ?? 0}
-                    federico={order.earnings[0]?.federico ?? 0}
-                    sub={order.earnings[0]?.sub ?? 0}
+                    oscar={order.earning?.oscar ?? 0}
+                    federico={order.earning?.federico ?? 0}
+                    sub={order.earning?.sub ?? 0}
                   />
                 )}
               </div>
@@ -198,7 +206,7 @@ type EquipmentsBookedProps = {
 };
 
 const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
-  const [editMode, setEditMode] = useState(false);
+  const [editEquipmentMode, setEditEquipmentMode] = useState(false);
   const [addEquipment, setAddEquipment] = useState(false);
 
   const { register, watch } = useForm<{ search: string }>();
@@ -218,11 +226,11 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
     bookId: string,
     ownerEquipment: EquipmentOwner
   ) => {
-    if (order.earnings[0]?.id) {
+    if (order.earning?.id) {
       const data = {
         orderId: order.id,
         bookId,
-        earningId: order.earnings[0].id,
+        earningId: order.earning.id,
         ownerEquipment: {
           id: ownerEquipment.id,
           quantity: ownerEquipment.equipment.quantity,
@@ -258,7 +266,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
               equipment={equipment}
               bookId={order.bookId}
               orderId={order.id}
-              earningId={order.earnings[0]?.id ?? ""}
+              earningId={order.earning?.id ?? ""}
               discountId={order.discount_id}
             />
           ))}
@@ -268,7 +276,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
           <Button
             size="sm"
             onClick={() => {
-              setEditMode(false);
+              setEditEquipmentMode(false);
               setAddEquipment(false);
             }}
           >
@@ -281,15 +289,15 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
         <div className="flex">
           <h2 className="text-lg font-semibold">Equipos alquilados</h2>
           <div className="ml-auto">
-            {editMode ? (
+            {editEquipmentMode ? (
               <CheckSquare
                 className="h-5 w-5 cursor-pointer text-green-400"
-                onClick={() => setEditMode(false)}
+                onClick={() => setEditEquipmentMode(false)}
               />
             ) : (
               <EditIcon
                 className="h-5 w-5 cursor-pointer"
-                onClick={() => setEditMode(true)}
+                onClick={() => setEditEquipmentMode(true)}
               />
             )}
           </div>
@@ -311,7 +319,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                 key={ownerEquipment.id}
                 className="grid grid-cols-9 items-center gap-x-2"
               >
-                {ownerEquipment.equipment.image && (
+                {ownerEquipment.equipment.image ? (
                   <div className="relative col-span-1 h-12 w-12">
                     <Image
                       src={ownerEquipment.equipment.image}
@@ -319,6 +327,8 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                       fill
                     />
                   </div>
+                ) : (
+                  <div />
                 )}
 
                 <div className="col-span-3 grid min-w-[300px]">
@@ -360,7 +370,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                   )}
                 </p>
 
-                {editMode && (
+                {editEquipmentMode && (
                   <Button
                     variant="secondary"
                     className="col-span-1 bg-transparent"
@@ -376,7 +386,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
           </div>
         </div>
 
-        {editMode && (
+        {editEquipmentMode && (
           <Button
             onClick={() => setAddEquipment(true)}
             className="flex w-1/4 gap-2"
@@ -476,6 +486,12 @@ type Discount = Prisma.DiscountGetPayload<{
   };
 }>;
 
+type DiscountState = {
+  value: number;
+  typeName: string;
+  code: string;
+};
+
 type OrderInfoProps = {
   info: {
     startDate: Date;
@@ -486,66 +502,122 @@ type OrderInfoProps = {
     workingDays: number;
     discount: Discount | null;
   };
+  location: Location;
+  setDiscount: Dispatch<SetStateAction<DiscountState | null>>;
+  discount: DiscountState | null;
+  total: number;
+  orderId: string;
 };
 
-const OrderInfo = ({ info }: OrderInfoProps) => {
+const OrderInfo = ({
+  info,
+  total,
+  discount,
+  setDiscount,
+  location,
+  orderId,
+}: OrderInfoProps) => {
+  const { register } = useForm<{ code: string }>();
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [editInfo, setEditInfo] = useState(false);
+
+  const { mutate } = api.discount.getValidDiscountByCode.useMutation();
+
   return (
-    <section className="grid gap-6 rounded-md border border-app-bg p-4">
-      <h2 className="text-lg font-semibold">Información del pedido</h2>
+    <>
+      <AddCoupon
+        location={location}
+        setDiscount={setDiscount}
+        discount={discount}
+        total={total}
+        showCouponModal={showCouponModal}
+        setShowCouponModal={setShowCouponModal}
+        admin
+        orderId={orderId}
+      />
 
-      <div className="grid grid-cols-3 gap-y-4">
-        <div className="grid gap-1">
-          <p className="text-xs text-primary/60">Retiro</p>
-          <p>
-            {info.startDate.toLocaleDateString("es-AR", {
-              year: "numeric",
-              day: "numeric",
-              month: "short",
-            })}
-          </p>
-        </div>
-        <div className="grid gap-1">
-          <p className="text-xs text-primary/60">Devolución</p>
-          <p>
-            {info.endDate.toLocaleDateString("es-AR", {
-              year: "numeric",
-              day: "numeric",
-              month: "short",
-            })}
-          </p>
-        </div>
-
-        <div className="grid gap-1">
-          <p className="text-xs text-primary/60">Días de renta</p>
-          <p>{info.workingDays}</p>
-        </div>
-
-        <div className="col-span-3 grid gap-1">
-          <p className="text-xs text-primary/60">Mensaje</p>
-          <p>{info.message ?? "-"}</p>
+      <section className="grid gap-6 rounded-md border border-app-bg p-4">
+        <div className="flex">
+          <h2 className="text-lg font-semibold">Información del pedido</h2>
+          <div className="ml-auto">
+            {editInfo ? (
+              <CheckSquare
+                className="h-5 w-5 cursor-pointer text-green-400"
+                onClick={() => setEditInfo(false)}
+              />
+            ) : (
+              <EditIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => setEditInfo(true)}
+              />
+            )}
+          </div>
         </div>
 
-        <div className="col-span-1 grid gap-1">
-          <p className="text-xs text-primary/60">Código</p>
-          <p>{info.discount?.code ?? "-"}</p>
-        </div>
+        <div className="grid grid-cols-3 gap-y-4">
+          <div className="grid gap-1">
+            <p className="text-xs text-primary/60">Retiro</p>
+            <p>
+              {info.startDate.toLocaleDateString("es-AR", {
+                year: "numeric",
+                day: "numeric",
+                month: "short",
+              })}
+            </p>
+          </div>
+          <div className="grid gap-1">
+            <p className="text-xs text-primary/60">Devolución</p>
+            <p>
+              {info.endDate.toLocaleDateString("es-AR", {
+                year: "numeric",
+                day: "numeric",
+                month: "short",
+              })}
+            </p>
+          </div>
 
-        <div className="col-span-2 grid gap-1">
-          <p className="text-xs text-primary/60">Descuento</p>
-          <p>{info.discount?.rule.value ?? "-"}</p>
-        </div>
+          <div className="grid gap-1">
+            <p className="text-xs text-primary/60">Días de renta</p>
+            <p>{info.workingDays}</p>
+          </div>
 
-        <div className="grid gap-1">
-          <p className="text-xs text-primary/60">Subtotal</p>
-          <p>{formatPrice(info?.subtotal)}</p>
-        </div>
+          <div className="col-span-3 grid gap-1">
+            <p className="text-xs text-primary/60">Mensaje</p>
+            <p>{info.message ?? "-"}</p>
+          </div>
 
-        <div className="grid gap-1">
-          <p className="text-xs text-primary/60">Total</p>
-          <p className="font-bold">{formatPrice(info?.total)}</p>
+          <div className="col-span-1 grid gap-1">
+            <p className="text-xs text-primary/60">Código</p>
+            <p>{info.discount?.code ?? "-"}</p>
+          </div>
+
+          <div className="col-span-2 grid gap-1">
+            <div className="flex items-center gap-4">
+              <p className="text-xs text-primary/60">Descuento</p>
+              {editInfo && (
+                <Button
+                  className="h-5 px-2 text-xs"
+                  onClick={() => setShowCouponModal(true)}
+                >
+                  Aplicar
+                </Button>
+              )}
+            </div>
+            <p>{info.discount?.rule.value ?? "-"}</p>
+          </div>
+
+          <div className="grid gap-1">
+            <p className="text-xs text-primary/60">Subtotal</p>
+            <p>{formatPrice(info?.subtotal)}</p>
+          </div>
+
+          <div className="grid gap-1">
+            <p className="text-xs text-primary/60">Total</p>
+            <p className="font-bold">{formatPrice(info?.total)}</p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

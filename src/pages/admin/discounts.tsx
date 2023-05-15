@@ -335,8 +335,7 @@ const DiscountForm = ({
         <Input
           type="text"
           {...register("minTotal", { valueAsNumber: true })}
-          defaultValue={discountSelected?.min_total ?? undefined}
-          required
+          defaultValue={discountSelected?.min_total ?? 0}
         />
       </div>
 
@@ -357,7 +356,7 @@ const SelectDiscountType = ({
   return (
     <Select
       onValueChange={(e) => setValue("typeId", e)}
-      defaultValue={types.filter((type) => type.name === "Percentage")[0]?.id}
+      defaultValue={types.find((type) => type.name === "Percentage")?.id}
     >
       <SelectTrigger>
         <SelectValue placeholder="selecionar tipo" />
@@ -369,7 +368,7 @@ const SelectDiscountType = ({
             <SelectItem
               value={type.id}
               key={type.id}
-              disabled={type.name === "Fixed"}
+              // disabled={type.name === "Fixed"}
             >
               {type.name}
             </SelectItem>

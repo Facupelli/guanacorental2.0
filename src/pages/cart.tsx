@@ -1,5 +1,7 @@
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
+import { type NextPage } from "next";
+import { useRouter } from "next/router";
 import Head from "next/head";
 
 import { useBoundStore } from "@/zustand/store";
@@ -16,15 +18,10 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import DialogWithState from "@/components/DialogWithState";
 import { DialogFooter } from "@/components/ui/dialog";
 import CartItemCounter from "@/components/CartItemCounter";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Info, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import AddCoupon from "@/components/AddCoupon";
 
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { api } from "@/utils/api";
@@ -36,9 +33,7 @@ import {
   isEquipmentAvailable,
 } from "@/lib/utils";
 
-import { type NextPage } from "next";
 import type { Equipment, Location } from "@/types/models";
-import { useRouter } from "next/router";
 
 type Discount = {
   value: number;
@@ -323,6 +318,7 @@ const RightBar = ({
   discount,
   subtotal,
 }: RightBarProps) => {
+  const [showCouponModal, setShowCouponModal] = useState(false);
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
 
@@ -331,92 +327,101 @@ const RightBar = ({
   );
 
   return (
-    <section className="col-span-4 rounded-md bg-white p-4">
-      <div className="grid gap-6">
-        {startDate && endDate && (
-          <div className="grid w-full gap-2">
-            <div className="flex w-full justify-between ">
-              <p className="font-semibold">Retiro:</p>
-              <p className="font-bold">
-                {new Date(startDate).toLocaleDateString()}{" "}
-                <span className="font-semibold">{pickupHour}hs</span>
-              </p>
-            </div>
-            <div className="flex justify-between">
-              <p className="font-semibold">Devolución: </p>
-              <p className="font-bold">
-                {new Date(endDate).toLocaleDateString()}{" "}
-                <span className="font-semibold">09:00hs</span>
-              </p>
-            </div>
-          </div>
-        )}
-
-        <SelectDateButton />
-        <Button variant="secondary">Continuar Alquilando</Button>
-
-        <Textarea
-          placeholder="Algo que nos quieras decir?"
-          {...register("message")}
-        />
-
+    <>
+      <AddCoupon
+        location={location}
+        setDiscount={setDiscount}
+        discount={discount}
+        total={cartTotal}
+        showCouponModal={showCouponModal}
+        setShowCouponModal={setShowCouponModal}
+      />
+      <section className="col-span-4 rounded-md bg-white p-4">
         <div className="grid gap-6">
-          <div>
-            <div className="flex items-center justify-between font-semibold">
-              <p>Sucursal:</p>
-              <p className="font-bold">{location.name}</p>
-            </div>
-
-            <div>
-              <AddCoupon
-                location={location}
-                setDiscount={setDiscount}
-                discount={discount}
-                total={cartTotal}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between font-semibold">
-            <p>Subtotal:</p>
-            {(startDate || endDate) && (
-              <p className="font-semibold">{formatPrice(subtotal)}</p>
-            )}
-          </div>
-          <div className="flex items-center justify-between font-semibold">
-            <p>Total:</p>
-            <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
-          </div>
-
-          {isAdmin && (
-            <div className="flex items-center justify-between font-semibold">
-              <div className="flex items-center">
-                <p>Email cliente:</p>
-                <CLientEmailTip />
+          {startDate && endDate && (
+            <div className="grid w-full gap-2">
+              <div className="flex w-full justify-between ">
+                <p className="font-semibold">Retiro:</p>
+                <p className="font-bold">
+                  {new Date(startDate).toLocaleDateString()}{" "}
+                  <span className="font-semibold">{pickupHour}hs</span>
+                </p>
               </div>
-              <Input
-                type="email"
-                {...register("email")}
-                className="ml-auto h-8 w-1/2"
-              />
+              <div className="flex justify-between">
+                <p className="font-semibold">Devolución: </p>
+                <p className="font-bold">
+                  {new Date(endDate).toLocaleDateString()}{" "}
+                  <span className="font-semibold">09:00hs</span>
+                </p>
+              </div>
             </div>
           )}
-        </div>
 
-        <div className="grid gap-2">
-          <Button
-            disabled={
-              !startDate || !endDate || isLoading || !areAllItemsAvailable
-            }
-            onClick={handleBookOrder}
-          >
-            {!startDate || !endDate
-              ? "Selecciona una fecha para alquilar!"
-              : "Agendar Pedido"}
-          </Button>
+          <SelectDateButton />
+          <Button variant="secondary">Continuar Alquilando</Button>
+
+          <Textarea
+            placeholder="Algo que nos quieras decir?"
+            {...register("message")}
+          />
+
+          <div className="grid gap-6">
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between font-semibold">
+                <p>Sucursal:</p>
+                <p className="font-bold">{location.name}</p>
+              </div>
+
+              <Button
+                onClick={() => setShowCouponModal(true)}
+                variant="secondary"
+                className="h-8"
+              >
+                {discount ? "Cupón aplicado" : "Ingresar cupon de descuento"}
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between font-semibold">
+              <p>Subtotal:</p>
+              {(startDate || endDate) && (
+                <p className="font-semibold">{formatPrice(subtotal)}</p>
+              )}
+            </div>
+            <div className="flex items-center justify-between font-semibold">
+              <p>Total:</p>
+              <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
+            </div>
+
+            {isAdmin && (
+              <div className="flex items-center justify-between font-semibold">
+                <div className="flex items-center">
+                  <p>Email cliente:</p>
+                  <CLientEmailTip />
+                </div>
+                <Input
+                  type="email"
+                  {...register("email")}
+                  className="ml-auto h-8 w-1/2"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Button
+              disabled={
+                !startDate || !endDate || isLoading || !areAllItemsAvailable
+              }
+              onClick={handleBookOrder}
+            >
+              {!startDate || !endDate
+                ? "Selecciona una fecha para alquilar!"
+                : "Agendar Pedido"}
+            </Button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
@@ -436,86 +441,6 @@ const CLientEmailTip = () => {
         </p>
       </PopoverContent>
     </Popover>
-  );
-};
-
-type AddCouponProps = {
-  location: Location;
-  setDiscount: Dispatch<SetStateAction<Discount | null>>;
-  discount: Discount | null;
-  total: number;
-};
-
-const AddCoupon = ({
-  location,
-  setDiscount,
-  discount,
-  total,
-}: AddCouponProps) => {
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [error, setError] = useState("");
-  const { register, getValues } = useForm<{ code: string }>();
-  const { mutate } = api.discount.getValidDiscountByCode.useMutation();
-
-  const handleApplyDiscount = () => {
-    const code = getValues("code");
-    mutate(
-      { code, location: location.id, total },
-      {
-        onSuccess: (data) => {
-          console.log(data);
-          setDiscount({
-            value: data.rule.value,
-            typeName: data.rule.type.name,
-            code: data.code,
-          });
-          setError("");
-        },
-        onError: (err) => {
-          console.log(err.message);
-          setError(err.message);
-          setShowErrorModal(true);
-        },
-      }
-    );
-  };
-
-  return (
-    <>
-      <DialogWithState
-        isOpen={showErrorModal}
-        setOpen={setShowErrorModal}
-        title="ERROR"
-      >
-        {error}
-      </DialogWithState>
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className=" font-semibold">
-            Ingresar cupón de descuento
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="flex gap-4 p-2">
-              <Input
-                type="text"
-                className="h-8"
-                {...register("code")}
-                disabled={!!discount}
-              />
-              <Button
-                disabled={!!discount}
-                type="button"
-                className="h-8"
-                variant={discount ? "secondary" : "default"}
-                onClick={handleApplyDiscount}
-              >
-                {discount ? "Aplicado" : "Aplicar"}
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </>
   );
 };
 

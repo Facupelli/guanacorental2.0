@@ -1,5 +1,7 @@
+import { calculateTotalWithDiscount } from "@/lib/utils";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
+import {calculateOwnerEarning} from "@/server/utils/order"
 import { TRPCError } from "@trpc/server";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -75,6 +77,87 @@ export const discountRouter = createTRPCRouter({
 
     return { discounts, types };
   }),
+
+  apllyDiscountToOrder: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        discountId: z.string(),
+        total: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { orderId, discountId, total } = input;
+
+      const discount = await prisma.discount.findUnique({
+        where: { id: discountId },
+        include: {
+          rule: {
+            include: {
+              type: true,
+            },
+          },
+        },
+      });
+
+      if (!discount) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Discount not found",
+        });
+      }
+
+      await prisma.discount.update({
+        where: {
+          id: discount.id,
+        },
+        data: {
+          usage_count: {
+            increment: 1,
+          },
+        },
+      });
+
+      const newTotal = calculateTotalWithDiscount(total, {
+        value: discount.rule.value,
+        code: discount.code,
+        typeName: discount.rule.type.name,
+      });
+
+      const updatedOrder = await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          discount: { connect: { id: discount.id } },
+          total: newTotal,
+        },
+        include: {
+          book: true,
+          equipments: {
+            include: { books: true, owner: true, equipment: true },
+          },
+          discount: {
+            include: {
+              rule: {
+                include: {
+                  type: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const earnings = calculateOwnerEarning(updatedOrder)
+
+      await prisma.earning.update({
+        where:{orderId},
+        data:{
+          federico: earnings?.federicoEarnings,
+          oscar: earnings?.oscarEarnings,
+          sub:earnings?.subEarnings
+        }
+      })
+    }),
 
   getValidDiscountByCode: protectedProcedure
     .input(

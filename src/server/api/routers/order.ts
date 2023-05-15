@@ -33,7 +33,7 @@ type Query = {
     equipments: {
       include: { books: boolean; equipment: true; owner: true };
     };
-    earnings: boolean;
+    earning: boolean;
   };
 };
 
@@ -225,7 +225,7 @@ export const orderRouter = createTRPCRouter({
           equipments: {
             include: { books: true, equipment: true, owner: true },
           },
-          earnings: true,
+          earning: true,
           discount: {
             include: { rule: true },
           },
@@ -265,7 +265,7 @@ export const orderRouter = createTRPCRouter({
           equipments: {
             include: { books: true, owner: true, equipment: true },
           },
-          earnings: true,
+          earning: true,
         },
       });
 
@@ -297,7 +297,7 @@ export const orderRouter = createTRPCRouter({
           equipments: {
             include: { books: true, equipment: true, owner: true },
           },
-          earnings: true,
+          earning: true,
         },
       };
 

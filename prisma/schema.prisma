@@ -217,7 +217,7 @@ model Order {
   locationId      String
   equipments      EquipmentOnOwner[]
   status          String
-  earnings        Earning[]
+  earning         Earning?             
   discount        Discount?             @relation(fields: [discount_id], references: [id])
   discount_id     String?
   // cart            Cart?                 @relation(fields: [cartId], references: [id])
@@ -237,7 +237,7 @@ model Earning {
   federico        Float
   sub             Float
   order           Order                 @relation(fields: [orderId], references: [id])
-  orderId         String
+  orderId         String              @unique
 }
 
 model DiscountType {
