@@ -82,8 +82,8 @@ const AdminRents: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">RENTAS</h1>
           <div className="grid gap-6 pt-6">
-            <section className="flex items-center">
-              <div className="flex w-1/2 items-center gap-6 rounded-md bg-white p-4">
+            <section className="flex flex-wrap items-center gap-4">
+              <div className="flex w-full items-center gap-6 rounded-md bg-white p-4 md:w-1/2">
                 <div className="flex w-full items-center gap-2">
                   <Label>Mes</Label>
                   <SelectMonth setValue={setValue} />
