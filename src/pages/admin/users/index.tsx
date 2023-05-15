@@ -132,9 +132,9 @@ const AdminUsers: NextPage = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="customers">
-                <div className="grid gap-6">
-                  <div className="flex">
-                    <div className="flex items-center gap-4 rounded-md bg-white p-4 md:w-1/2">
+                <div className="grid grid-cols-12 gap-6">
+                  <div className="col-span-12 grid grid-cols-12 gap-4">
+                    <div className="col-span-12 flex items-center gap-4 rounded-md bg-white p-4 sm:col-span-11 md:w-1/2">
                       <Label className="whitespace-nowrap">
                         Rol del cliente
                       </Label>
@@ -142,20 +142,22 @@ const AdminUsers: NextPage = () => {
                         <SelectRole roles={roles.data} setValue={setValue} />
                       )}
                     </div>
-                    <div className="ml-auto">
+                    <div className="col-span-12 sm:col-span-4 sm:col-start-12">
                       <Button onClick={handleCreateUser} disabled={!isAdmin}>
                         Crear Cliente
                       </Button>
                     </div>
                   </div>
 
-                  {data?.users && (
-                    <DataTable
-                      data={data.users}
-                      setRowData={setUser}
-                      columns={userColumns}
-                    />
-                  )}
+                  <div className="col-span-12">
+                    {data?.users && (
+                      <DataTable
+                        data={data.users}
+                        setRowData={setUser}
+                        columns={userColumns}
+                      />
+                    )}
+                  </div>
 
                   <Pagination
                     totalCount={data?.totalCount ?? 0}

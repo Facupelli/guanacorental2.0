@@ -19,7 +19,7 @@ type Props = {
 const AdminLayout = ({ children }: Props) => {
   return (
     <div className="bg-app-bg pt-[70px]">
-      <section className="fixed top-[70px] w-full sm:w-[180px]">
+      <section className="fixed top-[70px] z-20 w-full sm:w-[180px]">
         <AdminNav />
       </section>
       <section className="mt-12 min-h-[calc(100vh_-_70px)] px-4 py-6 sm:ml-[180px] sm:mt-0 sm:px-10">

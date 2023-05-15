@@ -178,8 +178,8 @@ const AdminDiscounts: NextPage = () => {
       <main className="">
         <AdminLayout>
           <h1 className="text-lg font-bold">DESCUENTOS</h1>
-          <div className="grid gap-6 pt-6">
-            <div className="flex">
+          <div className="grid grid-cols-12 gap-6 pt-6">
+            <div className="col-span-12 flex">
               <div className="ml-auto">
                 <Button
                   onClick={() => {
@@ -194,14 +194,16 @@ const AdminDiscounts: NextPage = () => {
               </div>
             </div>
 
-            {data?.discounts && (
-              <DataTable
-                data={data.discounts}
-                columns={columns}
-                cellProps={cellProps}
-                setRowData={setDiscount}
-              />
-            )}
+            <div className="col-span-12">
+              {data?.discounts && (
+                <DataTable
+                  data={data.discounts}
+                  columns={columns}
+                  cellProps={cellProps}
+                  setRowData={setDiscount}
+                />
+              )}
+            </div>
           </div>
         </AdminLayout>
       </main>
