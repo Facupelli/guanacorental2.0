@@ -185,7 +185,7 @@ const LeftBar = ({
         Filtros
         <FilterIcon className="h-5 w-5" />
       </label>
-      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 md:relative md:left-0 md:top-0 md:col-span-3 md:flex md:h-[calc(100vh_-_148px)] md:w-full md:flex-col md:gap-4 md:bg-white md:p-4 md:text-primary md:shadow-sm">
+      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 md:relative md:left-0 md:top-0 md:col-span-3 md:flex md:h-[calc(100vh_-_148px)] md:w-full md:flex-col md:gap-4 md:bg-white md:p-4 md:text-primary md:shadow-sm">
         <SelectLocation
           locations={locations}
           placeholder="Elegir sucursal"

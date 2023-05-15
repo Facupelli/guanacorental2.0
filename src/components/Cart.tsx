@@ -36,8 +36,8 @@ const Cart = () => {
       <aside
         ref={cartModalRef}
         className={`fixed  ${
-          showCartModal ? "right-0" : "right-[-30vw]"
-        } top-[70px] z-20 h-[calc(100vh_-_70px)] w-[25%] bg-white p-4 transition-all duration-300 ease-in-out`}
+          showCartModal ? "right-0" : "right-[-100%] sm:right-[-30vw]"
+        } top-[70px] z-20 h-[calc(100vh_-_70px)] w-full bg-white p-4 transition-all duration-300 ease-in-out sm:w-[25%] sm:min-w-[300px]`}
       >
         <div className="relative flex h-full flex-col gap-3 ">
           <div className="flex items-center justify-between">
