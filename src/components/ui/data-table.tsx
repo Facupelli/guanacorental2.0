@@ -1,15 +1,15 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useRowExpansion } from "@/hooks/useRowExpansion";
 
 import type { CellFunctions, Columns } from "@/types/table";
 import { type ReactNode, type Dispatch, type SetStateAction } from "react";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "./table";
 
 type TableProps<T, P> = {
   columns: Columns<T, P>[];
