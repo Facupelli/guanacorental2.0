@@ -276,7 +276,7 @@ const OwnerLocationStockModal = ({
 
     mutate(mutateData, {
       onSuccess: () => {
-        ctx.equipment.adminGetEquipment.invalidate();
+        void ctx.equipment.adminGetEquipment.invalidate();
         setOpen(false);
       },
       onError: (err) => {
