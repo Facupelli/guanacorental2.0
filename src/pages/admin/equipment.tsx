@@ -507,8 +507,20 @@ const AddEquipment = ({
 
   const ctx = api.useContext();
   const { mutate, isLoading } = api.equipment.createEquipment.useMutation();
+  const editEquipment = api.equipment.putEquipment.useMutation();
 
   const onSubmit = (data: AddEquipmentForm) => {
+    if (equipment) {
+      return editEquipment.mutate(
+        { ...data, equipmentId: equipment.id },
+        {
+          onSuccess: () => {
+            void ctx.equipment.adminGetEquipment.invalidate();
+            setShowAddEquipmentModal && setShowAddEquipmentModal(false);
+          },
+        }
+      );
+    }
     mutate(data, {
       onSuccess: () => {
         void ctx.equipment.adminGetEquipment.invalidate();

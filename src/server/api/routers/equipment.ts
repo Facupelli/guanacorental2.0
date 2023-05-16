@@ -75,11 +75,12 @@ export const equipmentRouter = createTRPCRouter({
         image: z.string(),
         price: z.number(),
         equipmentId: z.string(),
-        available: z.string(),
+        categoryId: z.string(),
+        // available: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      const { name, brand, model, image, price, equipmentId, available } =
+      const { name, brand, model, image, price, equipmentId, categoryId } =
         input;
 
       await prisma.equipment.update({
@@ -90,7 +91,8 @@ export const equipmentRouter = createTRPCRouter({
           name,
           brand,
           model,
-          available: available === "on" ? true : false,
+          category: { connect: { id: categoryId } },
+          // available: available === "on" ? true : false,
         },
       });
 
