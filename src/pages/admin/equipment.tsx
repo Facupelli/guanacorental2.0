@@ -497,7 +497,7 @@ const AddEquipment = ({
   equipment,
   setShowAddEquipmentModal,
 }: AddEquipmentProps) => {
-  const { register, handleSubmit } = useForm<AddEquipmentForm>();
+  const { register, handleSubmit, setValue } = useForm<AddEquipmentForm>();
 
   const ctx = api.useContext();
   const { mutate } = api.equipment.createEquipment.useMutation();
@@ -555,7 +555,7 @@ const AddEquipment = ({
       <div>
         <Label>Categoría</Label>
         <SelectEquipmentCategory
-          register={register}
+          setValue={setValue}
           defaultValue={equipment?.categoryId}
         />
       </div>
@@ -583,22 +583,25 @@ const AddEquipment = ({
 };
 
 const SelectEquipmentCategory = ({
-  register,
+  setValue,
   defaultValue,
 }: {
-  register: UseFormRegister<AddEquipmentForm>;
+  setValue: UseFormSetValue<AddEquipmentForm>;
   defaultValue?: string;
 }) => {
   const { data } = api.category.getAllCategories.useQuery();
 
   return (
-    <Select {...register("categoryId")} defaultValue={defaultValue}>
+    <Select
+      onValueChange={(e) => setValue("categoryId", e)}
+      defaultValue={defaultValue}
+    >
       <SelectTrigger>
         <SelectValue placeholder="seleccionar categoría" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Sucursales</SelectLabel>
+          <SelectLabel>Categorías</SelectLabel>
           {data?.map((category) => (
             <SelectItem value={category.id} key={category.id}>
               {category.name}
