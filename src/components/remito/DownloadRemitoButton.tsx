@@ -45,7 +45,7 @@ export const DownloadRemitoButton = ({ order }: RemitoProps) => {
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = blobUrl;
-    link.download = `${order.customer.name} - ${order.number}`;
+    link.download = `${order.customer.name ?? "Cliente"} - ${order.number}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

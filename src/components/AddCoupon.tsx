@@ -61,7 +61,7 @@ const AddCoupon = ({
               { orderId, discountId: data.id, total },
               {
                 onSuccess: () => {
-                  ctx.order.getOrderById.invalidate();
+                  void ctx.order.getOrderById.invalidate();
                 },
               }
             );

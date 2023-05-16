@@ -33,23 +33,6 @@ Font.register({
   ],
 });
 
-// Font.register({
-//   family: "Panton",
-//   fonts: [
-//     {
-//       src: "https://db.onlinewebfonts.com/t/5920187ef0bf42859293e1ea01545b96.ttf",
-//     },
-//     {
-//       src: "https://db.onlinewebfonts.com/t/d5a58cd8ad7ce7bbe4716dc5b95fb0fb.ttf",
-//       fontWeight: 600,
-//     },
-//     {
-//       src: "https://db.onlinewebfonts.com/t/24398819ac2f8f57d97b6d2c131686fe.ttf",
-//       fontWeight: 700,
-//     },
-//   ],
-// });
-
 const MyDocument = Document;
 const MyPage = Page;
 
@@ -201,10 +184,6 @@ type Order = Prisma.OrderGetPayload<{
       include: { books: true; equipment: true; owner: true };
     };
   };
-}>;
-
-type OwnerEquipment = Prisma.EquipmentOnOwnerGetPayload<{
-  include: { books: true; equipment: true; owner: true };
 }>;
 
 type Props = {

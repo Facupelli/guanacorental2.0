@@ -1,7 +1,5 @@
-import dayjs from "dayjs";
 import { CalendarDays, Info } from "lucide-react";
 import Calendar from "react-calendar";
-import { useSession } from "next-auth/react";
 import { useBoundStore } from "@/zustand/store";
 import { useState } from "react";
 
@@ -22,14 +20,12 @@ import {
 import { Button } from "./button";
 import SelectPickupHour from "./SelectPickupHour";
 
-import { ROLES } from "@/lib/magic_strings";
+import { disableWeekend } from "@/lib/dates";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
-import { disableWeekend } from "@/lib/dates";
 
 const SelectDateButton = () => {
   const [isOpen, setOpen] = useState(false);
-  const { data: session } = useSession();
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);

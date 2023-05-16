@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Location } from "@/types/models";
-import { ChangeEvent, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 type SelectLocationProps = {
   locations: Location[];

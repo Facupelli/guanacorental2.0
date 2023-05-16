@@ -38,8 +38,6 @@ import {
 } from "@/lib/utils";
 
 import type { Equipment, Location } from "@/types/models";
-import dayjs from "dayjs";
-import { ROLES } from "@/lib/magic_strings";
 
 type Discount = {
   value: number;

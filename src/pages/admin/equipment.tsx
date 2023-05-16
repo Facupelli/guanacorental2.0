@@ -14,7 +14,6 @@ import { type GetServerSideProps, type NextPage } from "next";
 import { prisma } from "@/server/db";
 import { authOptions } from "@/server/auth";
 import { appRouter } from "@/server/api/root";
-import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -46,12 +45,12 @@ import { MoreHorizontal, Plus, X } from "lucide-react";
 
 import { getIsAdmin } from "@/lib/utils";
 import { api } from "@/utils/api";
+import useDebounce from "@/hooks/useDebounce";
 
-import type { EquipmentOnOwner, Location, Owner } from "@/types/models";
+import type { Location, Owner } from "@/types/models";
 import { type Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
-import { OwnerequipmentForm } from "@/types/ownerEquipment";
-import useDebounce from "@/hooks/useDebounce";
+import { type OwnerequipmentForm } from "@/types/ownerEquipment";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {

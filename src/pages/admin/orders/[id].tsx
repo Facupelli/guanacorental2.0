@@ -1,9 +1,10 @@
 import superjason from "superjson";
 import { useForm } from "react-hook-form";
 import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import DialogWithState from "@/components/DialogWithState";
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
+import AddCoupon from "@/components/AddCoupon";
 import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
 
 import { api } from "@/utils/api";
@@ -25,9 +27,7 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 
 import useDebounce from "@/hooks/useDebounce";
 
-import { Location, type Prisma, type Role } from "@prisma/client";
-import { useSession } from "next-auth/react";
-import AddCoupon from "@/components/AddCoupon";
+import type { Location, Prisma, Role } from "@prisma/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -517,11 +517,8 @@ const OrderInfo = ({
   location,
   orderId,
 }: OrderInfoProps) => {
-  const { register } = useForm<{ code: string }>();
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [editInfo, setEditInfo] = useState(false);
-
-  const { mutate } = api.discount.getValidDiscountByCode.useMutation();
 
   return (
     <>
