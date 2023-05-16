@@ -101,7 +101,7 @@ const Admin: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">CALENDARIO</h1>
           <div className="grid grid-cols-12 gap-6 pt-6">
-            <div className="col-span-12 flex items-center gap-2 rounded-md bg-white p-4 md:w-1/3">
+            <div className="col-span-12 flex items-center gap-2 rounded-md bg-white p-4 md:w-2/3 lg:w-1/3">
               <Label>Sucursal:</Label>
               {locations?.data && (
                 <SelectLocation

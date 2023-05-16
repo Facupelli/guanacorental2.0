@@ -133,8 +133,8 @@ const AdminUsers: NextPage = () => {
               </TabsList>
               <TabsContent value="customers">
                 <div className="grid grid-cols-12 gap-6">
-                  <div className="col-span-12 grid grid-cols-12 gap-4">
-                    <div className="col-span-12 flex items-center gap-4 rounded-md bg-white p-4 sm:col-span-11 md:w-1/2">
+                  <div className="col-span-12 flex gap-4">
+                    <div className="flex items-center gap-4 rounded-md bg-white p-4">
                       <Label className="whitespace-nowrap">
                         Rol del cliente
                       </Label>
@@ -142,7 +142,7 @@ const AdminUsers: NextPage = () => {
                         <SelectRole roles={roles.data} setValue={setValue} />
                       )}
                     </div>
-                    <div className="col-span-12 sm:col-span-4 sm:col-start-12">
+                    <div className="ml-auto">
                       <Button onClick={handleCreateUser} disabled={!isAdmin}>
                         Crear Cliente
                       </Button>
