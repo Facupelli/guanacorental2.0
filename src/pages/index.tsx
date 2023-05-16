@@ -297,7 +297,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
   return (
-    <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
+    <article className="grid max-w-[300px] gap-2 rounded-sm bg-white p-4 shadow-sm">
       {equipment.image && (
         <div className="relative h-[200px] w-auto">
           <Image
