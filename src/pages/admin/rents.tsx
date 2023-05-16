@@ -22,10 +22,13 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
 import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
+import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 
-type RentForm = { month: string; year: string };
+type RentForm = { month: string; year: string; location: string };
 
 const AdminRents: NextPage = () => {
+  const locations = api.location.getAllLocations.useQuery();
+
   const { setValue, watch } = useForm<RentForm>({
     defaultValues: {
       month: "all",
@@ -35,10 +38,12 @@ const AdminRents: NextPage = () => {
 
   const year = watch("year");
   const month = watch("month");
+  const location = watch("location");
 
   const { data } = api.rent.getTotal.useQuery({
     year,
     month,
+    location,
   });
 
   const handleDownloadExcel = () => {
@@ -82,6 +87,17 @@ const AdminRents: NextPage = () => {
         <AdminLayout>
           <h1 className="text-lg font-bold">RENTAS</h1>
           <div className="grid gap-6 pt-6">
+            {locations.data && (
+              <div className="flex items-center gap-4 rounded-md bg-white p-4 md:w-1/2">
+                <Label>Sucursal</Label>
+                <AdminSelectLocation
+                  locations={locations.data}
+                  setValue={(e) => setValue("location", e)}
+                >
+                  <SelectItem value="äll">Todas</SelectItem>
+                </AdminSelectLocation>
+              </div>
+            )}
             <section className="flex flex-wrap items-center gap-4">
               <div className="flex w-full items-center gap-6 rounded-md bg-white p-4 md:w-1/2">
                 <div className="flex w-full items-center gap-2">

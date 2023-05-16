@@ -9,28 +9,30 @@ type EarningQuery = {
       book: {
         start_date: { gte: Date; lte: Date };
       };
+      locationId?: string;
     };
   };
 };
 
 type OrderQuery = {
-  where?: WherePipe;
-};
-
-type WherePipe = {
-  book?: {
-    start_date: {
-      gte: Date;
-      lte: Date;
+  where?: {
+    locationId?: string;
+    book?: {
+      start_date: {
+        gte: Date;
+        lte: Date;
+      };
     };
   };
 };
 
 export const rentRouter = createTRPCRouter({
   getTotal: protectedProcedure
-    .input(z.object({ month: z.string(), year: z.string() }))
+    .input(
+      z.object({ month: z.string(), year: z.string(), location: z.string() })
+    )
     .query(async ({ input }) => {
-      const { month, year } = input;
+      const { month, year, location } = input;
 
       const orderQuery: OrderQuery = {};
       const earningQuery: EarningQuery = {};
@@ -65,6 +67,15 @@ export const rentRouter = createTRPCRouter({
             },
           },
         };
+      }
+
+      if (location !== "all") {
+        orderQuery.where = orderQuery.where ?? {};
+        orderQuery.where.locationId = location;
+
+        if (earningQuery.where) {
+          earningQuery.where.order.locationId = location;
+        }
       }
 
       const orders = await prisma.order.findMany(orderQuery);
