@@ -118,7 +118,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
             />
             <div className="col-span-12 flex flex-col gap-4 lg:col-span-9">
               <section className="grid gap-4 rounded-sm bg-white p-4 shadow-sm lg:flex">
-                <div className="flex items-center">
+                <div className="flex w-full items-center ">
                   <Input
                     type="search"
                     placeholder="Buscar equipos por nombre, marca o modelo"
