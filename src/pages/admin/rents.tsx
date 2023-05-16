@@ -50,7 +50,7 @@ const AdminRents: NextPage = () => {
     const options = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json", // Tipo de contenido que se enviará
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ year, month }),
     };

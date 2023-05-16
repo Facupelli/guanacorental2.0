@@ -23,7 +23,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import AddCoupon from "@/components/AddCoupon";
 
-import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import {
+  disableWeekend,
+  getDatesInRange,
+  getTotalWorkingDays,
+} from "@/lib/dates";
 import { api } from "@/utils/api";
 import {
   calcaulateCartTotal,
@@ -34,6 +38,8 @@ import {
 } from "@/lib/utils";
 
 import type { Equipment, Location } from "@/types/models";
+import dayjs from "dayjs";
+import { ROLES } from "@/lib/magic_strings";
 
 type Discount = {
   value: number;
@@ -205,7 +211,7 @@ const CartPage: NextPage = () => {
         <div className="mx-auto max-w-7xl py-8 sm:pt-12">
           <section className="grid grid-cols-12 gap-y-12 sm:gap-x-8 sm:gap-y-0">
             <section className="col-span-12 sm:col-span-8">
-              <div className="hidden grid-cols-12 pb-6 sm:grid">
+              <div className="hidden grid-cols-12 pb-6 text-primary/60 sm:grid">
                 <p className="col-span-7">Equipos</p>
                 <p className="col-span-2">Cantidad</p>
                 <p className="col-span-2">Precio</p>
@@ -244,14 +250,21 @@ type ItemsListProps = {
 const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
   return (
     <div className="grid gap-8">
-      {items?.map((item) => (
-        <Item
-          key={item.id}
-          item={item}
-          startDate={startDate}
-          endDate={endDate}
-        />
-      ))}
+      {items.length > 0 ? (
+        items.map((item) => (
+          <Item
+            key={item.id}
+            item={item}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        ))
+      ) : (
+        <div>
+          No tienes equipos agregados al carrito! Ingresa a reservas onlines
+          para ver los equipos dispobibles.
+        </div>
+      )}
     </div>
   );
 };
@@ -268,7 +281,7 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
   const available = isEquipmentAvailable(item, { startDate, endDate });
 
   return (
-    <div className="grid grid-cols-12 items-center gap-y-2 border-b-2 border-primary-foreground pb-4 sm:gap-y-0">
+    <div className="grid grid-cols-12 items-center gap-y-2 border-b-2 border-primary-foreground pb-4 sm:gap-y-0 md:border-none">
       <div className="col-span-12 sm:col-span-7">
         <p>
           <strong className="font-extrabold">
@@ -334,6 +347,8 @@ const RightBar = ({
   const areAllItemsAvailable = cart.every((item) =>
     isEquipmentAvailable(item, { startDate, endDate })
   );
+
+  const datesAreWeekend = disableWeekend(startDate, endDate);
 
   return (
     <>
@@ -419,7 +434,11 @@ const RightBar = ({
           <div className="grid gap-2">
             <Button
               disabled={
-                !startDate || !endDate || isLoading || !areAllItemsAvailable
+                !startDate ||
+                !endDate ||
+                isLoading ||
+                !areAllItemsAvailable ||
+                datesAreWeekend
               }
               onClick={handleBookOrder}
             >

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { SCHEDULES } from "./magic_strings";
 
 export const getDatesInRange = (startDate: Date, endDate: Date) => {
@@ -50,4 +51,20 @@ export const getTotalWorkingDays = (dates: Date[], pickupHour: string) => {
   }
 
   return weekDay + weekendDay / 2;
+};
+
+export const disableWeekend = (
+  startDate: Date | null,
+  endDate: Date | null
+) => {
+  if (
+    dayjs(startDate).day() === 6 ||
+    dayjs(startDate).day() === 0 ||
+    dayjs(endDate).day() === 6 ||
+    dayjs(endDate).day() === 0
+  ) {
+    return true;
+  }
+
+  return false;
 };

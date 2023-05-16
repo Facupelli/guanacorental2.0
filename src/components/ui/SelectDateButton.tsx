@@ -25,6 +25,7 @@ import SelectPickupHour from "./SelectPickupHour";
 import { ROLES } from "@/lib/magic_strings";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
+import { disableWeekend } from "@/lib/dates";
 
 const SelectDateButton = () => {
   const [isOpen, setOpen] = useState(false);
@@ -32,8 +33,8 @@ const SelectDateButton = () => {
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  // const endDate = useBoundStore((state) => state.startDate);
-  // const startDate = useBoundStore((state) => state.endDate);
+  const endDate = useBoundStore((state) => state.startDate);
+  const startDate = useBoundStore((state) => state.endDate);
 
   // const [modal, setModal] = useState(isOpen);
 
@@ -44,21 +45,7 @@ const SelectDateButton = () => {
     }
   };
 
-  const disableWeekend = ({ date }: { date: Date }) => {
-    if (dayjs(date).day() === 6 || dayjs(date).day() === 0) {
-      return true;
-    }
-
-    if (
-      session?.user.role.map((role) => role.name).includes(ROLES.ADMIN) &&
-      dayjs().day() === 5 &&
-      dayjs().hour() < 19
-    ) {
-      return true;
-    }
-
-    return false;
-  };
+  const datesAreWeekend = disableWeekend(startDate, endDate);
 
   // const disableEquipmentBooked = ({ date }: { date: Date }) => {
   //   if (startDate && endDate) {
@@ -89,8 +76,15 @@ const SelectDateButton = () => {
             locale="es-ES"
             minDate={new Date()}
             onChange={(e) => handleDateChange(e)}
-            tileDisabled={disableWeekend}
+            // tileDisabled={disableWeekend}
           />
+
+          {datesAreWeekend && (
+            <div className="text-sm text-red-600">
+              Los equipos no pueden ser retirados ni devueltos los días sábados
+              y domingos. El rental abre de lunes a viernes.
+            </div>
+          )}
 
           <div>
             <SelectPickupHour />
@@ -153,7 +147,7 @@ const RentHourTip = () => {
       <PopoverContent className="grid gap-2">
         <p>
           Los equipos se retiran de lunes a jueves a las 09:00hs y los viernes a
-          alas 09:00hs o 20:00hs
+          las 09:00hs o 20:00hs
         </p>
         <p>La devolución de los equipos es de lunes a viernes a las 09:00hs</p>
       </PopoverContent>
@@ -172,7 +166,7 @@ const RentPriceTip = () => {
       </PopoverTrigger>
       <PopoverContent className="grid gap-2">
         <p>
-          Sistema day/weekend, retiro viernes 20:00hs y devolución lunes 09:00hs
+          Sistema day/weekend. Retiro viernes 20:00hs y devolución lunes 09:00hs
           precio por una jornada.
         </p>
         <p>

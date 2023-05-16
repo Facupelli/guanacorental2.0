@@ -65,9 +65,9 @@
   font-size: 0.75em;
   font-weight: bold;
 }
-/* .react-calendar__month-view__days__day--weekend {
-      color: #d10000;
-    } */
+.react-calendar__month-view__days__day--weekend {
+  color: #d06021;
+}
 .react-calendar__month-view__days__day--neighboringMonth {
   color: #757575;
 }
@@ -89,14 +89,16 @@
 }
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
-  background-color: #e6e6e6;
+  background-color: #1d1d1b;
+  color: white;
 }
 /* .react-calendar__tile--now {
       background: #ffff76;
     } */
 .react-calendar__tile--now:enabled:hover,
 .react-calendar__tile--now:enabled:focus {
-  background: #ffffa9;
+  background: #d06021;
+  color: white;
 }
 .react-calendar__tile--hasActive {
   background: #76baff;
@@ -116,7 +118,7 @@
   background: #1d1d1b;
 }
 .react-calendar--selectRange .react-calendar__tile--hover {
-  background-color: #e6e6e6;
+  background-color: #dd7b41dc;
 }
 
 .pickup-and-return {
