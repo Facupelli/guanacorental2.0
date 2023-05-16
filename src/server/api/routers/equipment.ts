@@ -44,7 +44,7 @@ export const equipmentRouter = createTRPCRouter({
         image: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        accessories: z.string(),
+        accessories: z.array(z.string()),
       })
     )
     .mutation(async ({ input }) => {

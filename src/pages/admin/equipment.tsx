@@ -41,7 +41,7 @@ import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DialogWithState from "@/components/DialogWithState";
 import DataTable from "@/components/ui/data-table";
-import { MoreHorizontal, Plus, X } from "lucide-react";
+import { Loader2, MoreHorizontal, Plus, X } from "lucide-react";
 
 import { getIsAdmin } from "@/lib/utils";
 import { api } from "@/utils/api";
@@ -485,7 +485,7 @@ type AddEquipmentForm = {
   price: number;
   image: string;
   categoryId: string;
-  accessories: string;
+  accessories: string[];
 };
 
 type AddEquipmentProps = {
@@ -500,12 +500,13 @@ const AddEquipment = ({
   const { register, handleSubmit, setValue } = useForm<AddEquipmentForm>();
 
   const ctx = api.useContext();
-  const { mutate } = api.equipment.createEquipment.useMutation();
+  const { mutate, isLoading } = api.equipment.createEquipment.useMutation();
 
   const onSubmit = (data: AddEquipmentForm) => {
     mutate(data, {
       onSuccess: () => {
         void ctx.equipment.adminGetEquipment.invalidate();
+        setShowAddEquipmentModal && setShowAddEquipmentModal(false);
       },
     });
   };
@@ -572,11 +573,17 @@ const AddEquipment = ({
 
       <div>
         <Label htmlFor="accessories">Accesorios</Label>
-        <Input type="text" id="accessories" {...register("accessories")} />
+        <Input type="text" id="accessories" {...register("accessories.0")} />
       </div>
 
       <div className="grid py-6">
-        <Button>Agregar</Button>
+        <Button disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Agregar"
+          )}
+        </Button>
       </div>
     </form>
   );
