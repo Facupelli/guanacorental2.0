@@ -266,6 +266,7 @@ const OwnerLocationStockModal = ({
     api.equipment.createEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: OwnerequipmentForm) => {
+    const ctx = api.useContext();
     const mutateData = {
       owner: data.owner.map((owner) => ({
         ...owner,
@@ -274,8 +275,9 @@ const OwnerLocationStockModal = ({
     };
 
     mutate(mutateData, {
-      onSuccess: (data) => {
-        console.log(data.message);
+      onSuccess: () => {
+        ctx.equipment.adminGetEquipment.invalidate();
+        setOpen(false);
       },
       onError: (err) => {
         console.error(err);
@@ -342,7 +344,11 @@ const OwnerLocationStockModal = ({
 
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isLoading}>
-            Actualizar
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              "Actualizar"
+            )}
           </Button>
         </div>
       </form>
