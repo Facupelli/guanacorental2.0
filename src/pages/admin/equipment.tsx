@@ -170,7 +170,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
       <DialogWithState
         isOpen={showAddEquipmentModal}
         setOpen={setShowAddEquipmentModal}
-        title="Agregar equipo"
+        title={equipment ? "Editar equipo" : "Agregar equipo"}
       >
         <AddEquipment
           equipment={equipment}
@@ -512,7 +512,11 @@ const AddEquipment = ({
   const onSubmit = (data: AddEquipmentForm) => {
     if (equipment) {
       return editEquipment.mutate(
-        { ...data, equipmentId: equipment.id },
+        {
+          ...data,
+          equipmentId: equipment.id,
+          categoryId: data.categoryId ?? equipment.categoryId,
+        },
         {
           onSuccess: () => {
             void ctx.equipment.adminGetEquipment.invalidate();
@@ -598,6 +602,8 @@ const AddEquipment = ({
         <Button disabled={isLoading}>
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : equipment ? (
+            "Actualizar"
           ) : (
             "Agregar"
           )}
