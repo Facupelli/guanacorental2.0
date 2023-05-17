@@ -106,7 +106,7 @@ const CartItem = ({ item }: CartItemProps) => {
   const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
 
   return (
-    <div className="rounded-md bg-secondary/50 p-2 shadow">
+    <div className="rounded-md bg-secondary/50 p-4 shadow">
       <div className="flex justify-end">
         <button onClick={() => deleteFromCart(item.id)}>
           <X className="h-4 w-4" />

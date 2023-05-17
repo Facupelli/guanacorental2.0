@@ -181,7 +181,7 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
       <Nav />
 
       <main className="">
-        <AdminLayout>
+        <AdminLayout route="Equipos">
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="flex flex-wrap items-start gap-4 pt-6">
             <div className="flex w-full items-center gap-4 rounded-md bg-white p-4 md:w-2/3">

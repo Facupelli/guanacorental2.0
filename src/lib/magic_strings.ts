@@ -103,3 +103,12 @@ export const monthList = [
   "Noviembre",
   "Diciembre",
 ];
+
+export const ADMIN_ROUTES = {
+  CALENDARIO: "Calendario",
+  PEDIDOS: "Pedidos",
+  CLIENTES: "Clientes",
+  EQUIPOS: "Equipos",
+  RENTAS: "Rentas",
+  DESCUENTOS: "Descuentos",
+};

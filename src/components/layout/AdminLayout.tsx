@@ -14,13 +14,14 @@ import { useSession } from "next-auth/react";
 
 type Props = {
   children: ReactNode;
+  route: string;
 };
 
-const AdminLayout = ({ children }: Props) => {
+const AdminLayout = ({ children, route }: Props) => {
   return (
     <div className="bg-app-bg pt-[70px]">
       <section className="fixed top-[70px] z-20 w-full md:w-[200px]">
-        <AdminNav />
+        <AdminNav activeRoute={route} />
       </section>
       <section className="mt-12 min-h-[calc(100vh_-_70px)] px-4 py-6 md:ml-[200px] md:mt-0 md:px-10">
         <div className="mx-auto max-w-7xl">{children}</div>
@@ -62,7 +63,7 @@ const adminRoutes = [
   },
 ];
 
-const AdminNav = () => {
+const AdminNav = ({ activeRoute }: { activeRoute: string }) => {
   const { data: session } = useSession();
   const isEmployee = getIsEmployee(session);
 
@@ -82,7 +83,11 @@ const AdminNav = () => {
                 href={route.route}
                 className={`${buttonVariants({
                   variant: "link",
-                })} flex items-center gap-4`}
+                })} flex items-center gap-4 ${
+                  activeRoute === route.name
+                    ? "text-secondary-foreground"
+                    : "text-white"
+                }`}
               >
                 {route.icon}
                 {route.name}
