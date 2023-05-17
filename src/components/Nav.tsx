@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { FacebookIcon, Menu, ShoppingCart, UserCog } from "lucide-react";
 
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
+import Cart from "./Cart";
 
 const Nav = () => {
   const router = useRouter();
@@ -40,13 +41,7 @@ const Nav = () => {
         </div>
 
         <div className="ml-auto">
-          <p
-            className="flex cursor-pointer items-center gap-2 text-white"
-            onClick={handleOpenCart}
-          >
-            <span className="hidden sm:block">CARRITO</span>
-            <ShoppingCart className="h-5 w-5 sm:h-4 sm:w-4" />
-          </p>
+          <Cart trigger />
         </div>
 
         <input

@@ -1,62 +1,77 @@
-import { useBoundStore } from "@/zustand/store";
-import { Button } from "./ui/button";
-import { type Equipment } from "@/types/models";
-import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/router";
+import { useBoundStore } from "@/zustand/store";
+
+import { Button } from "./ui/button";
 import SelectDateButton from "./ui/SelectDateButton";
 import CartItemCounter from "./CartItemCounter";
-import { ArrowRight, X } from "lucide-react";
-import useOnClickOutside from "@/hooks/useOnClickOutside";
-import { useCallback, useRef } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  // SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
+import { ArrowRight, ShoppingCart, X } from "lucide-react";
 
-const Cart = () => {
+import { formatPrice } from "@/lib/utils";
+import { useScreenSize } from "@/hooks/useScreenSize";
+
+import { type Equipment } from "@/types/models";
+import { type Dispatch, type SetStateAction } from "react";
+
+const Cart = ({
+  trigger,
+  open,
+  setOpen,
+}: {
+  trigger?: boolean;
+  open?: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+}) => {
   const router = useRouter();
 
-  const cartModalRef = useRef(null);
+  const { sheetSize } = useScreenSize();
 
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
-
-  const showCartModal = useBoundStore((state) => state.showCartModal);
-  const closeCartModal = useBoundStore((state) => state.setCloseCartModal);
+  const setOpenCart = useBoundStore((state) => state.setOpenCartModal);
+  const showCart = useBoundStore((state) => state.showCartModal);
 
   const cartItems = useBoundStore((state) => state.cartItems);
 
-  useOnClickOutside(
-    cartModalRef,
-    useCallback(() => closeCartModal(), [closeCartModal])
-  );
-
   const handleGoToCartPage = () => {
     void router.push("/cart");
-    closeCartModal();
   };
+
   return (
-    <>
-      <aside
-        ref={cartModalRef}
-        className={`fixed  ${
-          showCartModal ? "right-0" : "right-[-100%] sm:right-[-40vw]"
-        } top-[70px] z-20 h-[calc(100vh_-_70px)] w-full bg-white p-4 transition-all duration-300 ease-in-out sm:w-[25%] sm:min-w-[300px]`}
-      >
-        <div className="relative flex h-full flex-col gap-3 ">
-          <div className="flex items-center justify-between">
-            <h1 className="font-bold">MI PEDIDO</h1>
-            <button onClick={closeCartModal}>
-              <X className="h-4 w-4" />{" "}
-            </button>
-          </div>
+    <Sheet open={open} onOpenChange={setOpen}>
+      {trigger && (
+        <SheetTrigger asChild>
+          <Button className="flex items-center gap-2 font-panton">
+            <span className="hidden text-base sm:block">CARRITO</span>
+            <ShoppingCart className="h-5 w-5 sm:h-4 sm:w-4" />
+          </Button>
+        </SheetTrigger>
+      )}
+      <SheetContent position="right" size={sheetSize}>
+        <SheetHeader>
+          <SheetTitle>MI PEDIDO</SheetTitle>
+          <SheetDescription className="grid">
+            {!startDate || !endDate ? (
+              <SelectDateButton />
+            ) : (
+              <div className="flex items-center justify-between">
+                <p>{new Date(startDate).toLocaleDateString()}</p>
+                <ArrowRight className="h-4 w-4" />{" "}
+                <p>{new Date(endDate).toLocaleDateString()}</p>
+              </div>
+            )}
+          </SheetDescription>
+        </SheetHeader>
 
-          {!startDate || !endDate ? (
-            <SelectDateButton />
-          ) : (
-            <div className="flex items-center justify-between">
-              <p>{new Date(startDate).toLocaleDateString()}</p>
-              <ArrowRight className="h-4 w-4" />{" "}
-              <p>{new Date(endDate).toLocaleDateString()}</p>
-            </div>
-          )}
-
+        <div className="relative flex h-[90%] flex-col gap-3 pt-4">
           <div className="grid gap-6 overflow-y-auto py-4">
             {cartItems.length === 0 ? (
               <div>
@@ -74,13 +89,12 @@ const Cart = () => {
             </Button>
           </div>
         </div>
-      </aside>
-      <div
-        className={`fixed top-[70px] z-10 h-screen w-screen bg-[rgba(0,0,0,0.3)] backdrop-blur-[1px] ${
-          showCartModal ? "right-0" : "right-[1000%]"
-        }`}
-      />
-    </>
+
+        {/* <SheetFooter>
+          <Button type="submit">Save changes</Button>
+        </SheetFooter> */}
+      </SheetContent>
+    </Sheet>
   );
 };
 
@@ -92,9 +106,11 @@ const CartItem = ({ item }: CartItemProps) => {
   const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
 
   return (
-    <div className="p-2 shadow">
+    <div className="rounded-md bg-secondary/50 p-2 shadow">
       <div className="flex justify-end">
-        <button onClick={() => deleteFromCart(item.id)}>X</button>
+        <button onClick={() => deleteFromCart(item.id)}>
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="flex gap-2">

@@ -174,7 +174,9 @@ export const equipmentRouter = createTRPCRouter({
         },
       });
 
-      const totalCount = await prisma.equipment.count();
+      const totalCount = await prisma.equipment.count({
+        where: wherePipe,
+      });
 
       return { equipment, totalCount };
     }),

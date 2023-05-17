@@ -46,6 +46,7 @@ type Props = {
 };
 
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
+  const [showCart, setShowCart] = useState(false);
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
 
@@ -103,7 +104,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         />
       </DialogWithState>
 
-      <Cart />
+      <Cart open={showCart} setOpen={setShowCart} />
 
       <Nav />
 
@@ -140,7 +141,11 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                   </p>
                 ) : (
                   equipments?.map((equipment) => (
-                    <EquipmentCard key={equipment.id} equipment={equipment} />
+                    <EquipmentCard
+                      key={equipment.id}
+                      equipment={equipment}
+                      setShowCart={setShowCart}
+                    />
                   ))
                 )}
               </section>
@@ -276,8 +281,9 @@ const SelectOrder = ({
 
 type EquipmentCardProps = {
   equipment: Equipment;
+  setShowCart: Dispatch<SetStateAction<boolean>>;
 };
-const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
+const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
   const cartItems = useBoundStore((state) => state.cartItems);
   const addToCart = useBoundStore((state) => state.addToCart);
   const openCartModal = useBoundStore((state) => state.setOpenCartModal);
@@ -291,7 +297,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
 
     addToCart(equipment);
 
-    if (cartItems.length === 0) openCartModal();
+    if (cartItems.length === 0) setShowCart(true);
   };
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });

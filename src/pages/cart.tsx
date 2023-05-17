@@ -247,7 +247,7 @@ type ItemsListProps = {
 };
 const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-4">
       {items.length > 0 ? (
         items.map((item) => (
           <Item
@@ -279,7 +279,7 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
   const available = isEquipmentAvailable(item, { startDate, endDate });
 
   return (
-    <div className="grid grid-cols-12 items-center gap-y-2 border-b-2 border-primary-foreground pb-4 sm:gap-y-0 md:border-none">
+    <div className="grid grid-cols-12 items-center gap-y-2 rounded-md bg-white/40 p-2 pb-4 sm:gap-y-0 md:border-none">
       <div className="col-span-12 sm:col-span-7">
         <p>
           <strong className="font-extrabold">
