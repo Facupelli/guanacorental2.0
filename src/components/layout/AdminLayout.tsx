@@ -14,7 +14,7 @@ import { useSession } from "next-auth/react";
 
 type Props = {
   children: ReactNode;
-  route: string;
+  route?: string;
 };
 
 const AdminLayout = ({ children, route }: Props) => {
@@ -63,7 +63,7 @@ const adminRoutes = [
   },
 ];
 
-const AdminNav = ({ activeRoute }: { activeRoute: string }) => {
+const AdminNav = ({ activeRoute }: { activeRoute: string | undefined }) => {
   const { data: session } = useSession();
   const isEmployee = getIsEmployee(session);
 

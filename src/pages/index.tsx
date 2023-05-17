@@ -93,6 +93,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
           content="Aquiler de equipos para cine y fotografía."
         />
         <link rel="icon" href="/logo-favicon.ico" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
       </Head>
 
       <DialogWithState
@@ -198,7 +199,7 @@ const LeftBar = ({
         Filtros
         <FilterIcon className="h-5 w-5" />
       </label>
-      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 lg:relative lg:left-0 lg:top-0 lg:col-span-3 lg:flex lg:h-[calc(100vh_-_148px)] lg:w-full lg:flex-col lg:gap-4 lg:bg-white lg:p-4 lg:text-primary lg:shadow-sm">
+      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 rounded-md bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 lg:relative lg:left-0 lg:top-0 lg:col-span-3 lg:flex lg:h-[calc(100vh_-_148px)] lg:w-full lg:flex-col lg:gap-4 lg:bg-white lg:p-4 lg:text-primary lg:shadow-sm">
         <SelectLocation
           locations={locations}
           placeholder="Elegir sucursal"
