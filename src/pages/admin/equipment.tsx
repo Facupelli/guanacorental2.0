@@ -262,11 +262,11 @@ const OwnerLocationStockModal = ({
     name: "owner",
   });
 
+  const ctx = api.useContext();
   const { mutate, isLoading } =
     api.equipment.createEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: OwnerequipmentForm) => {
-    const ctx = api.useContext();
     const mutateData = {
       owner: data.owner.map((owner) => ({
         ...owner,

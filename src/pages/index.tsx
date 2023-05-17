@@ -131,7 +131,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 </div>
                 <SelectOrder setSort={setSort} />
               </section>
-              <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-8 pb-10">
+              <section className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] content-start gap-8 pb-10">
                 {isLoading && <div>Cargando...</div>}
                 {equipments?.length === 0 ? (
                   <p>
@@ -297,7 +297,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
   return (
-    <article className="grid max-w-[300px] gap-2 rounded-sm bg-white p-4 shadow-sm">
+    <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
       {equipment.image && (
         <div className="relative h-[200px] w-auto">
           <Image
