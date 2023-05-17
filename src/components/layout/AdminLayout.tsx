@@ -19,10 +19,10 @@ type Props = {
 const AdminLayout = ({ children }: Props) => {
   return (
     <div className="bg-app-bg pt-[70px]">
-      <section className="fixed top-[70px] z-20 w-full md:w-[180px]">
+      <section className="fixed top-[70px] z-20 w-full md:w-[200px]">
         <AdminNav />
       </section>
-      <section className="mt-12 min-h-[calc(100vh_-_70px)] px-4 py-6 md:ml-[180px] md:mt-0 md:px-10">
+      <section className="mt-12 min-h-[calc(100vh_-_70px)] px-4 py-6 md:ml-[200px] md:mt-0 md:px-10">
         <div className="mx-auto max-w-7xl">{children}</div>
       </section>
     </div>
@@ -67,7 +67,7 @@ const AdminNav = () => {
   const isEmployee = getIsEmployee(session);
 
   return (
-    <nav className="h-fit w-full bg-primary/90 md:h-screen md:w-[180px]">
+    <nav className="h-fit w-full bg-primary/90 md:h-screen md:w-[200px]">
       <ul className="flex items-center gap-2 overflow-x-auto p-2 md:grid md:p-4">
         {adminRoutes.map((route, i) => {
           if (
@@ -82,10 +82,10 @@ const AdminNav = () => {
                 href={route.route}
                 className={`${buttonVariants({
                   variant: "link",
-                })} flex items-center gap-2`}
+                })} flex items-center gap-4`}
               >
-                {route.name}
                 {route.icon}
+                {route.name}
               </Link>
             </li>
           );

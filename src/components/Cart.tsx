@@ -48,7 +48,7 @@ const Cart = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {trigger && (
-        <SheetTrigger asChild>
+        <SheetTrigger asChild className="p-0">
           <Button className="flex items-center gap-2 font-panton">
             <span className="hidden text-base sm:block">CARRITO</span>
             <ShoppingCart className="h-5 w-5 sm:h-4 sm:w-4" />

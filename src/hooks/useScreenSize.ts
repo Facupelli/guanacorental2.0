@@ -16,7 +16,6 @@ export const useScreenSize = () => {
       } else {
         setSheetSize("default");
       }
-      console.log(width);
     };
 
     handleResize();
