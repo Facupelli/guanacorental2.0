@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
 import DialogWithState from "@/components/DialogWithState";
 import { DialogFooter } from "@/components/ui/dialog";
@@ -38,12 +38,16 @@ import {
 } from "@/lib/utils";
 
 import type { Equipment, Location } from "@/types/models";
+import Link from "next/link";
 
 type Discount = {
   value: number;
   typeName: string;
   code: string;
 };
+
+const noPetitionSentError =
+  "No has enviado el alta de cliente. Para poder alquilar equipos es necesario llenar el formulario de alta de cliente.";
 
 const CartPage: NextPage = () => {
   const { data: session } = useSession();
@@ -93,14 +97,24 @@ const CartPage: NextPage = () => {
   const isAdmin = getIsAdmin(session);
 
   const handleBookOrder = () => {
-    if (!startDate || !endDate || !session?.user || !workingDays) {
+    if (!session?.user) {
+      setError("Debes iniciar sesión para realizar una reserva.");
+      setErrorModal(true);
+      return;
+    }
+
+    if (!startDate || !endDate || !workingDays) {
+      return;
+    }
+
+    if (!session.user.petitionSent) {
+      setError(noPetitionSentError);
+      setErrorModal(true);
       return;
     }
 
     if (!session.user.customerApproved) {
-      setError(
-        "No has enviado el alta de cliente o tu alta todavía no fue aprobada"
-      );
+      setError("Tu alta de cliente todavía no fue aprobada");
       setErrorModal(true);
       return;
     }
@@ -191,6 +205,14 @@ const CartPage: NextPage = () => {
         setOpen={setErrorModal}
       >
         <p>{error}</p>
+        {error === noPetitionSentError && (
+          <Link
+            href="/new-user"
+            className="font-semibold text-primary hover:underline"
+          >
+            ir al alta
+          </Link>
+        )}
         <DialogFooter>
           <Button
             onClick={() => {

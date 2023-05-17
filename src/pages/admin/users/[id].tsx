@@ -160,6 +160,31 @@ const AdminUserDetail: NextPage = () => {
               </section>
 
               <section className="grid gap-6 rounded-md border border-app-bg p-4">
+                <h5 className="text-lg font-semibold">
+                  Contactos relacionados
+                </h5>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="grid gap-1">
+                    <p className="text-xs text-primary/60">Contacto 1</p>
+                    <p>{data?.user.address?.contact_1}</p>
+                  </div>
+                  <div className="grid gap-1">
+                    <p className="text-xs text-primary/60">Vínculo 1</p>
+                    <p>{data?.user.address?.bond_1}</p>
+                  </div>
+                  <div />
+                  <div className="grid gap-1">
+                    <p className="text-xs text-primary/60">Contacto 2</p>
+                    <p>{data?.user.address?.contact_2}</p>
+                  </div>
+                  <div className="grid gap-1">
+                    <p className="text-xs text-primary/60">Vínculo 2</p>
+                    <p>{data?.user.address?.bond_2}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-6 rounded-md border border-app-bg p-4">
                 <h5 className="text-lg font-semibold">Información del banco</h5>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-1">
