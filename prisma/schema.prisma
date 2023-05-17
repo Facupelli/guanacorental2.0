@@ -95,6 +95,8 @@ model Address {
   bank              String
   alias             String
   cbu               String
+  dni_front         String @default("asd")
+  dni_back          String @default("asd")
 
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt

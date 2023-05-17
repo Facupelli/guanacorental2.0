@@ -115,7 +115,13 @@ export const userRouter = createTRPCRouter({
     }),
 
   createUserAddress: protectedProcedure
-    .input(validationAddress.extend({ userId: z.string().nonempty() }))
+    .input(
+      validationAddress.extend({
+        userId: z.string().nonempty(),
+        dniBack: z.string(),
+        dniFront: z.string(),
+      })
+    )
     .mutation(async ({ input }) => {
       let newUser;
 
@@ -150,6 +156,8 @@ export const userRouter = createTRPCRouter({
           bond_1: input.bond_1,
           contact_2: input.contact_2,
           bond_2: input.bond_2,
+          dni_back: input.dniBack,
+          dni_front: input.dniFront,
         },
       });
 

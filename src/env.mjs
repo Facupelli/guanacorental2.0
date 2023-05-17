@@ -32,6 +32,8 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+    NEXT_PUBLIC_CL_CLOUD_NAME: z.string(),
+    NEXT_PUBLIC_CL_UPLOAD_PRESET: z.string(),
   },
 
   /**
@@ -45,5 +47,7 @@ export const env = createEnv({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    NEXT_PUBLIC_CL_CLOUD_NAME: process.env.NEXT_PUBLIC_CL_CLOUD_NAME,
+    NEXT_PUBLIC_CL_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CL_UPLOAD_PRESET,
   },
 });
