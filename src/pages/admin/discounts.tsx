@@ -358,7 +358,7 @@ const SelectDiscountType = ({
   return (
     <Select
       onValueChange={(e) => setValue("typeId", e)}
-      defaultValue={types.find((type) => type.name === "Percentage")?.id}
+      // defaultValue={types.find((type) => type.name === "Percentage")?.id}
     >
       <SelectTrigger>
         <SelectValue placeholder="selecionar tipo" />
