@@ -36,9 +36,9 @@ const AdminRents: NextPage = () => {
     },
   });
 
-  const year = watch("year");
-  const month = watch("month");
-  const location = watch("location");
+  const year = watch("year", "2023");
+  const month = watch("month", "all");
+  const location = watch("location", "all");
 
   const { data } = api.rent.getTotal.useQuery({
     year,
