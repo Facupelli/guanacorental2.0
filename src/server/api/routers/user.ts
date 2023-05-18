@@ -3,6 +3,7 @@ import { prisma } from "@/server/db";
 import { validationAddress } from "@/lib/validation";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { sendMail } from "@/server/utils/mailer";
 
 export const userRouter = createTRPCRouter({
   getPetitionUsers: protectedProcedure.query(async () => {
@@ -242,9 +243,14 @@ export const userRouter = createTRPCRouter({
           id: userId,
         },
         data: {
-          customer_approved: customerApproved,
+          customer_approved: false,
         },
       });
+
+      if (user && user.email) {
+        const mail = await sendMail(user.email);
+        console.log(mail);
+      }
 
       return { message: "success", user };
     }),
