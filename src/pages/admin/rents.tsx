@@ -56,7 +56,12 @@ const AdminRents: NextPage = () => {
     };
 
     const fetch4nodeBuffer = () =>
-      fetch(`http://localhost:3000/api/4node`, options);
+      fetch(
+        process.env.NODE_ENV === "production"
+          ? "https://guanacorental.onrender.com/api/4node"
+          : `http://localhost:3000/api/4node`,
+        options
+      );
 
     fetch4nodeBuffer()
       .then((res) => res.blob())
@@ -110,7 +115,12 @@ const AdminRents: NextPage = () => {
                 </div>
               </div>
               <div className="ml-auto">
-                <Button onClick={handleDownloadExcel}>Descargar Excel</Button>
+                <Button
+                  disabled={data?.totalFromOrders === 0}
+                  onClick={handleDownloadExcel}
+                >
+                  Descargar Excel
+                </Button>
               </div>
             </section>
 

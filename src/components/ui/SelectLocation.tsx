@@ -60,7 +60,7 @@ export const AdminSelectLocation = ({
   children,
 }: AdminSelectLocationProps) => {
   return (
-    <Select onValueChange={setValue}>
+    <Select onValueChange={setValue} defaultValue="all">
       <SelectTrigger className={className}>
         <SelectValue placeholder="elegir" />
       </SelectTrigger>
