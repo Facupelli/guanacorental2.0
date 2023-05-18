@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
@@ -55,6 +56,14 @@ type Props = {
   };
 };
 
+type Result = {
+  event: string;
+  info: {
+    resource_type: string;
+    secure_url: string;
+  };
+};
+
 const NewUserPage: NextPage<Props> = ({}: Props) => {
   const { data: session } = useSession();
   const {
@@ -77,7 +86,6 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
   }, []);
 
   const openWidget = (setImagePublicId: Dispatch<SetStateAction<string>>) => {
-    /* eslint-disable */
     if (typeof window !== "undefined" && window.cloudinary) {
       const widget = window.cloudinary.createUploadWidget(
         {
@@ -87,7 +95,9 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
           maxFileSize: 5000000,
           folder: "customers_dni",
         },
-        (error, result) => {
+
+        (e: string, result: Result) => {
+          console.log("RESULT", result);
           if (
             result?.event === "success" &&
             result?.info.resource_type === "image"
@@ -98,7 +108,6 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
       );
       widget.open(); // open up the widget after creation
     }
-    /* eslint-enable */
   };
 
   const { isLoading, mutate } = api.user.createUserAddress.useMutation();

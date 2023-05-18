@@ -295,7 +295,6 @@ type EquipmentCardProps = {
 const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
   const cartItems = useBoundStore((state) => state.cartItems);
   const addToCart = useBoundStore((state) => state.addToCart);
-  const openCartModal = useBoundStore((state) => state.setOpenCartModal);
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
 

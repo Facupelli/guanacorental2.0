@@ -2,7 +2,7 @@ import superjason from "superjson";
 import { getServerSession } from "next-auth";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { UseFormRegister, useForm } from "react-hook-form";
+import { type UseFormRegister, useForm } from "react-hook-form";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
