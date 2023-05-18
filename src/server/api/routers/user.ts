@@ -142,6 +142,7 @@ export const userRouter = createTRPCRouter({
               id: roleId,
             },
           },
+          petition_sent: true,
         },
         take,
         skip,
@@ -152,7 +153,16 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      const totalCount = await prisma.user.count();
+      const totalCount = await prisma.user.count({
+        where: {
+          role: {
+            some: {
+              id: roleId,
+            },
+          },
+          petition_sent: true,
+        },
+      });
 
       return { users, totalCount };
     }),
