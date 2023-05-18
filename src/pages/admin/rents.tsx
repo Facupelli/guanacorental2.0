@@ -99,7 +99,7 @@ const AdminRents: NextPage = () => {
                   locations={locations.data}
                   setValue={(e) => setValue("location", e)}
                 >
-                  <SelectItem value="äll">Todas</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
                 </AdminSelectLocation>
               </div>
             )}
