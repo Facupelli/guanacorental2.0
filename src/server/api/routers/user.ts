@@ -20,18 +20,61 @@ export const userRouter = createTRPCRouter({
   }),
 
   editUser: protectedProcedure
-    .input(z.object({ userId: z.string(), name: z.string() }))
+    .input(
+      z.object({
+        userId: z.string(),
+        fullName: z.string(),
+        company: z.string(),
+        phone: z.string(),
+        province: z.string(),
+        city: z.string(),
+        address_1: z.string(),
+        dni_number: z.string(),
+        occupation: z.string(),
+        cuit: z.string(),
+        bussinessName: z.string(),
+      })
+    )
     .mutation(async ({ input }) => {
-      const { userId, name } = input;
+      const {
+        userId,
+        fullName,
+        company,
+        phone,
+        province,
+        city,
+        address_1,
+        dni_number,
+        occupation,
+        cuit,
+        bussinessName,
+      } = input;
 
-      await prisma.user.update({
+      const user = await prisma.user.update({
         where: {
           id: userId,
         },
         data: {
-          name,
+          name: fullName,
         },
       });
+
+      if (user && user.addressId) {
+        await prisma.address.update({
+          where: { id: user.addressId },
+          data: {
+            company,
+            phone,
+            province,
+            city,
+            address_1,
+            dni_number,
+            occupation,
+            cuit,
+            bussines_name: bussinessName,
+          },
+        });
+      }
 
       return { message: "success" };
     }),
