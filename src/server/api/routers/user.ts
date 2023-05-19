@@ -243,11 +243,11 @@ export const userRouter = createTRPCRouter({
           id: userId,
         },
         data: {
-          customer_approved: false,
+          customer_approved: customerApproved,
         },
       });
 
-      if (user && user.email) {
+      if (user && user.email && customerApproved) {
         await sendMail(
           { email: user.email },
           "customerApproved.handlebars",

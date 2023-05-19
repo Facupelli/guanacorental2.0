@@ -97,7 +97,6 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
         },
 
         (e: string, result: Result) => {
-          console.log("RESULT", result);
           if (
             result?.event === "success" &&
             result?.info.resource_type === "image"
@@ -237,7 +236,7 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
                     type="button"
                     onClick={() => openWidget(setDniFront)}
                   >
-                    subir archivo
+                    {dniFront ? "Archivo cargado" : "Subir archvio"}
                   </Button>
                 </div>
 
@@ -248,7 +247,7 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
                     type="button"
                     onClick={() => openWidget(setDniBack)}
                   >
-                    subir archivo
+                    {dniBack ? "Archivo cargado" : "Subir archvio"}
                   </Button>
                 </div>
 
