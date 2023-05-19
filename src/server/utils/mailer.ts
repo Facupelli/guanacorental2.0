@@ -1,10 +1,22 @@
 import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
+import handlebars from "handlebars";
 
 const NODEMAILER_G_APP = process.env.NODEMAILER_G_APP;
 
-export const sendMail = async (email: string) => {
+type User = {
+  name?: string;
+  phone?: string;
+  number?: number;
+  startDate?: string;
+  endDate?: string;
+  pickupHour?: string;
+  email: string;
+  equipmentList?: { item: string; quantity: string }[];
+};
+
+export const sendMail = async (user: User, templateName: string) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -13,23 +25,18 @@ export const sendMail = async (email: string) => {
     },
   });
 
-  function readHTMLFile() {
-    const template = fs.readFileSync(
-      path.resolve(
-        process.cwd() + "/src/server/utils/templates/customerApproved.html"
-      ),
-      "utf-8"
-    );
-    return template;
-  }
+  const templateSource = fs.readFileSync(
+    path.resolve(process.cwd() + `/src/server/utils/templates/${templateName}`),
+    "utf-8"
+  );
 
-  const html = readHTMLFile();
+  const template = handlebars.compile(templateSource);
 
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",
-    to: email,
+    to: user.email,
     subject: "FOMRULARIO DE ALTA GUANACO RENTAL",
-    html,
+    html: template(user),
   };
 
   const mail = await transporter.sendMail(mailOptions);

@@ -3,7 +3,10 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
-import { getEquipmentOnOwnerIds } from "@/server/utils/order";
+import {
+  getEquipmentOnOwnerIds,
+  getOrderEquipmentOnOwners,
+} from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { isEquipmentAvailable } from "@/lib/utils";
@@ -13,6 +16,7 @@ import {
   updateEarnings,
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
+import { sendMail } from "@/server/utils/mailer";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -503,6 +507,11 @@ export const orderRouter = createTRPCRouter({
                 },
               },
             },
+            customer: {
+              include: {
+                address: true,
+              },
+            },
           },
         });
       } catch (err) {
@@ -526,6 +535,37 @@ export const orderRouter = createTRPCRouter({
       //CALCULATE AND CREATE EARNINGS FOR EACH OWNER
 
       const earnings = await calcualteAndCreateEarnings(newOrder);
+
+      //SEND MAIL TO CUSTOMER
+      if (newOrder.customer.email && newOrder.customer.name) {
+        const filteredOrder = {
+          ...newOrder,
+          equipments: getOrderEquipmentOnOwners(
+            newOrder.equipments,
+            newOrder.bookId
+          ),
+        };
+
+        const equipmentList = filteredOrder.equipments.map((equipment) => ({
+          item: `${equipment.equipment.name} ${equipment.equipment.brand} ${equipment.equipment.model}`,
+          quantity: `${equipment.books.reduce((acc, curr) => {
+            return acc + curr.quantity;
+          }, 0)}`,
+        }));
+
+        const mailData = {
+          name: newOrder.customer.name,
+          email: newOrder.customer.email,
+          phone: newOrder.customer.address?.phone,
+          number: newOrder.number,
+          startDate: startDate.toLocaleDateString(),
+          endDate: endDate.toLocaleDateString(),
+          pickupHour,
+          equipmentList,
+        };
+
+        await sendMail(mailData, "newOrder.handlebars");
+      }
 
       return { newOrder, earnings };
     }),
