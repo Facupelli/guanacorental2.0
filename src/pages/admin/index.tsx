@@ -77,6 +77,8 @@ const Admin: NextPage = () => {
     [data]
   );
 
+  console.log(data);
+
   useEffect(() => {
     handleClickDay(new Date());
   }, [data, handleClickDay]);

@@ -151,8 +151,6 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
   const [showModal, setShowModal] = useState(false);
   const [file, setFile] = useState<File | undefined>();
 
-  console.log("isOpen", showModal);
-
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files?.length > 0) {
       setFile(event.target.files[0]);
