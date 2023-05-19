@@ -248,7 +248,11 @@ export const userRouter = createTRPCRouter({
       });
 
       if (user && user.email) {
-        await sendMail({ email: user.email }, "customerApproved.handlebars");
+        await sendMail(
+          { email: user.email },
+          "customerApproved.handlebars",
+          "ALTA DE CLIENTE"
+        );
       }
 
       return { message: "success", user };

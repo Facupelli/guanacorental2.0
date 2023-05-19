@@ -564,7 +564,11 @@ export const orderRouter = createTRPCRouter({
           equipmentList,
         };
 
-        await sendMail(mailData, "newOrder.handlebars");
+        await sendMail(
+          mailData,
+          "newOrder.handlebars",
+          "NUEVO PEDIDO REALIZADO"
+        );
       }
 
       return { newOrder, earnings };

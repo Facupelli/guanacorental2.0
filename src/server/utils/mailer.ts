@@ -16,7 +16,11 @@ type User = {
   equipmentList?: { item: string; quantity: string }[];
 };
 
-export const sendMail = async (user: User, templateName: string) => {
+export const sendMail = async (
+  user: User,
+  templateName: string,
+  subject: string
+) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

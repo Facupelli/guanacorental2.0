@@ -64,6 +64,7 @@ const CartPage: NextPage = () => {
   const [error, setError] = useState("");
 
   const cartItems = useBoundStore((state) => state.cartItems);
+  const emptyCart = useBoundStore((state) => state.emptyCart);
 
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
@@ -153,6 +154,7 @@ const CartPage: NextPage = () => {
       {
         onSuccess: () => {
           setShowSuccessModal(true);
+          emptyCart();
         },
         onError: (err) => {
           setError(err.message);

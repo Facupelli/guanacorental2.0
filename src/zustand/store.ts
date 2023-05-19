@@ -61,6 +61,7 @@ interface CartSlice {
   deleteFromCart: (id: string) => void;
   addItemQuantity: (id: string) => void;
   substractItemQuantity: (id: string) => void;
+  emptyCart: () => void;
 }
 
 const createCartSlice: StateCreator<
@@ -105,6 +106,7 @@ const createCartSlice: StateCreator<
         }
       }),
     })),
+  emptyCart: () => set(() => ({ cartItems: [] })),
 });
 
 export const useBoundStore = create<LocationSlice & DateSlice & CartSlice>()(
