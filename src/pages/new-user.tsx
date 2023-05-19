@@ -1,7 +1,13 @@
 /* eslint-disable */
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -74,6 +80,8 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
     resolver: zodResolver(validationAddress),
   });
 
+  const divRef = useRef<HTMLDivElement>(null);
+
   const [showModal, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -116,6 +124,9 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
 
     if (!dniBack || !dniFront) {
       setDniError("Las fotos del dni son obligatorias");
+      if (divRef.current) {
+        divRef.current.scrollIntoView({ behavior: "smooth" });
+      }
       return;
     }
 
@@ -228,7 +239,10 @@ const NewUserPage: NextPage<Props> = ({}: Props) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+              <div
+                className="grid scroll-my-[150px] grid-cols-2 gap-x-8 gap-y-2"
+                ref={divRef}
+              >
                 <div className="grid gap-2">
                   <Label>Foto de tu DNI frente (5mb max)</Label>
                   <Button
