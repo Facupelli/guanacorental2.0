@@ -1,3 +1,4 @@
+import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import DialogWithState from "@/components/DialogWithState";
+import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
 import { orderStatusClass } from "./magic_strings";
@@ -20,8 +22,6 @@ import { type Prisma } from "@prisma/client";
 import {
   useState,
   type MouseEvent,
-  type ChangeEvent,
-  type FormEvent,
 } from "react";
 
 type Order = Prisma.OrderGetPayload<{
@@ -148,21 +148,16 @@ const DynamicButton = dynamic<{ order: Order }>(() =>
 );
 
 const OrderActionsDropMenu = ({ order }: { order: Order }) => {
+  const { register, handleSubmit } = useForm<{ file: FileList }>();
+
   const [showModal, setShowModal] = useState(false);
-  const [file, setFile] = useState<File | undefined>();
+  const [error, setError] = useState("");
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files?.length > 0) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!file || !order.customer.email) return;
+  const onSubmit = async (data: { file: FileList }) => {
+    if (!data.file[0] || !order.customer.email) return;
 
     const formData = new FormData();
-    formData.append("pdf", file);
+    formData.append("pdf", data.file[0]);
     formData.append("email", order.customer.email);
     formData.append("orderNumber", String(order.number));
 
@@ -172,9 +167,9 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
     });
 
     if (response.ok) {
-      console.log("Email sent successfully!");
+      setShowModal(false);
     } else {
-      console.error("Failed to send email!");
+      setError("Failed to send email");
     }
   };
 
@@ -185,10 +180,13 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
         setOpen={setShowModal}
         title="Adjuntar remito"
       >
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <input type="file" onChange={handleFileChange} />
-          <button type="submit">Enviar</button>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
+          <Input type="file" {...register("file")} />
+          <Button size="sm" type="submit">
+            Enviar correo
+          </Button>
         </form>
+        {error && <p className="text-red-600">{error}</p>}
       </DialogWithState>
 
       <DropdownMenu>
