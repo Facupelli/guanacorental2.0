@@ -13,6 +13,7 @@ module.exports = {
     extend: {
       fontFamily: {
         panton: ["var(--font-panton)", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

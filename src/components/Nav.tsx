@@ -91,9 +91,9 @@ export const GoogleButton = () => {
   return (
     <button
       onClick={() => void signIn("google")}
-      className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
+      className="flex h-[35px] items-center rounded-[2px] border border-[#dadce0] bg-[#fff] px-[12px] "
     >
-      <div className="mr-2 flex items-center">
+      <div className="mr-2 h-[18px] w-[18px]">
         <Image
           src="/google/g-logo.png"
           width={18}
@@ -101,7 +101,7 @@ export const GoogleButton = () => {
           alt="google g logo"
         />
       </div>
-      <p className="whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
+      <p className="whitespace-nowrap font-roboto text-[13px] font-semibold tracking-[0.25px] text-[#3c4043]">
         Acceder con Google
       </p>
     </button>
@@ -112,10 +112,10 @@ export const FacebookButton = () => {
   return (
     <button
       onClick={() => void signIn("facebook")}
-      className="flex h-[35px] items-center bg-white px-4 text-[#3c4043]"
+      className="h-[35px] rounded-[2px] border border-[#1a77f2] bg-[#1a77f2] px-4 text-[#3c4043]"
     >
-      <div className="flex items-center gap-2 whitespace-nowrap text-[13px] font-medium tracking-[0.25px]">
-        <FacebookIcon className="h-4 w-4" /> Acceder con Facebook
+      <div className="flex items-center whitespace-nowrap font-roboto  text-[13px] font-semibold tracking-[0.25px] text-[#fff]">
+        <FacebookIcon className="mr-2 h-4 w-4" /> Acceder con Facebook
       </div>
     </button>
   );
