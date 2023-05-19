@@ -9,7 +9,7 @@ import {
 } from "@/server/utils/order";
 import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
-import { isEquipmentAvailable } from "@/lib/utils";
+import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import {
   calcualteAndCreateEarnings,
   getUpdatedCart,
@@ -562,6 +562,7 @@ export const orderRouter = createTRPCRouter({
           endDate: endDate.toLocaleDateString(),
           pickupHour,
           equipmentList,
+          total: formatPrice(newOrder.total)
         };
 
         await sendMail(

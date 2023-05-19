@@ -4,8 +4,13 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>Pedido Recibido</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; font-family:
-      "Helvetica"; font-size: 20px; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Helvetica";
+        font-size: 18px;
+      }
     </style>
   </head>
   <body style="max-width: 800px; margin: auto; position: relative">
@@ -53,7 +58,7 @@
         </div>
       </div>
     </div>
-    <div style="padding: 0px 40px">
+    <div style="padding: 0px 60px">
       <div style="max-width: 800px; display: flex; padding: 25px 0px 0px 0px">
         <p>Nuevo pedido de {{name}}</p>
         <p style="margin-left: auto">Teléfono: {{phone}}</p>
@@ -63,40 +68,64 @@
         Número de pedido: #{{number}}
       </p>
 
-      <table style="border-collapse: collapse; border: 1px solid black;">
+      <table style="border-collapse: collapse; border: 1px solid black">
         <thead>
           <tr>
             <th
-              style="min-width:400px; font-weight: 400; text-align: left; padding: 15px 10px; border: 1px solid black"
-            >ÍTEM</th>
+              style="
+                min-width: 400px;
+                font-weight: 400;
+                text-align: left;
+                padding: 15px 10px;
+                border: 1px solid black;
+              "
+            >
+              ÍTEM
+            </th>
             <th
-              style="font-weight: 400; text-align: left; padding: 15px 10px; border: 1px solid black"
-            >CANTIDAD</th>
+              style="
+                font-weight: 400;
+                text-align: left;
+                padding: 15px 10px;
+                border: 1px solid black;
+              "
+            >
+              CANTIDAD
+            </th>
           </tr>
         </thead>
         <tbody>
           {{#each equipmentList}}
-            <tr style="border: 1px solid black;">
-              <td
-                style="min-width:400px; padding: 15px 10px; border: 1px solid black"
-              >{{item}}</td>
-              <td
-                style="padding: 15px 10px; border: 1px solid black"
-              >{{quantity}}</td>
-            </tr>
+          <tr style="border: 1px solid black">
+            <td
+              style="
+                min-width: 400px;
+                padding: 15px 10px;
+                border: 1px solid black;
+              "
+            >
+              {{item}}
+            </td>
+            <td style="padding: 15px 10px; border: 1px solid black">
+              {{quantity}}
+            </td>
+          </tr>
           {{/each}}
+          <tr>
+            <td style="padding: 15px 10px">PRECIO FINAL: {{total}}</td>
+          </tr>
         </tbody>
       </table>
+      <p style="font-size: 15px; padding: 10px 0px">
+        *Los precios expresados no incluyen IVA
+      </p>
 
       <p style="font-weight: 700; padding: 25px 0px">
         Información de retiro y devolución:
       </p>
 
       <p style="font-weight: 700">
-        RETIRO:
-        {{startDate}}
-        a las
-        {{pickupHour}}hs
+        RETIRO: {{startDate}} a las {{pickupHour}}hs
       </p>
       <p style="font-weight: 700">DEVOLUCIÓN: {{endDate}} a las 09:00hs</p>
 
@@ -105,8 +134,9 @@
       </p>
       <p>DIRECCIÓN DE RETIRO: Chacabuco 170 - Ciudad de Mendoza</p>
 
-      <p style="padding: 25px 0px;">Recordá asistir con tiempo, los checkeos
-        podrían demorar</p>
+      <p style="padding: 25px 0px">
+        Recordá asistir con tiempo, los checkeos podrían demorar
+      </p>
     </div>
   </body>
   <div style="padding: 20px 0px; max-width: 700px; margin: auto">
@@ -123,26 +153,28 @@
         style="width: 200px; height: 200px"
         src="https://res.cloudinary.com/dzjz8pe0y/image/upload/v1684439308/mailer/guanaco_vjfeks.png"
       />
-      <div>
+      <div style="height: 60px">
         <div style="width: 500px; margin: auto; display: flex; padding: 20px 0">
           <a
             style="
-              font-size: 15px;
+              font-size: 14px;
               font-weight: 800;
               color: #cd6328;
               text-decoration: none;
             "
             href="https://www.guanacorental.com/"
-          >WWW.GUANACORENTAL.COM</a>
+            >WWW.GUANACORENTAL.COM</a
+          >
           <a
             style="
               margin-left: auto;
-              font-size: 15px;
+              font-size: 14px;
               font-weight: 800;
               color: #cd6328;
               text-decoration: none;
             "
-          >GUANACO.RENTALAUDIOVISUAL</a>
+            >GUANACO.RENTALAUDIOVISUAL</a
+          >
         </div>
         <div>
           <p style="font-size: 14px">

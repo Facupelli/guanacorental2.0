@@ -14,6 +14,7 @@ type User = {
   pickupHour?: string;
   email: string;
   equipmentList?: { item: string; quantity: string }[];
+  total?: string;
 };
 
 export const sendMail = async (
