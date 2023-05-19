@@ -47,7 +47,8 @@ const Admin: NextPage = () => {
 
   const [, setOrder] = useState<Order | null>(null);
 
-  // const [calendarValue, setCalendarValue] = useState();
+  const calendarDay = useBoundStore((state) => state.calendarDay);
+  const setCalendarDay = useBoundStore((state) => state.setCalendarDay);
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
   const [orders, setOrders] = useState<Order[] | null>(null);
@@ -60,6 +61,8 @@ const Admin: NextPage = () => {
   const handleClickDay = useCallback(
     (day: Date) => {
       if (data) {
+        setCalendarDay(day);
+
         const orders = data.filter(
           (order) =>
             dayjs(order.book.start_date).isSame(dayjs(day), "day") ||
@@ -78,8 +81,8 @@ const Admin: NextPage = () => {
   );
 
   useEffect(() => {
-    handleClickDay(new Date());
-  }, [data, handleClickDay]);
+    handleClickDay(calendarDay);
+  }, [data, handleClickDay, calendarDay]);
 
   const isAdmin = getIsAdmin(session);
 
@@ -123,7 +126,7 @@ const Admin: NextPage = () => {
                 minDate={calendarMinDate}
                 onClickDay={handleClickDay}
                 className="rounded-lg p-4"
-                defaultValue={new Date()}
+                defaultValue={calendarDay}
                 tileClassName={({ date }: { date: Date }) => {
                   if (
                     data?.find(

@@ -16,7 +16,7 @@ interface LocationSlice {
 }
 
 const createLocationSlice: StateCreator<
-  LocationSlice & DateSlice & CartSlice,
+  LocationSlice & DateSlice & CartSlice & AdminSlice,
   [],
   [],
   LocationSlice
@@ -39,7 +39,7 @@ interface DateSlice {
 }
 
 const createDateSlice: StateCreator<
-  LocationSlice & DateSlice & CartSlice,
+  LocationSlice & DateSlice & CartSlice & AdminSlice,
   [],
   [],
   DateSlice
@@ -65,7 +65,7 @@ interface CartSlice {
 }
 
 const createCartSlice: StateCreator<
-  LocationSlice & DateSlice & CartSlice,
+  LocationSlice & DateSlice & CartSlice & AdminSlice,
   [],
   [],
   CartSlice
@@ -109,10 +109,28 @@ const createCartSlice: StateCreator<
   emptyCart: () => set(() => ({ cartItems: [] })),
 });
 
-export const useBoundStore = create<LocationSlice & DateSlice & CartSlice>()(
+interface AdminSlice {
+  calendarDay: Date;
+  setCalendarDay: (day: Date) => void;
+}
+
+const createAdminSlice: StateCreator<
+  LocationSlice & DateSlice & CartSlice & AdminSlice,
+  [],
+  [],
+  AdminSlice
+> = (set) => ({
+  calendarDay: new Date(),
+  setCalendarDay: (day) => set(() => ({ calendarDay: day })),
+});
+
+export const useBoundStore = create<
+  LocationSlice & DateSlice & CartSlice & AdminSlice
+>()(
   devtools((...a) => ({
     ...createLocationSlice(...a),
     ...createDateSlice(...a),
     ...createCartSlice(...a),
+    ...createAdminSlice(...a),
   }))
 );
