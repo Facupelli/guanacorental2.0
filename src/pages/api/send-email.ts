@@ -28,6 +28,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
         const pdfFile = files.pdf as formidable.File;
         const userEmail = fields.email;
+        const orderNumber = fields.orderNumber;
 
         if (pdfFile.originalFilename) {
           // Aquí puedes realizar acciones con el archivo PDF, como guardarlo en el servidor o procesarlo de alguna manera.
@@ -52,7 +53,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           const mailOptions = {
             from: "Guanaco Rental hola@guanacorental.com",
             to: userEmail,
-            subject: "PEDIDO RETIRADO CON ÉXITO",
+            subject: `PEDIDO #${orderNumber} RETIRADO CON ÉXITO`,
             html: template({}),
             attachments: [
               {
