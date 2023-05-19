@@ -28,7 +28,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
         const pdfFile = files.pdf as formidable.File;
         const userEmail = fields.email;
-        const orderNumber = fields.orderNumber;
+        const orderNumber = fields.orderNumber as string;
 
         if (pdfFile.originalFilename) {
           // Aquí puedes realizar acciones con el archivo PDF, como guardarlo en el servidor o procesarlo de alguna manera.
