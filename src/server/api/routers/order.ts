@@ -16,7 +16,7 @@ import {
   updateEarnings,
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
-import { sendMail } from "@/server/utils/mailer";
+import { sendMail, sendOrderDeliveredMail } from "@/server/utils/mailer";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -562,7 +562,7 @@ export const orderRouter = createTRPCRouter({
           endDate: endDate.toLocaleDateString(),
           pickupHour,
           equipmentList,
-          total: formatPrice(newOrder.total)
+          total: formatPrice(newOrder.total),
         };
 
         await sendMail(
@@ -573,5 +573,15 @@ export const orderRouter = createTRPCRouter({
       }
 
       return { newOrder, earnings };
+    }),
+
+  setOrderDelivered: protectedProcedure
+    .input(z.object({}))
+    .mutation(async () => {
+      const mailSent = await sendOrderDeliveredMail({
+        email: "facundopellicer@gmail.com",
+      });
+
+      return mailSent;
     }),
 });

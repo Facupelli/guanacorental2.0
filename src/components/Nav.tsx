@@ -13,18 +13,9 @@ const Nav = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
-  const setOpenCartModal = useBoundStore((state) => state.setOpenCartModal);
-  const showCartModal = useBoundStore((state) => state.showCartModal);
-
   const isAdmin = getIsAdmin(session);
   const isEmployee = getIsEmployee(session);
 
-  const handleOpenCart = () => {
-    if (showCartModal) {
-      return;
-    }
-    setOpenCartModal();
-  };
   return (
     <header>
       <nav className="fixed z-30 flex h-[70px] w-full items-center gap-6 bg-primary px-6">

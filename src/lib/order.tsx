@@ -10,13 +10,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import DialogWithState from "@/components/DialogWithState";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
 import { orderStatusClass } from "./magic_strings";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
-import { type MouseEvent } from "react";
+import {
+  useState,
+  type MouseEvent,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -142,23 +148,68 @@ const DynamicButton = dynamic<{ order: Order }>(() =>
 );
 
 const OrderActionsDropMenu = ({ order }: { order: Order }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [file, setFile] = useState<File | undefined>();
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files?.length > 0) {
+      setFile(event.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!file || !order.customer.email) return;
+
+    const formData = new FormData();
+    formData.append("pdf", file);
+    formData.append("email", order.customer.email);
+
+    const response = await fetch("/api/send-email", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      console.log("Email sent successfully!");
+    } else {
+      console.error("Failed to send email!");
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <Link href={`/admin/orders/${order.id}`}>Ver detalle</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <DynamicButton order={order} />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DialogWithState
+        isOpen={showModal}
+        setOpen={setShowModal}
+        title="Adjuntar remito"
+      >
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <input type="file" onChange={handleFileChange} />
+          <button type="submit">Enviar</button>
+        </form>
+      </DialogWithState>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <Link href={`/admin/orders/${order.id}`}>Ver detalle</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <DynamicButton order={order} />
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowModal(true)}>
+            Marcar retirado
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };

@@ -47,3 +47,39 @@ export const sendMail = async (
   const mail = await transporter.sendMail(mailOptions);
   return mail;
 };
+
+export const sendOrderDeliveredMail = async (user: User) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "hola@guanacorental.com",
+      pass: NODEMAILER_G_APP,
+    },
+  });
+
+  const templateSource = fs.readFileSync(
+    path.resolve(
+      process.cwd() + `/src/server/utils/templates/orderDelivered.handlebars`
+    ),
+    "utf-8"
+  );
+
+  const template = handlebars.compile(templateSource);
+
+  const mailOptions = {
+    from: "Guanaco Rental hola@guanacorental.com",
+    to: user.email,
+    subject: "FOMRULARIO DE ALTA GUANACO RENTAL",
+    html: template(user),
+    attachments: [
+      {
+        filename: "enviarmail.pdf",
+        contentType: "application/pdf",
+        path: "C:/Users/facun/Desktop/enviarmail.pdf",
+      },
+    ],
+  };
+
+  const mail = await transporter.sendMail(mailOptions);
+  return mail;
+};

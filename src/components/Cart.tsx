@@ -36,8 +36,6 @@ const Cart = ({
 
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
-  const setOpenCart = useBoundStore((state) => state.setOpenCartModal);
-  const showCart = useBoundStore((state) => state.showCartModal);
 
   const cartItems = useBoundStore((state) => state.cartItems);
 

@@ -34,8 +34,6 @@ const generatePdfRows = (order: Order) => {
 export const DownloadRemitoButton = ({ order }: RemitoProps) => {
   const pdfEquipmentRows = generatePdfRows(order);
 
-  console.log(pdfEquipmentRows);
-
   const [instance, updateInstance] = usePDF({
     document: <RemitoPdf order={order} pdfEquipmentRows={pdfEquipmentRows} />,
   });
