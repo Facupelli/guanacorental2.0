@@ -76,7 +76,7 @@ const AdminOrders: NextPage = () => {
     search,
   });
 
-  const filteredOrers = data?.orders.map((order) => ({
+  const filteredOrders = data?.orders.map((order) => ({
     ...order,
     equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
   }));
@@ -120,9 +120,9 @@ const AdminOrders: NextPage = () => {
               />
             </div>
             <div className="col-span-12">
-              {filteredOrers && (
+              {filteredOrders && (
                 <DataTable
-                  data={filteredOrers}
+                  data={filteredOrders}
                   columns={orderColumns}
                   setRowData={setOrder}
                   expandedComponent={equipmentsList}

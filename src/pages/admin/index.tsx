@@ -66,12 +66,12 @@ const Admin: NextPage = () => {
             dayjs(order.book.end_date).isSame(dayjs(day), "day")
         );
 
-        const filteredOrers = orders.map((order) => ({
+        const filteredOrders = orders.map((order) => ({
           ...order,
           equipments: getOrderEquipmentOnOwners(order.equipments, order.bookId),
         }));
 
-        setOrders(filteredOrers);
+        setOrders(filteredOrders);
       }
     },
     [data]
