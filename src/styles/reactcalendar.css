@@ -38,6 +38,13 @@
   height: 44px;
   margin-bottom: 1em;
 }
+
+@media (max-width: 480px) {
+  .react-calendar__navigation {
+    height: 34px;
+  }
+}
+
 .react-calendar__navigation button {
   min-width: 44px;
   background: none;
@@ -55,9 +62,23 @@
   font-weight: bold;
   font-size: 0.75em;
 }
+
+@media (max-width: 480px) {
+  .react-calendar__month-view__weekdays {
+    font-size: 0.7em;
+  }
+}
+
 .react-calendar__month-view__weekdays__weekday {
   padding: 0.5em;
 }
+
+@media (max-width: 480px) {
+  .react-calendar__month-view__weekdays__weekday {
+    padding: 0.2em;
+  }
+}
+
 .react-calendar__month-view__weekNumbers .react-calendar__tile {
   display: flex;
   align-items: center;

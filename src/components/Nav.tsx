@@ -103,7 +103,7 @@ export const FacebookButton = () => {
   return (
     <button
       onClick={() => void signIn("facebook")}
-      className="h-[35px] rounded-[2px] border border-[#1a77f2] bg-[#1a77f2] px-4 text-[#3c4043]"
+      className="h-[35px] rounded-[2px] border border-[#1a77f2] bg-[#1a77f2] px-2 text-[#3c4043]  sm:px-4"
     >
       <div className="flex items-center whitespace-nowrap font-roboto  text-[13px] font-semibold tracking-[0.25px] text-[#fff]">
         <FacebookIcon className="mr-2 h-4 w-4" /> Acceder con Facebook

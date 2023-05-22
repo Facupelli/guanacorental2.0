@@ -60,13 +60,13 @@ const SelectDateButton = () => {
         <DialogHeader>
           <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
           <DialogDescription>
-            <div>
+            <div className="hidden sm:block">
               Selecciona la fecha de retiro de los equipos y después la fecha de
               devolución. Luego selecciona el horario de retiro de los equipos.
             </div>
           </DialogDescription>
         </DialogHeader>
-        <div className="grid justify-center gap-6">
+        <div className="grid justify-center gap-2 sm:gap-6">
           <Calendar
             selectRange={true}
             locale="es-ES"
@@ -84,7 +84,7 @@ const SelectDateButton = () => {
 
           <div>
             <SelectPickupHour />
-            <div className="flex items-center text-xs">
+            <div className="hidden items-center text-xs sm:flex">
               <div className="flex items-center">
                 <RentWeekendTip />
                 Fin de semana
