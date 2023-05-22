@@ -21,7 +21,7 @@ const Nav = () => {
       <nav className="fixed z-30 flex h-[70px] w-full items-center gap-6 bg-primary px-6">
         <div>
           <Link href="/">
-            <div className="relative aspect-square w-14">
+            <div className="relative aspect-square w-12 sm:w-14">
               <Image
                 src="/guanaco-rental-logo.svg"
                 alt="guanaco rental logo"
@@ -42,7 +42,7 @@ const Nav = () => {
           id="click"
         />
         <label htmlFor="click" className="text-white sm:hidden">
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </label>
 
         <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">

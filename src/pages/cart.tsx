@@ -7,7 +7,7 @@ import Head from "next/head";
 import { useBoundStore } from "@/zustand/store";
 import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 
-import Nav from "@/components/Nav";
+import Nav, { FacebookButton, GoogleButton } from "@/components/Nav";
 import {
   Popover,
   PopoverContent,
@@ -46,6 +46,7 @@ type Discount = {
   code: string;
 };
 
+const loginError = "Debes iniciar sesión para realizar una reserva.";
 const noPetitionSentError =
   "No has enviado el alta de cliente. Para poder alquilar equipos es necesario llenar el formulario de alta de cliente.";
 
@@ -99,7 +100,7 @@ const CartPage: NextPage = () => {
 
   const handleBookOrder = () => {
     if (!session?.user) {
-      setError("Debes iniciar sesión para realizar una reserva.");
+      setError(loginError);
       setErrorModal(true);
       return;
     }
@@ -214,6 +215,12 @@ const CartPage: NextPage = () => {
           >
             ir al alta
           </Link>
+        )}
+        {error === loginError && (
+          <div className="grid gap-2">
+            <GoogleButton />
+            <FacebookButton />
+          </div>
         )}
         <DialogFooter>
           <Button
