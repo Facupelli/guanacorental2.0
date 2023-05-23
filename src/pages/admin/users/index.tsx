@@ -157,14 +157,14 @@ const AdminUsers: NextPage = () => {
                         columns={userColumns}
                       />
                     )}
-                  </div>
 
-                  <Pagination
-                    totalCount={data?.totalCount ?? 0}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    onPageChange={(page) => setCurrentPage(page as number)}
-                  />
+                    <Pagination
+                      totalCount={data?.totalCount ?? 0}
+                      currentPage={currentPage}
+                      pageSize={pageSize}
+                      onPageChange={(page) => setCurrentPage(page as number)}
+                    />
+                  </div>
                 </div>
               </TabsContent>
               <TabsContent value="petitions">

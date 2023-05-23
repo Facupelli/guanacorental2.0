@@ -39,6 +39,8 @@ import {
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Category, Equipment, Location } from "@/types/models";
+import Calendar from "react-calendar";
+import dayjs from "dayjs";
 
 type Props = {
   locations: Location[];
@@ -293,6 +295,8 @@ type EquipmentCardProps = {
   setShowCart: Dispatch<SetStateAction<boolean>>;
 };
 const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
+  const [showCalendar, setShowCalendar] = useState(false);
+
   const cartItems = useBoundStore((state) => state.cartItems);
   const addToCart = useBoundStore((state) => state.addToCart);
   const startDate = useBoundStore((state) => state.startDate);
@@ -310,47 +314,79 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
+  console.log(equipment);
+
   return (
-    <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
-      {equipment.image && (
-        <div className="relative h-[200px] w-auto">
-          <Image
-            src={equipment.image}
-            alt={`${equipment.name} ${equipment.brand} equipment picture`}
-            fill
-            style={{ objectFit: "contain" }}
-          />
+    <>
+      <DialogWithState isOpen={showCalendar} setOpen={setShowCalendar} title="">
+        <Calendar
+          minDate={new Date()}
+          tileClassName={({ date }) => {
+            if (date < new Date()) {
+              return;
+            }
+            if (
+              isEquipmentAvailable(equipment, {
+                startDate: date,
+                endDate: dayjs(date).add(1, "day").toDate(),
+              })
+            ) {
+              return "free-day";
+            }
+            return "booked-day";
+          }}
+        />
+      </DialogWithState>
+      <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
+        {equipment.image && (
+          <div className="relative h-[200px] w-auto">
+            <Image
+              src={equipment.image}
+              alt={`${equipment.name} ${equipment.brand} equipment picture`}
+              fill
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+        )}
+
+        <div>
+          <p className="font-bold">
+            {equipment.name} {equipment.brand}
+          </p>
+          <p>{equipment.model}</p>
         </div>
-      )}
 
-      <div>
-        <p className="font-bold">
-          {equipment.name} {equipment.brand}
-        </p>
-        <p>{equipment.model}</p>
-      </div>
+        <div className="flex items-center justify-end text-sm">
+          <p className={`${available ? "text-green-500" : "text-red-500"}`}>
+            {available ? "Disponible" : "Reservado"}
+          </p>
+          <Button
+            size="sm"
+            variant="darklink"
+            className="text-xs"
+            onClick={() => setShowCalendar(true)}
+          >
+            ver más
+          </Button>
+        </div>
 
-      <div className="flex items-center justify-end text-sm">
-        <p className={`${available ? "text-green-500" : "text-red-500"}`}>
-          {available ? "Disponible" : "Reservado"}
-        </p>
-        <Button size="sm" variant="darklink" className="text-xs">
-          ver más
-        </Button>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <p className="text-lg font-bold">{formatPrice(equipment.price)}</p>
-        <Button
-          size="sm"
-          variant="secondary"
-          className="font-bold"
-          onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
-        >
-          {isAlreadyInCart ? "Agregado" : <ShoppingCart className="h-5 w-5" />}
-        </Button>
-      </div>
-    </article>
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-bold">{formatPrice(equipment.price)}</p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="font-bold"
+            onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
+          >
+            {isAlreadyInCart ? (
+              "Agregado"
+            ) : (
+              <ShoppingCart className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+      </article>
+    </>
   );
 };
 
