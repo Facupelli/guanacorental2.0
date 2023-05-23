@@ -23,6 +23,9 @@ type Query = {
   where?: {
     locationId?: string;
     number?: number;
+    book?: {
+      start_date: { gte: Date };
+    };
   };
   take: number;
   skip: number;
@@ -322,6 +325,7 @@ export const orderRouter = createTRPCRouter({
 
       if (sort === ADMIN_ORDERS_SORT["NEXT ORDERS"]) {
         query.orderBy = { book: { start_date: "asc" } };
+        query.where = { book: { start_date: { gte: new Date() } } };
       }
 
       if (sort === ADMIN_ORDERS_SORT["LAST ORDERS"]) {
@@ -334,7 +338,9 @@ export const orderRouter = createTRPCRouter({
 
       const orders = await prisma.order.findMany(query);
 
-      const totalCount = await prisma.order.count();
+      const totalCount = await prisma.order.count({
+        where: query.where,
+      });
 
       return { orders, totalCount };
     }),
