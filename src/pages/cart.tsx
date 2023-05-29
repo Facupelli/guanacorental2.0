@@ -18,7 +18,7 @@ import SelectDateButton from "@/components/ui/SelectDateButton";
 import DialogWithState from "@/components/DialogWithState";
 import { DialogFooter } from "@/components/ui/dialog";
 import CartItemCounter from "@/components/CartItemCounter";
-import { Info, X } from "lucide-react";
+import { Info, Loader2, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import AddCoupon from "@/components/AddCoupon";
@@ -471,6 +471,7 @@ const RightBar = ({
               }
               onClick={handleBookOrder}
             >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {!startDate || !endDate
                 ? "Selecciona una fecha para alquilar!"
                 : "Agendar Pedido"}
