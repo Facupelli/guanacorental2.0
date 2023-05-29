@@ -26,19 +26,24 @@ export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   const sortByOwnerPriority = (owners: Owner[]) => {
     const ownerPriority = ["Both", "Fede", "Oscar", "Sub"];
     return owners.sort((a, b) => {
-      if (a.owner.name && b.owner.name) {
-        return (
-          ownerPriority.indexOf(a.owner.name) -
-          ownerPriority.indexOf(b.owner.name)
-        );
+      const ownerIndexA = ownerPriority.indexOf(a.owner.name);
+      const ownerIndexB = ownerPriority.indexOf(b.owner.name);
+
+      if (ownerIndexA === -1 && ownerIndexB === -1) {
+        return 0; // Si ambos ownerName no están en ownerPriority, se mantiene el orden actual
       }
-      return 1;
+      if (ownerIndexA === -1) {
+        return 1; // Si ownerName de 'a' no está en ownerPriority, se coloca al final
+      }
+      if (ownerIndexB === -1) {
+        return -1; // Si ownerName de 'b' no está en ownerPriority, se coloca al final
+      }
+
+      return ownerIndexA - ownerIndexB; // Ordenar según la prioridad en ownerPriority
     });
   };
 
   const owners = sortByOwnerPriority(item.owner!);
-
-  console.log("OWNERS", item.owner);
 
   // Recorre cada dueño para obtener la cantidad deseada
   let remainingQuantity = quantity;
