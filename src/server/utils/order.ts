@@ -1,38 +1,35 @@
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
 import { type Prisma } from "@prisma/client";
 
-type CartItem = {
-  id?: string;
-  quantity: number;
-  price: number;
-  owner?:
-    | {
-        id: string;
-        ownerId: string;
-        stock: number;
-        locationId: string;
-        ownerName?: string | undefined;
-      }[]
-    | undefined;
-};
+type CartItem = Prisma.EquipmentGetPayload<{
+  include: {
+    owner: {
+      include: {
+        owner: true;
+        location: true;
+        books: { include: { book: true } };
+      };
+    };
+  };
+}>;
 
-type Owner = {
-  id: string;
-  ownerId: string;
-  stock: number;
-  locationId: string;
-  ownerName?: string | undefined;
-};
+type Owner = Prisma.EquipmentOnOwnerGetPayload<{
+  include: {
+    owner: true;
+    location: true;
+    books: { include: { book: true } };
+  };
+}>;
 
 export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   // Ordena el arreglo de owners según la prioridad especificada
   const sortByOwnerPriority = (owners: Owner[]) => {
     const ownerPriority = ["Both", "Fede", "Oscar", "Sub"];
     return owners.sort((a, b) => {
-      if (a.ownerName && b.ownerName) {
+      if (a.owner.name && b.owner.name) {
         return (
-          ownerPriority.indexOf(a.ownerName) -
-          ownerPriority.indexOf(b.ownerName)
+          ownerPriority.indexOf(a.owner.name) -
+          ownerPriority.indexOf(b.owner.name)
         );
       }
       return 1;
@@ -40,6 +37,8 @@ export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
   };
 
   const owners = sortByOwnerPriority(item.owner!);
+
+  console.log("OWNERS", item.owner);
 
   // Recorre cada dueño para obtener la cantidad deseada
   let remainingQuantity = quantity;
