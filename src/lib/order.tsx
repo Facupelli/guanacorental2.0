@@ -19,10 +19,7 @@ import { orderStatusClass } from "./magic_strings";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
-import {
-  useState,
-  type MouseEvent,
-} from "react";
+import { useState, type MouseEvent } from "react";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -126,6 +123,9 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
             <p className="font-semibold">{ownerEquipment.equipment.name}</p>
             <p className="font-semibold">{ownerEquipment.equipment.brand}</p>
             <p>{ownerEquipment.equipment.model}</p>
+            <p className="text-xs text-primary/60">
+              {ownerEquipment.owner.name}
+            </p>
           </div>
           <div>
             <p>

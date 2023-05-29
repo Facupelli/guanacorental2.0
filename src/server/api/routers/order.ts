@@ -325,7 +325,9 @@ export const orderRouter = createTRPCRouter({
 
       if (sort === ADMIN_ORDERS_SORT["NEXT ORDERS"]) {
         query.orderBy = { book: { start_date: "asc" } };
-        query.where = { book: { start_date: { gte: new Date() } } };
+        query.where = {
+          book: { start_date: { gte: dayjs().startOf("day").toDate() } },
+        };
       }
 
       if (sort === ADMIN_ORDERS_SORT["LAST ORDERS"]) {

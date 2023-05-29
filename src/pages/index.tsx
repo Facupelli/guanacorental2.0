@@ -314,8 +314,6 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
-  console.log(equipment);
-
   return (
     <>
       <DialogWithState isOpen={showCalendar} setOpen={setShowCalendar} title="">
