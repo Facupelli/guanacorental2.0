@@ -37,8 +37,12 @@ import { api } from "@/utils/api";
 import { authOptions } from "@/server/auth";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
-import { type Prisma, type Role } from "@prisma/client";
+import { type Location, type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { Input } from "@/components/ui/input";
+import { AdminSelectLocation } from "@/components/ui/SelectLocation";
+import { prisma } from "@/server/db";
+import useDebounce from "@/hooks/useDebounce";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -77,7 +81,11 @@ const userColumns: Columns<User, CellProps>[] = [
   },
 ];
 
-const AdminUsers: NextPage = () => {
+type Props = {
+  locations: Location[];
+};
+
+const AdminUsers: NextPage<Props> = ({ locations }: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [, setUser] = useState<User | null>(null);
@@ -85,11 +93,16 @@ const AdminUsers: NextPage = () => {
     null
   );
 
-  const { watch, setValue } = useForm<{ roleId: string }>();
+  const { watch, setValue, register } = useForm<{
+    roleId: string;
+    search: string;
+    location: string;
+  }>();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  const roleId = watch("roleId");
+  const roleId = watch("roleId", undefined);
+  const search = useDebounce(watch("search", undefined), 500);
 
   const roles = api.role.getAllRoles.useQuery();
   const petitionUsers = api.user.getPetitionUsers.useQuery();
@@ -97,6 +110,7 @@ const AdminUsers: NextPage = () => {
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
     roleId,
+    search,
   });
 
   const isAdmin = getIsAdmin(session);
@@ -134,7 +148,14 @@ const AdminUsers: NextPage = () => {
               <TabsContent value="customers">
                 <div className="grid grid-cols-12 gap-6">
                   <div className="col-span-12 flex gap-4">
-                    <div className="flex items-center gap-4 rounded-md bg-white p-4">
+                    <div className="flex w-full items-center gap-4 rounded-md bg-white p-4">
+                      <Input
+                        type="search"
+                        placeholder="buscar por nombre y apellido"
+                        {...register("search")}
+                      />
+                      <Label>Sucursal</Label>
+
                       <Label className="whitespace-nowrap">
                         Rol del cliente
                       </Label>
@@ -142,8 +163,12 @@ const AdminUsers: NextPage = () => {
                         <SelectRole roles={roles.data} setValue={setValue} />
                       )}
                     </div>
-                    <div className="ml-auto">
-                      <Button onClick={handleCreateUser} disabled={!isAdmin}>
+                    <div className="col-span-12 ml-auto">
+                      <Button
+                        onClick={handleCreateUser}
+                        disabled={!isAdmin}
+                        className="whitespace-nowrap"
+                      >
                         Crear Cliente
                       </Button>
                     </div>
@@ -218,7 +243,11 @@ const SelectRole = ({
   setValue,
 }: {
   roles: Role[];
-  setValue: UseFormSetValue<{ roleId: string }>;
+  setValue: UseFormSetValue<{
+    roleId: string;
+    location: string;
+    search: string;
+  }>;
 }) => {
   return (
     <Select onValueChange={(e) => setValue("roleId", e)}>
@@ -431,10 +460,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const { user } = session;
+  const locations = await prisma.location.findMany({});
 
   return {
     props: {
       user,
+      locations,
     },
   };
 };

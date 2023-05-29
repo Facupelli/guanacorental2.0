@@ -5,6 +5,17 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { sendMail } from "@/server/utils/mailer";
 
+type wherePipe = {
+  role?: {
+    some: {
+      id: string;
+    };
+  };
+  petition_sent: boolean;
+  customer_approved: boolean;
+  name?: string;
+};
+
 export const userRouter = createTRPCRouter({
   getPetitionUsers: protectedProcedure.query(async () => {
     const users = await prisma.user.findMany({
@@ -131,21 +142,27 @@ export const userRouter = createTRPCRouter({
         take: z.number(),
         skip: z.number(),
         roleId: z.string().optional(),
+        search: z.string(),
       })
     )
     .query(async ({ input }) => {
-      const { take, skip, roleId } = input;
+      const { take, skip, roleId, search } = input;
+
+      const wherePipe: wherePipe = {
+        petition_sent: true,
+        customer_approved: true,
+      };
+
+      if (roleId) {
+        wherePipe.role = { some: { id: roleId } };
+      }
+
+      if (search) {
+        wherePipe.name = search;
+      }
 
       const users = await prisma.user.findMany({
-        where: {
-          role: {
-            some: {
-              id: roleId,
-            },
-          },
-          petition_sent: true,
-          customer_approved:true,
-        },
+        where: wherePipe,
         take,
         skip,
         include: {
@@ -156,15 +173,7 @@ export const userRouter = createTRPCRouter({
       });
 
       const totalCount = await prisma.user.count({
-        where: {
-          role: {
-            some: {
-              id: roleId,
-            },
-          },
-          petition_sent: true,
-          customer_approved:true,
-        },
+        where: wherePipe,
       });
 
       return { users, totalCount };
