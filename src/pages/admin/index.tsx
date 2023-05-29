@@ -77,7 +77,7 @@ const Admin: NextPage = () => {
         setOrders(filteredOrders);
       }
     },
-    [data]
+    [data, setCalendarDay]
   );
 
   useEffect(() => {

@@ -1,10 +1,9 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useBoundStore } from "@/zustand/store";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { FacebookIcon, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { FacebookIcon, Menu, UserCog } from "lucide-react";
 
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import Cart from "./Cart";

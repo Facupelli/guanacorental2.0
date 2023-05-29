@@ -1,10 +1,6 @@
+import { type Equipment } from "@/types/models";
 import { useBoundStore } from "@/zustand/store";
 import { useEffect } from "react";
-
-type LocationData = {
-  locationName: string;
-  locationId: string;
-};
 
 let didCartInit = false;
 
@@ -19,7 +15,8 @@ export const useLoadCartFromLocalStorage = () => {
       if (cart?.length === 0) {
         const localCart = localStorage.getItem("cart");
         if (localCart) {
-          setCart(JSON.parse(localCart));
+          const parsedCart = JSON.parse(localCart) as Equipment[];
+          setCart(parsedCart);
         }
       }
     }

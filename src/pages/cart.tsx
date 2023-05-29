@@ -314,8 +314,9 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
     //LOCALSTORAGE
     const localCart = localStorage.getItem("cart");
     if (localCart) {
-      const updatedCart = JSON.parse(localCart).filter(
-        (localItem: CartItem) => localItem.id !== item.id
+      const parsedCart = JSON.parse(localCart) as Equipment[];
+      const updatedCart = parsedCart.filter(
+        (localItem: Equipment) => localItem.id !== item.id
       );
       localStorage.setItem("cart", JSON.stringify([...updatedCart]));
     }
