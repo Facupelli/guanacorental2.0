@@ -595,7 +595,7 @@ const AddEquipment = ({
 
       <div>
         <Label htmlFor="accessories">Accesorios</Label>
-        <Input type="text" id="accessories" {...register("accessories.0")} />
+        <Input type="text" id="accessories" {...register("accessories.0")} defaultValue={equipment?.accessories[0]} />
       </div>
 
       <div className="grid py-6">
