@@ -1,17 +1,6 @@
 import { getDatesInRange, getTotalWorkingDays } from "@/lib/dates";
+import { type CartItem } from "@/types/cart";
 import { type Prisma } from "@prisma/client";
-
-type CartItem = Prisma.EquipmentGetPayload<{
-  include: {
-    owner: {
-      include: {
-        owner: true;
-        location: true;
-        books: { include: { book: true } };
-      };
-    };
-  };
-}>;
 
 type Owner = Prisma.EquipmentOnOwnerGetPayload<{
   include: {

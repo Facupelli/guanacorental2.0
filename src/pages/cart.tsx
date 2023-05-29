@@ -38,6 +38,7 @@ import {
 } from "@/lib/utils";
 
 import type { Equipment, Location } from "@/types/models";
+import { type CartItem } from "@/types/cart";
 import Link from "next/link";
 
 type Discount = {
@@ -307,6 +308,19 @@ type ItemProps = {
 const Item = ({ item, endDate, startDate }: ItemProps) => {
   const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
 
+  const handleRemoveFromCart = (itemId: string) => {
+    deleteFromCart(itemId);
+
+    //LOCALSTORAGE
+    const localCart = localStorage.getItem("cart");
+    if (localCart) {
+      const updatedCart = JSON.parse(localCart).filter(
+        (localItem: CartItem) => localItem.id !== item.id
+      );
+      localStorage.setItem("cart", JSON.stringify([...updatedCart]));
+    }
+  };
+
   const available = isEquipmentAvailable(item, { startDate, endDate });
 
   return (
@@ -334,7 +348,7 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
       </p>
       <button
         className="col-span-2 flex justify-end sm:col-span-1 "
-        onClick={() => deleteFromCart(item.id)}
+        onClick={() => handleRemoveFromCart(item.id)}
       >
         <X className=" h-4 w-4 " />
       </button>

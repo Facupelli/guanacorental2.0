@@ -309,6 +309,23 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
     addToCart(equipment);
 
+    //LOCALSTORAGE
+    const localCart = localStorage.getItem("cart");
+    if (localCart) {
+      localStorage.setItem(
+        "cart",
+        JSON.stringify([
+          ...JSON.parse(localCart),
+          { ...equipment, quantity: 1 },
+        ])
+      );
+    } else {
+      localStorage.setItem(
+        "cart",
+        JSON.stringify([{ ...equipment, quantity: 1 }])
+      );
+    }
+
     if (cartItems.length === 0) setShowCart(true);
   };
 

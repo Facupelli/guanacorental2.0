@@ -62,6 +62,7 @@ interface CartSlice {
   addItemQuantity: (id: string) => void;
   substractItemQuantity: (id: string) => void;
   emptyCart: () => void;
+  setCart: (cart: Equipment[]) => void;
 }
 
 const createCartSlice: StateCreator<
@@ -107,6 +108,7 @@ const createCartSlice: StateCreator<
       }),
     })),
   emptyCart: () => set(() => ({ cartItems: [] })),
+  setCart: (cart) => set(() => ({ cartItems: cart })),
 });
 
 interface AdminSlice {

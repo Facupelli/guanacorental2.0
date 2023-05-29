@@ -20,6 +20,7 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 
 import { type Equipment } from "@/types/models";
 import { type Dispatch, type SetStateAction } from "react";
+import { type CartItem } from "@/types/cart";
 
 const Cart = ({
   trigger,
@@ -103,10 +104,23 @@ type CartItemProps = {
 const CartItem = ({ item }: CartItemProps) => {
   const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
 
+  const handleRemoveFromCart = (itemId: string) => {
+    deleteFromCart(itemId);
+
+    //LOCALSTORAGE
+    const localCart = localStorage.getItem("cart");
+    if (localCart) {
+      const updatedCart = JSON.parse(localCart).filter(
+        (localItem: CartItem) => localItem.id !== item.id
+      );
+      localStorage.setItem("cart", JSON.stringify([...updatedCart]));
+    }
+  };
+
   return (
     <div className="rounded-md bg-secondary/50 p-4 shadow">
       <div className="flex justify-end">
-        <button onClick={() => deleteFromCart(item.id)}>
+        <button onClick={() => handleRemoveFromCart(item.id)}>
           <X className="h-4 w-4" />
         </button>
       </div>
