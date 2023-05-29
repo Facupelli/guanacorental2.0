@@ -576,7 +576,7 @@ export const orderRouter = createTRPCRouter({
         await sendMail(
           mailData,
           "newOrder.handlebars",
-          "NUEVO PEDIDO REALIZADO"
+          `NUEVO PEDIDO REALIZADO #${newOrder.number}`
         );
       }
 

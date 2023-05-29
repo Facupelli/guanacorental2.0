@@ -40,7 +40,7 @@ export const sendMail = async (
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",
     to: user.email,
-    subject: "FOMRULARIO DE ALTA GUANACO RENTAL",
+    subject,
     html: template(user),
   };
 
@@ -69,7 +69,7 @@ export const sendOrderDeliveredMail = async (user: User) => {
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",
     to: user.email,
-    subject: "FOMRULARIO DE ALTA GUANACO RENTAL",
+    subject: "PEDIDO RETIRADO CON ÉXITO",
     html: template(user),
     attachments: [
       {
