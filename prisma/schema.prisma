@@ -74,29 +74,29 @@ model Address {
   id                String      @default(cuid()) @id
   customer          User?
   full_name         String
-  phone             String
+  phone             String     @unique
   province          String
   city              String
   postal_code       String?
   address_1         String
   address_2         String?
   dni_number        String
-  birth_date        String
+  birth_date        String?
   occupation        String
   company           String?
   student           Boolean?
   employee          Boolean?
   bussines_name     String?
   cuit              String?
-  contact_1         String
-  contact_2         String
-  bond_1            String
-  bond_2            String
+  contact_1         String @default("en db vieja")
+  contact_2         String @default("en db vieja")
+  bond_1            String @default("en db vieja")
+  bond_2            String @default("en db vieja")
   bank              String
   alias             String
   cbu               String
-  dni_front         String @default("asd")
-  dni_back          String @default("asd")
+  dni_front         String @default("en db vieja")
+  dni_back          String @default("en db vieja")
 
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt

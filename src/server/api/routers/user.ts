@@ -144,6 +144,7 @@ export const userRouter = createTRPCRouter({
             },
           },
           petition_sent: true,
+          customer_approved:true,
         },
         take,
         skip,
@@ -162,6 +163,7 @@ export const userRouter = createTRPCRouter({
             },
           },
           petition_sent: true,
+          customer_approved:true,
         },
       });
 
