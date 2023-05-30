@@ -31,8 +31,12 @@ const Nav = () => {
         </div>
 
         <div className="ml-auto">
-          <Cart trigger />
+          <Link href="/faq" className="text-white">
+            FAQ
+          </Link>
         </div>
+
+        <Cart trigger />
 
         <input
           type="checkbox"
