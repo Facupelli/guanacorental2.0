@@ -66,6 +66,21 @@ export const equipmentRouter = createTRPCRouter({
       return newEquipment;
     }),
 
+  putAvailability: protectedProcedure
+    .input(z.object({ availability: z.boolean(), equipmentId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { availability, equipmentId } = input;
+
+      await prisma.equipment.update({
+        where: { id: equipmentId },
+        data: {
+          available: availability,
+        },
+      });
+
+      return { message: "success" };
+    }),
+
   putEquipment: protectedProcedure
     .input(
       z.object({
@@ -77,7 +92,6 @@ export const equipmentRouter = createTRPCRouter({
         equipmentId: z.string(),
         categoryId: z.string(),
         accessories: z.array(z.string()),
-        // available: z.string(),
       })
     )
     .mutation(async ({ input }) => {

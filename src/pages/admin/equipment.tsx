@@ -93,9 +93,27 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
   {
     title: "Disponible",
     cell: (rowData) => {
+      const ctx = api.useContext();
+      const { mutate } = api.equipment.putAvailability.useMutation();
+
+      const handleChangeAvailability = (checked: boolean) => {
+        mutate(
+          { equipmentId: rowData.id, availability: checked },
+          {
+            onSuccess: () => {
+              ctx.equipment.adminGetEquipment.invalidate();
+            },
+          }
+        );
+      };
+
       return (
         <div className="flex justify-center">
-          <Switch defaultChecked={rowData.available} title="habilitado" />
+          <Switch
+            checked={rowData.available}
+            title="habilitado"
+            onCheckedChange={(e) => handleChangeAvailability(e)}
+          />
         </div>
       );
     },
@@ -595,7 +613,12 @@ const AddEquipment = ({
 
       <div>
         <Label htmlFor="accessories">Accesorios</Label>
-        <Input type="text" id="accessories" {...register("accessories.0")} defaultValue={equipment?.accessories[0]} />
+        <Input
+          type="text"
+          id="accessories"
+          {...register("accessories.0")}
+          defaultValue={equipment?.accessories[0]}
+        />
       </div>
 
       <div className="grid py-6">
