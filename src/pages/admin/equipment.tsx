@@ -101,7 +101,7 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
           { equipmentId: rowData.id, availability: checked },
           {
             onSuccess: () => {
-              ctx.equipment.adminGetEquipment.invalidate();
+              void ctx.equipment.adminGetEquipment.invalidate();
             },
           }
         );
