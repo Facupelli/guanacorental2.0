@@ -315,9 +315,9 @@ export const orderRouter = createTRPCRouter({
         };
       } else {
         if (location !== "all") {
+          console.log("LOCATION ---------------->>>>>>>", location);
           query.where = { locationId: location };
         }
-
         if (search) {
           query.where = { number: Number(search) };
         }
@@ -325,9 +325,11 @@ export const orderRouter = createTRPCRouter({
 
       if (sort === ADMIN_ORDERS_SORT["NEXT ORDERS"]) {
         query.orderBy = { book: { start_date: "asc" } };
-        query.where = {
-          book: { start_date: { gte: dayjs().startOf("day").toDate() } },
-        };
+        if (query.where) {
+          query.where.book = {
+            start_date: { gte: dayjs().startOf("day").toDate() },
+          };
+        }
       }
 
       if (sort === ADMIN_ORDERS_SORT["LAST ORDERS"]) {
