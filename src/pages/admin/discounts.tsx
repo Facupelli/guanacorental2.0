@@ -57,7 +57,7 @@ const columns: Columns<Discount, CellProps>[] = [
   {
     title: "Código",
     cell: (rowData) => (
-      <pre className="rounded-2xl bg-secondary-foreground/10 p-1 px-2">
+      <pre className="inline-block rounded-2xl bg-secondary-foreground/10 p-1 px-4">
         {rowData.code}
       </pre>
     ),
