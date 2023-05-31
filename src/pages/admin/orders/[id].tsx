@@ -512,7 +512,6 @@ type OrderInfoProps = {
 
 const OrderInfo = ({
   info,
-  total,
   discount,
   setDiscount,
   location,

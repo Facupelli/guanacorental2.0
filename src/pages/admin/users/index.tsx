@@ -84,7 +84,7 @@ type Props = {
   locations: Location[];
 };
 
-const AdminUsers: NextPage<Props> = ({ locations }: Props) => {
+const AdminUsers: NextPage<Props> = ({}: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [, setUser] = useState<User | null>(null);

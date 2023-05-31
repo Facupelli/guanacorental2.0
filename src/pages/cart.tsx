@@ -38,7 +38,6 @@ import {
 } from "@/lib/utils";
 
 import type { Equipment, Location } from "@/types/models";
-import { type CartItem } from "@/types/cart";
 import Link from "next/link";
 
 type Discount = {
