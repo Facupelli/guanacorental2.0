@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { useForm } from "react-hook-form";
 import { api } from "@/utils/api";
 import { type Location } from "@prisma/client";
+import { Label } from "./ui/label";
 
 type Discount = {
   value: number;
@@ -35,7 +36,10 @@ const AddCoupon = ({
   orderId,
 }: AddCouponProps) => {
   const [error, setError] = useState("");
-  const { register, getValues } = useForm<{ code: string }>();
+  const { register, getValues } = useForm<{
+    code: string;
+    applyToSub: boolean;
+  }>();
 
   const ctx = api.useContext();
 
@@ -57,8 +61,10 @@ const AddCoupon = ({
           setError("");
 
           if (admin && orderId) {
+            const applyToSub = getValues("applyToSub");
+
             orderMutate.mutate(
-              { orderId, discountId: data.id, total },
+              { orderId, discountId: data.id, total, applyToSub },
               {
                 onSuccess: () => {
                   void ctx.order.getOrderById.invalidate();
@@ -83,7 +89,7 @@ const AddCoupon = ({
         isOpen={showCouponModal}
         setOpen={setShowCouponModal}
       >
-        <div className="grid gap-4 p-2">
+        <div className="grid gap-2 p-2">
           <Input
             type="text"
             className="h-8"
@@ -91,6 +97,21 @@ const AddCoupon = ({
             disabled={!!discount}
             placeholder="Escribe aquí el código del cupón"
           />
+
+          <div className="flex items-center gap-2">
+            <div>
+              <Input
+                type="checkbox"
+                className="h-8"
+                {...register("applyToSub")}
+                disabled={!!discount}
+                placeholder="Escribe aquí el código del cupón"
+                defaultChecked
+                id="applyToSub"
+              />
+            </div>
+            <Label htmlFor="applyToSub">Aplicar descuento a subalquiler</Label>
+          </div>
           <p className="text-red-600">{error}</p>
         </div>
         <DialogFooter>

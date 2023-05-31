@@ -79,7 +79,15 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
     await fetchNextPage();
   };
 
-  const equipments = data?.pages.map((page) => page.equipments).flat();
+  const equipments = data?.pages
+    .map((page) => page.equipments)
+    .flat()
+    .map((item) => ({
+      ...item,
+      owner: item.owner.filter(
+        (ownerOnEquipment) => ownerOnEquipment.locationId === location.id
+      ),
+    }));
 
   return (
     <>

@@ -89,7 +89,10 @@ export const getOrderEquipmentOnOwners = (
   return equipmentOnOwners;
 };
 
-export const calculateOwnerEarning = (newOrder: NewOrder) => {
+export const calculateOwnerEarning = (
+  newOrder: NewOrder,
+  applyToSub?: boolean
+) => {
   const { book, equipments, bookId, discount } = newOrder;
   const { start_date, end_date, pickup_hour } = book;
 
@@ -126,9 +129,22 @@ export const calculateOwnerEarning = (newOrder: NewOrder) => {
       } else if (ownerName === "Oscar") {
         oscarEarnings += price;
       } else if (ownerName === "Sub") {
-        subEarnings += price * 0.7;
-        federicoEarnings += price * 0.15;
-        oscarEarnings += price * 0.15;
+        if (!applyToSub && discount) {
+          const cleanPrice = workingDays * equipmentPrice * quantity * 0.7;
+          subEarnings += cleanPrice;
+          const bothEarnings = workingDays * equipmentPrice * quantity * 0.3;
+          const bothEarningsWithDiscount =
+            bothEarnings - bothEarnings * (discount.rule.value / 100);
+          const bothEarningsWithSubDiscount =
+            bothEarningsWithDiscount - cleanPrice * (discount.rule.value / 100);
+
+          federicoEarnings += bothEarningsWithSubDiscount / 2;
+          oscarEarnings += bothEarningsWithSubDiscount / 2;
+        } else {
+          subEarnings += price * 0.7;
+          federicoEarnings += price * 0.15;
+          oscarEarnings += price * 0.15;
+        }
       } else {
         federicoEarnings += price / 2;
         oscarEarnings += price / 2;

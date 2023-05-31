@@ -1,7 +1,7 @@
 import { calculateTotalWithDiscount } from "@/lib/utils";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
-import {calculateOwnerEarning} from "@/server/utils/order"
+import { calculateOwnerEarning } from "@/server/utils/order";
 import { TRPCError } from "@trpc/server";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -84,10 +84,11 @@ export const discountRouter = createTRPCRouter({
         orderId: z.string(),
         discountId: z.string(),
         total: z.number(),
+        applyToSub: z.boolean(),
       })
     )
     .mutation(async ({ input }) => {
-      const { orderId, discountId, total } = input;
+      const { orderId, discountId, total, applyToSub } = input;
 
       const discount = await prisma.discount.findUnique({
         where: { id: discountId },
@@ -147,16 +148,16 @@ export const discountRouter = createTRPCRouter({
         },
       });
 
-      const earnings = calculateOwnerEarning(updatedOrder)
+      const earnings = calculateOwnerEarning(updatedOrder, applyToSub);
 
       await prisma.earning.update({
-        where:{orderId},
-        data:{
+        where: { orderId },
+        data: {
           federico: earnings?.federicoEarnings,
           oscar: earnings?.oscarEarnings,
-          sub:earnings?.subEarnings
-        }
-      })
+          sub: earnings?.subEarnings,
+        },
+      });
     }),
 
   getValidDiscountByCode: protectedProcedure
