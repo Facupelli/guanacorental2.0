@@ -46,7 +46,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   useLoadLocationFromLocalStorage();
-  useLoadCartFromLocalStorage();
+  // useLoadCartFromLocalStorage();
 
   return (
     <SessionProvider session={session}>

@@ -69,7 +69,7 @@ const Cart = ({
           </SheetDescription>
         </SheetHeader>
 
-        {/* <div className="relative flex h-[90%] flex-col gap-3 pt-4">
+        <div className="relative flex h-[90%] flex-col gap-3 pt-4">
           <div className="grid gap-6 overflow-y-auto py-4">
             {cartItems.length === 0 ? (
               <div>
@@ -86,7 +86,7 @@ const Cart = ({
               VER CARRITO
             </Button>
           </div>
-        </div> */}
+        </div>
       </SheetContent>
     </Sheet>
   );
@@ -103,14 +103,14 @@ const CartItem = ({ item }: CartItemProps) => {
     deleteFromCart(itemId);
 
     //LOCALSTORAGE
-    const localCart = localStorage.getItem("cart");
-    if (localCart) {
-      const parsedCart = JSON.parse(localCart) as Equipment[];
-      const updatedCart = parsedCart.filter(
-        (localItem: Equipment) => localItem.id !== item.id
-      );
-      localStorage.setItem("cart", JSON.stringify([...updatedCart]));
-    }
+    // const localCart = localStorage.getItem("cart");
+    // if (localCart) {
+    //   const parsedCart = JSON.parse(localCart) as Equipment[];
+    //   const updatedCart = parsedCart.filter(
+    //     (localItem: Equipment) => localItem.id !== item.id
+    //   );
+    //   localStorage.setItem("cart", JSON.stringify([...updatedCart]));
+    // }
   };
 
   return (
