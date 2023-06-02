@@ -408,7 +408,7 @@ const ActionsDropMenu = ({
         >
           editar
         </DropdownMenuItem>
-        <DropdownMenuItem>eliminar</DropdownMenuItem>
+        {/* <DropdownMenuItem>eliminar</DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

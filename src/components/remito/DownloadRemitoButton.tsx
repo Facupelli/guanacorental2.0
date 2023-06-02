@@ -51,6 +51,8 @@ export const DownloadRemitoButton = ({ order }: RemitoProps) => {
   };
 
   return (
-    <button onClick={() => handleDownload(instance.blob)}>Descargar PDF</button>
+    <button onClick={() => handleDownload(instance.blob)}>
+      Descargar Remito
+    </button>
   );
 };
