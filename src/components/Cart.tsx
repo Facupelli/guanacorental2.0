@@ -8,7 +8,6 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
-  // SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -70,7 +69,7 @@ const Cart = ({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="relative flex h-[90%] flex-col gap-3 pt-4">
+        {/* <div className="relative flex h-[90%] flex-col gap-3 pt-4">
           <div className="grid gap-6 overflow-y-auto py-4">
             {cartItems.length === 0 ? (
               <div>
@@ -87,11 +86,7 @@ const Cart = ({
               VER CARRITO
             </Button>
           </div>
-        </div>
-
-        {/* <SheetFooter>
-          <Button type="submit">Save changes</Button>
-        </SheetFooter> */}
+        </div> */}
       </SheetContent>
     </Sheet>
   );
