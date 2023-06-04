@@ -142,7 +142,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                   <Input
                     type="search"
                     placeholder="Buscar equipos por nombre, marca o modelo"
-                    className="rounded-br-none rounded-tr-none"
+                    className="rounded-br-none rounded-tr-none focus-visible:outline focus-visible:ring-0"
                     {...register("search")}
                   />
                   <div className="h-10 rounded-br-md rounded-tr-md bg-primary px-3">
