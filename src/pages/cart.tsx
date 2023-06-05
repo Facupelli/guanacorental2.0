@@ -454,9 +454,17 @@ const RightBar = ({
                 <p className="font-semibold">{formatPrice(subtotal)}</p>
               )}
             </div>
-            <div className="flex items-center justify-between font-semibold">
-              <p>Total:</p>
-              <p className="text-xl font-extrabold">{formatPrice(cartTotal)}</p>
+
+            <div className="grid gap-1">
+              <div className="flex items-center justify-between font-semibold">
+                <p>Total:</p>
+                <p className="text-xl font-extrabold">
+                  {formatPrice(cartTotal)}
+                </p>
+              </div>
+              <p className="text-right text-sm text-primary/60">
+                El precio no incluye impuestos de facturación.
+              </p>
             </div>
 
             {isAdmin && (

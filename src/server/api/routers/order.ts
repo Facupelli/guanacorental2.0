@@ -336,7 +336,7 @@ export const orderRouter = createTRPCRouter({
       }
 
       if (sort === ADMIN_ORDERS_SORT.HISTORY) {
-        query.orderBy = { book: { start_date: "asc" } };
+        query.orderBy = { book: { start_date: "desc" } };
       }
 
       const orders = await prisma.order.findMany(query);

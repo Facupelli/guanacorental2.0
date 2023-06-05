@@ -7,6 +7,7 @@ import {
 } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { SORT_TYPES } from "@/lib/magic_strings";
+import { TRPCError } from "@trpc/server";
 
 type WherePipe = {
   available?: boolean;
@@ -123,6 +124,22 @@ export const equipmentRouter = createTRPCRouter({
       return { message: "success" };
     }),
 
+  deleteEquipmentOnOwner: protectedProcedure
+    .input(z.object({ ownerId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { ownerId } = input;
+
+      if (!ownerId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "missin ownerId" });
+      }
+
+      await prisma.equipmentOnOwner.delete({
+        where: { id: ownerId },
+      });
+
+      return { message: "success" };
+    }),
+
   createEquipmentOnOwner: protectedProcedure
     .input(
       z.object({
@@ -163,12 +180,13 @@ export const equipmentRouter = createTRPCRouter({
       z.object({
         search: z.string().optional(),
         locationId: z.string().optional(),
+        categoryId: z.string().optional(),
         take: z.number(),
         skip: z.number(),
       })
     )
     .query(async ({ input }) => {
-      const { search, locationId, take, skip } = input;
+      const { search, locationId, categoryId, take, skip } = input;
 
       const wherePipe: WherePipe = {};
 
@@ -186,6 +204,10 @@ export const equipmentRouter = createTRPCRouter({
         } else {
           wherePipe.owner = { some: { location: { id: locationId } } };
         }
+      }
+
+      if (categoryId && categoryId !== "all") {
+        wherePipe.categoryId = categoryId;
       }
 
       const equipment = await prisma.equipment.findMany({

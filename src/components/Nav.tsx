@@ -31,6 +31,12 @@ const Nav = () => {
         </div>
 
         <div className="ml-auto">
+          <Link href="/" className="text-white">
+            INICIO
+          </Link>
+        </div>
+
+        <div>
           <Link href="/faq" className="text-white">
             FAQ
           </Link>

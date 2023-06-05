@@ -41,14 +41,14 @@ import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DialogWithState from "@/components/DialogWithState";
 import DataTable from "@/components/ui/data-table";
-import { Loader2, MoreHorizontal, Plus, X } from "lucide-react";
+import { Loader2, MoreHorizontal, Plus, Trash2, X } from "lucide-react";
 
 import { getIsAdmin } from "@/lib/utils";
 import { api } from "@/utils/api";
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Location, Owner } from "@/types/models";
-import { type Prisma } from "@prisma/client";
+import type { Category, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
 import { type OwnerequipmentForm } from "@/types/ownerEquipment";
 
@@ -134,12 +134,18 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
 type Props = {
   locations: Location[];
   owners: Owner[];
+  categories: Category[];
 };
 
-const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
+const EquipmentAdmin: NextPage<Props> = ({
+  locations,
+  owners,
+  categories,
+}: Props) => {
   const { register, setValue, watch } = useForm<{
     search: string;
     location: string;
+    categoryId: string;
   }>();
 
   const [equipment, setEquipment] = useState<Equipment | null>(null);
@@ -152,12 +158,14 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
   // const location = useBoundStore((state) => state.location);
 
   const search = useDebounce(watch("search", ""), 500);
-  const location = watch("location");
+  const locationId = watch("location");
+  const categoryId = watch("categoryId", "all");
 
   const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
-    locationId: location,
+    locationId,
+    categoryId,
     search,
   });
 
@@ -216,6 +224,11 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="none">Sin sucursal</SelectItem>
               </AdminSelectLocation>
+              <Label>Categoría</Label>
+              <SelectCategory
+                categories={categories}
+                setValue={(e) => setValue("categoryId", e)}
+              />
             </div>
             <div className="ml-auto flex items-start gap-6">
               <p>total: {data?.totalCount}</p>
@@ -239,6 +252,9 @@ const EquipmentAdmin: NextPage<Props> = ({ locations, owners }: Props) => {
                 setRowData={setEquipment}
                 cellProps={cellProps}
               />
+            )}
+            {data?.equipment.length === 0 && (
+              <div className="p-4">No hay equipos.</div>
             )}
 
             <Pagination
@@ -284,6 +300,8 @@ const OwnerLocationStockModal = ({
   const ctx = api.useContext();
   const { mutate, isLoading } =
     api.equipment.createEquipmentOnOwner.useMutation();
+  const deleteEquipmenOnOwner =
+    api.equipment.deleteEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: OwnerequipmentForm) => {
     const mutateData = {
@@ -302,6 +320,18 @@ const OwnerLocationStockModal = ({
         console.error(err);
       },
     });
+  };
+
+  const handleDeleteStock = (id: string) => {
+    deleteEquipmenOnOwner.mutate(
+      { ownerId: id },
+      {
+        onSuccess: () => {
+          void ctx.equipment.adminGetEquipment.invalidate();
+          setOpen(false);
+        },
+      }
+    );
   };
 
   return (
@@ -329,8 +359,13 @@ const OwnerLocationStockModal = ({
               <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
                 {owner.stock}
               </p>
-              <Button variant="link" className="text-gray-800">
-                <X className="h-3 w-3" />
+              <Button
+                type="button"
+                variant="link"
+                className="text-gray-800"
+                onClick={() => handleDeleteStock(owner.id)}
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           ))}
@@ -372,6 +407,32 @@ const OwnerLocationStockModal = ({
         </div>
       </form>
     </DialogWithState>
+  );
+};
+
+type SelecCategoryProps = {
+  categories: Category[];
+  setValue: (e: string) => void;
+};
+
+const SelectCategory = ({ categories, setValue }: SelecCategoryProps) => {
+  return (
+    <Select onValueChange={setValue} defaultValue="all">
+      <SelectTrigger>
+        <SelectValue placeholder="elegir" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Categorías</SelectLabel>
+          <SelectItem value="all">Todas</SelectItem>
+          {categories.map((category) => (
+            <SelectItem value={category.id} key={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
@@ -690,6 +751,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const locations = await prisma.location.findMany({});
   const owners = await prisma.owner.findMany({});
+  const categories = await prisma.category.findMany({});
 
   await helpers.equipment.adminGetEquipment.prefetch({ take: 15, skip: 0 });
 
@@ -698,6 +760,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       trpcState: helpers.dehydrate(),
       locations,
       owners,
+      categories,
     },
   };
 };
