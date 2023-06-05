@@ -110,7 +110,7 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
       {rowData.equipments.map((ownerEquipment) => (
         <div key={ownerEquipment.id} className="flex items-center gap-4">
           {ownerEquipment.equipment.image && (
-            <div className="relative h-10 w-10 rounded-full">
+            <div className="relative h-10 w-10 rounded-full bg-white">
               <Image
                 src={ownerEquipment.equipment.image}
                 alt="equipment picture"

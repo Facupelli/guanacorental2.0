@@ -19,6 +19,17 @@ import DialogWithState from "@/components/DialogWithState";
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
 import AddCoupon from "@/components/AddCoupon";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
 
 import { api } from "@/utils/api";
@@ -133,11 +144,26 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                 />
 
                 {isAdmin && (
-                  <EarningsInfo
-                    oscar={order.earning?.oscar ?? 0}
-                    federico={order.earning?.federico ?? 0}
-                    sub={order.earning?.sub ?? 0}
-                  />
+                  <>
+                    <EarningsInfo
+                      oscar={order.earning?.oscar ?? 0}
+                      federico={order.earning?.federico ?? 0}
+                      sub={order.earning?.sub ?? 0}
+                    />
+
+                    <section className="grid gap-2 rounded-md border border-red-400 p-4">
+                      <h2 className="pb-2 text-lg font-semibold">
+                        Cancelar Pedido
+                      </h2>
+                      <p>
+                        El pedido será cancelado. Se notificará al usuario via
+                        correo electrónico.
+                      </p>
+                      <div>
+                        <CancelOrderAlert />
+                      </div>
+                    </section>
+                  </>
                 )}
               </div>
             </div>
@@ -145,6 +171,33 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const CancelOrderAlert = () => {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Cancelar</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            Estas seguro que quieres cancelar el pedido?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no puede deshacerse. Borrará el pedido permanetemente de
+            la base de datos.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>No</AlertDialogCancel>
+          <AlertDialogAction className="bg-red-600">
+            Cancelar pedido
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
