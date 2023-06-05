@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import { api } from "@/utils/api";
 import { type Location } from "@prisma/client";
 import { Label } from "./ui/label";
+import { useSession } from "next-auth/react";
+import { getIsAdmin } from "@/lib/utils";
 
 type Discount = {
   value: number;
@@ -35,6 +37,8 @@ const AddCoupon = ({
   admin,
   orderId,
 }: AddCouponProps) => {
+  const { data: session } = useSession();
+
   const [error, setError] = useState("");
   const { register, getValues } = useForm<{
     code: string;
@@ -45,6 +49,8 @@ const AddCoupon = ({
 
   const { mutate } = api.discount.getValidDiscountByCode.useMutation();
   const orderMutate = api.discount.apllyDiscountToOrder.useMutation();
+
+  const isAdmin = getIsAdmin(session);
 
   const handleApplyDiscount = () => {
     const code = getValues("code");
@@ -98,20 +104,24 @@ const AddCoupon = ({
             placeholder="Escribe aquí el código del cupón"
           />
 
-          <div className="flex items-center gap-2">
-            <div>
-              <Input
-                type="checkbox"
-                className="h-8"
-                {...register("applyToSub")}
-                disabled={!!discount}
-                placeholder="Escribe aquí el código del cupón"
-                defaultChecked
-                id="applyToSub"
-              />
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <div>
+                <Input
+                  type="checkbox"
+                  className="h-8"
+                  {...register("applyToSub")}
+                  disabled={!!discount}
+                  placeholder="Escribe aquí el código del cupón"
+                  defaultChecked
+                  id="applyToSub"
+                />
+              </div>
+              <Label htmlFor="applyToSub">
+                Aplicar descuento a subalquiler
+              </Label>
             </div>
-            <Label htmlFor="applyToSub">Aplicar descuento a subalquiler</Label>
-          </div>
+          )}
           <p className="text-red-600">{error}</p>
         </div>
         <DialogFooter>

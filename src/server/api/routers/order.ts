@@ -315,7 +315,6 @@ export const orderRouter = createTRPCRouter({
         };
       } else {
         if (location !== "all") {
-          console.log("LOCATION ---------------->>>>>>>", location);
           query.where = { locationId: location };
         }
         if (search) {
