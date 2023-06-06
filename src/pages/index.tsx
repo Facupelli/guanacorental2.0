@@ -84,7 +84,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
   useEffect(() => {
     if (inView) {
-      fetchNextPage();
+      void fetchNextPage();
     }
   }, [inView]);
 
