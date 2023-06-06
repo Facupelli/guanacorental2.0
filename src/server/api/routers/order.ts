@@ -7,7 +7,11 @@ import {
   getEquipmentOnOwnerIds,
   getOrderEquipmentOnOwners,
 } from "@/server/utils/order";
-import { ADMIN_ORDERS_SORT, ORDER_DELIVER_STATUS } from "@/lib/magic_strings";
+import {
+  ADMIN_ORDERS_SORT,
+  ORDER_DELIVER_STATUS,
+  ORDER_RETURN_STATUS,
+} from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import {
@@ -505,6 +509,7 @@ export const orderRouter = createTRPCRouter({
             subtotal,
             message,
             deliver_status: ORDER_DELIVER_STATUS.PENDING,
+            return_status: ORDER_RETURN_STATUS.PENDING,
             discount: discountModel
               ? { connect: { id: discountModel?.id } }
               : undefined,

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -43,6 +44,12 @@ type Order = Prisma.OrderGetPayload<{
 
 type CellProps = unknown;
 
+const getIsToday = (date: Date) => {
+  const today = dayjs().startOf("day");
+  const providedDate = dayjs(date).startOf("day");
+  return today.isSame(providedDate);
+};
+
 export const orderColumns: Columns<Order, CellProps>[] = [
   { title: "N°", cell: (rowData) => <div>{rowData.number}</div> },
   { title: "Nombre", cell: (rowData) => <div>{rowData.customer.name}</div> },
@@ -52,13 +59,27 @@ export const orderColumns: Columns<Order, CellProps>[] = [
   },
   {
     title: "Retiro",
-    cell: (rowData) => (
-      <div>{rowData.book.start_date.toLocaleDateString()}</div>
-    ),
+    cell: (rowData) => {
+      const isToday = getIsToday(rowData.book.start_date);
+
+      return (
+        <div className={isToday ? "font-bold" : ""}>
+          {isToday ? "HOY" : rowData.book.start_date.toLocaleDateString()}
+        </div>
+      );
+    },
   },
   {
     title: "Devolución",
-    cell: (rowData) => <div>{rowData.book.end_date.toLocaleDateString()}</div>,
+    cell: (rowData) => {
+      const isToday = getIsToday(rowData.book.end_date);
+
+      return (
+        <div className={isToday ? "font-bold" : ""}>
+          {isToday ? "HOY" : rowData.book.end_date.toLocaleDateString()}
+        </div>
+      );
+    },
   },
   {
     title: "Retiro",
