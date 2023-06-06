@@ -611,6 +611,21 @@ export const orderRouter = createTRPCRouter({
       return { message: "success" };
     }),
 
+  setOrderReturned: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { orderId } = input;
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          return_status: ORDER_RETURN_STATUS.RETURNED,
+        },
+      });
+
+      return { message: "success" };
+    }),
+
   deleteOrderById: protectedProcedure
     .input(z.object({ orderId: z.string(), bookId: z.string() }))
     .mutation(async ({ input }) => {

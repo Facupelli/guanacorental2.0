@@ -60,8 +60,13 @@ export const orderStatusClass: StatusStyles = {
     "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
   [ORDER_DELIVER_STATUS.DELIVERED]:
     "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+};
+
+export const orderReturnedClass: StatusStyles = {
   [ORDER_RETURN_STATUS.RETURNED]:
     "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+  [ORDER_RETURN_STATUS.PENDING]:
+    "py-1 px-3 bg-red-100 rounded-xl text-slate-800",
 };
 
 export const discountStatusClass = {

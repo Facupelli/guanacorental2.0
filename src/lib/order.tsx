@@ -19,6 +19,7 @@ import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 import {
   ORDER_DELIVER_STATUS,
   ORDER_RETURN_STATUS,
+  orderReturnedClass,
   orderStatusClass,
 } from "./magic_strings";
 
@@ -61,10 +62,14 @@ export const orderColumns: Columns<Order, CellProps>[] = [
     title: "Retiro",
     cell: (rowData) => {
       const isToday = getIsToday(rowData.book.start_date);
+      const statusValue: string = rowData.deliver_status;
 
       return (
-        <div className={isToday ? "font-bold" : ""}>
-          {isToday ? "HOY" : rowData.book.start_date.toLocaleDateString()}
+        <div className={`flex items-center gap-2`}>
+          <p className={isToday ? "font-bold" : ""}>
+            {isToday ? "HOY" : rowData.book.start_date.toLocaleDateString()}
+          </p>
+          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
       );
     },
@@ -73,32 +78,14 @@ export const orderColumns: Columns<Order, CellProps>[] = [
     title: "Devolución",
     cell: (rowData) => {
       const isToday = getIsToday(rowData.book.end_date);
+      const statusValue: string = rowData.return_status;
 
       return (
-        <div className={isToday ? "font-bold" : ""}>
-          {isToday ? "HOY" : rowData.book.end_date.toLocaleDateString()}
-        </div>
-      );
-    },
-  },
-  {
-    title: "Retiro",
-    cell: (rowData) => {
-      const statusValue: string = rowData.deliver_status;
-      return (
-        <div>
-          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Devolución",
-    cell: (rowData) => {
-      const statusValue: string = rowData.return_status;
-      return (
-        <div>
-          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
+        <div className={`flex items-center gap-2`}>
+          <p className={isToday ? "font-bold" : ""}>
+            {isToday ? "HOY" : rowData.book.end_date.toLocaleDateString()}
+          </p>
+          <span className={orderReturnedClass[statusValue]}>{statusValue}</span>
         </div>
       );
     },
@@ -190,6 +177,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
 
   const ctx = api.useContext();
   const { mutate } = api.order.setOrderDelivered.useMutation();
+  const setOrderReturned = api.order.setOrderReturned.useMutation();
 
   const [isLoading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -222,6 +210,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
           onSuccess: () => {
             setShowModal(false);
             void ctx.order.getCalendarOrders.invalidate();
+            void ctx.order.getOrders.invalidate();
             setLoading(false);
           },
         }
@@ -230,6 +219,18 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
       setError("Failed to send email");
       setLoading(false);
     }
+  };
+
+  const handleReturnOrder = (orderId: string) => {
+    setOrderReturned.mutate(
+      { orderId },
+      {
+        onSuccess: () => {
+          void ctx.order.getCalendarOrders.invalidate();
+          void ctx.order.getOrders.invalidate();
+        },
+      }
+    );
   };
 
   return (
@@ -283,6 +284,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             // onClick={() => setShowModal(true)}
+            onClick={() => handleReturnOrder(order.id)}
             className="flex cursor-pointer gap-2"
           >
             <div className="m-0 p-0 ">

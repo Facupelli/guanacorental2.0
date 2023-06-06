@@ -360,6 +360,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
               alt={`${equipment.name} ${equipment.brand} equipment picture`}
               fill
               style={{ objectFit: "contain" }}
+              sizes="(max-width: 468px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
             />
           </div>
         )}
