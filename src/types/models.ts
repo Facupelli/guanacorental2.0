@@ -75,7 +75,8 @@ export type Order = {
   location: Location;
   locationId: string;
   equipments: EquipmentOnOwner[];
-  status: string;
+  deliver_status: string;
+  return_status: string;
   earnings: Earning[];
   subtotal: number;
   total: number;

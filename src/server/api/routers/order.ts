@@ -7,7 +7,7 @@ import {
   getEquipmentOnOwnerIds,
   getOrderEquipmentOnOwners,
 } from "@/server/utils/order";
-import { ADMIN_ORDERS_SORT, ORDER_STATUS } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT, ORDER_DELIVER_STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import {
@@ -16,11 +16,7 @@ import {
   updateEarnings,
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
-import {
-  sendCancelOrderMail,
-  sendMail,
-  sendOrderDeliveredMail,
-} from "@/server/utils/mailer";
+import { sendCancelOrderMail, sendMail } from "@/server/utils/mailer";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -508,7 +504,7 @@ export const orderRouter = createTRPCRouter({
             total,
             subtotal,
             message,
-            status: ORDER_STATUS.PENDING,
+            deliver_status: ORDER_DELIVER_STATUS.PENDING,
             discount: discountModel
               ? { connect: { id: discountModel?.id } }
               : undefined,
@@ -603,7 +599,7 @@ export const orderRouter = createTRPCRouter({
       await prisma.order.update({
         where: { id: orderId },
         data: {
-          status: ORDER_STATUS.DELIVERED,
+          deliver_status: ORDER_DELIVER_STATUS.DELIVERED,
         },
       });
 
@@ -639,8 +635,8 @@ export const orderRouter = createTRPCRouter({
       }
 
       await sendCancelOrderMail(
-        customer.order?.customer.email,
-        customer.order?.number
+        customer.order.customer.email,
+        customer.order.number
       );
 
       return { message: "success" };

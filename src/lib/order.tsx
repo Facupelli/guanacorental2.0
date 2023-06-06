@@ -15,7 +15,11 @@ import DialogWithState from "@/components/DialogWithState";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
-import { ORDER_STATUS, orderStatusClass } from "./magic_strings";
+import {
+  ORDER_DELIVER_STATUS,
+  ORDER_RETURN_STATUS,
+  orderStatusClass,
+} from "./magic_strings";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
@@ -57,9 +61,20 @@ export const orderColumns: Columns<Order, CellProps>[] = [
     cell: (rowData) => <div>{rowData.book.end_date.toLocaleDateString()}</div>,
   },
   {
-    title: "Estado",
+    title: "Retiro",
     cell: (rowData) => {
-      const statusValue: string = rowData.status;
+      const statusValue: string = rowData.deliver_status;
+      return (
+        <div>
+          <span className={orderStatusClass[statusValue]}>{statusValue}</span>
+        </div>
+      );
+    },
+  },
+  {
+    title: "Devolución",
+    cell: (rowData) => {
+      const statusValue: string = rowData.return_status;
       return (
         <div>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
@@ -155,14 +170,17 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
   const ctx = api.useContext();
   const { mutate } = api.order.setOrderDelivered.useMutation();
 
+  const [isLoading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
 
   const onSubmit = async (data: { file: FileList }) => {
     setError("");
+    setLoading(true);
 
     if (!data.file[0] || !order.customer.email) {
       setError("Debes adjuntar el remito con el contrato");
+      setLoading(false);
       return;
     }
 
@@ -182,12 +200,14 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
         {
           onSuccess: () => {
             setShowModal(false);
-            ctx.order.getCalendarOrders.invalidate();
+            void ctx.order.getCalendarOrders.invalidate();
+            setLoading(false);
           },
         }
       );
     } else {
       setError("Failed to send email");
+      setLoading(false);
     }
   };
 
@@ -201,7 +221,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
           <Input type="file" {...register("file")} />
           <Button size="sm" type="submit">
-            Enviar correo
+            {isLoading ? "Cargando.." : "Enviar correo"}
           </Button>
         </form>
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -224,18 +244,36 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowModal(true)}
-            className="flex cursor-pointer gap-1"
+            className="flex cursor-pointer gap-2"
           >
             <div className="m-0 p-0 ">
               <Input
                 type="checkbox"
                 id="delivered"
                 className="h-4"
-                checked={order.status === ORDER_STATUS.DELIVERED}
+                checked={
+                  order.deliver_status === ORDER_DELIVER_STATUS.DELIVERED
+                }
               />
             </div>
             <Label className="cursor-pointer font-normal" htmlFor="delivered">
               Marcar retirado
+            </Label>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            // onClick={() => setShowModal(true)}
+            className="flex cursor-pointer gap-2"
+          >
+            <div className="m-0 p-0 ">
+              <Input
+                type="checkbox"
+                id="returned"
+                className="h-4"
+                checked={order.return_status === ORDER_RETURN_STATUS.RETURNED}
+              />
+            </div>
+            <Label className="cursor-pointer font-normal" htmlFor="returned">
+              Marcar devolución
             </Label>
           </DropdownMenuItem>
         </DropdownMenuContent>

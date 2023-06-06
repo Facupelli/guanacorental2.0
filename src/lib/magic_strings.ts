@@ -32,10 +32,15 @@ export const SCHEDULES: Schedules = {
   },
 };
 
-export const ORDER_STATUS = {
+export const ORDER_DELIVER_STATUS = {
   PENDING: "Pendiente",
   DELIVERED: "Entregado",
   TODAY: "Entrega Hoy",
+};
+
+export const ORDER_RETURN_STATUS = {
+  PENDING: "Pendiente",
+  RETURNED: "Devuelto",
 };
 
 export const COUPON_STATUS = {
@@ -49,9 +54,14 @@ interface StatusStyles {
 }
 
 export const orderStatusClass: StatusStyles = {
-  [ORDER_STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
-  [ORDER_STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
-  [ORDER_STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+  [ORDER_DELIVER_STATUS.PENDING]:
+    "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
+  [ORDER_DELIVER_STATUS.TODAY]:
+    "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
+  [ORDER_DELIVER_STATUS.DELIVERED]:
+    "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+  [ORDER_RETURN_STATUS.RETURNED]:
+    "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
 };
 
 export const discountStatusClass = {
