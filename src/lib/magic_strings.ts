@@ -32,7 +32,7 @@ export const SCHEDULES: Schedules = {
   },
 };
 
-export const STATUS = {
+export const ORDER_STATUS = {
   PENDING: "Pendiente",
   DELIVERED: "Entregado",
   TODAY: "Entrega Hoy",
@@ -49,9 +49,9 @@ interface StatusStyles {
 }
 
 export const orderStatusClass: StatusStyles = {
-  [STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
-  [STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
-  [STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
+  [ORDER_STATUS.PENDING]: "py-1 px-3 bg-yellow-100 rounded-xl text-slate-800",
+  [ORDER_STATUS.TODAY]: "py-1 px-3 bg-blue-100 rounded-xl text-slate-800",
+  [ORDER_STATUS.DELIVERED]: "py-1 px-3 bg-green-100 rounded-xl text-slate-800",
 };
 
 export const discountStatusClass = {

@@ -160,7 +160,10 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                         correo electrónico.
                       </p>
                       <div>
-                        <CancelOrderAlert />
+                        <CancelOrderAlert
+                          bookId={order.bookId}
+                          orderId={order.id}
+                        />
                       </div>
                     </section>
                   </>
@@ -174,7 +177,30 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   );
 };
 
-const CancelOrderAlert = () => {
+const CancelOrderAlert = ({
+  bookId,
+  orderId,
+}: {
+  bookId: string;
+  orderId: string;
+}) => {
+  const router = useRouter();
+  const { mutate } = api.order.deleteOrderById.useMutation();
+
+  const handleCancelOrder = (orderId: string, bookId: string) => {
+    mutate(
+      { orderId, bookId },
+      {
+        onSuccess: () => {
+          void router.push("/admin/orders");
+        },
+        onError: (err) => {
+          console.log(err);
+        },
+      }
+    );
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -192,7 +218,10 @@ const CancelOrderAlert = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>No</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-600">
+          <AlertDialogAction
+            onClick={() => handleCancelOrder(orderId, bookId)}
+            className="bg-red-600"
+          >
             Cancelar pedido
           </AlertDialogAction>
         </AlertDialogFooter>

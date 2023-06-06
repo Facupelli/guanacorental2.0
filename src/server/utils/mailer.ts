@@ -83,3 +83,35 @@ export const sendOrderDeliveredMail = async (user: User) => {
   const mail = await transporter.sendMail(mailOptions);
   return mail;
 };
+
+export const sendCancelOrderMail = async (
+  email: string,
+  orderNumber: number
+) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "hola@guanacorental.com",
+      pass: NODEMAILER_G_APP,
+    },
+  });
+
+  const templateSource = fs.readFileSync(
+    path.resolve(
+      process.cwd() + `/src/server/utils/templates/orderCanceled.handlebars`
+    ),
+    "utf-8"
+  );
+
+  const template = handlebars.compile(templateSource);
+
+  const mailOptions = {
+    from: "Guanaco Rental hola@guanacorental.com",
+    to: email,
+    subject: "PEDIDO CANCELADO",
+    html: template(orderNumber),
+  };
+
+  const mail = await transporter.sendMail(mailOptions);
+  return mail;
+};

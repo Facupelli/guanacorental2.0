@@ -7,7 +7,7 @@ import {
   getEquipmentOnOwnerIds,
   getOrderEquipmentOnOwners,
 } from "@/server/utils/order";
-import { ADMIN_ORDERS_SORT, STATUS } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT, ORDER_STATUS } from "@/lib/magic_strings";
 import { type Prisma } from "@prisma/client";
 import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import {
@@ -16,7 +16,11 @@ import {
   updateEarnings,
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
-import { sendMail, sendOrderDeliveredMail } from "@/server/utils/mailer";
+import {
+  sendCancelOrderMail,
+  sendMail,
+  sendOrderDeliveredMail,
+} from "@/server/utils/mailer";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -504,7 +508,7 @@ export const orderRouter = createTRPCRouter({
             total,
             subtotal,
             message,
-            status: STATUS.PENDING,
+            status: ORDER_STATUS.PENDING,
             discount: discountModel
               ? { connect: { id: discountModel?.id } }
               : undefined,
@@ -592,12 +596,53 @@ export const orderRouter = createTRPCRouter({
     }),
 
   setOrderDelivered: protectedProcedure
-    .input(z.object({}))
-    .mutation(async () => {
-      const mailSent = await sendOrderDeliveredMail({
-        email: "facundopellicer@gmail.com",
+    .input(z.object({ orderId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { orderId } = input;
+
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          status: ORDER_STATUS.DELIVERED,
+        },
       });
 
-      return mailSent;
+      return { message: "success" };
+    }),
+
+  deleteOrderById: protectedProcedure
+    .input(z.object({ orderId: z.string(), bookId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { orderId, bookId } = input;
+
+      await prisma.earning.delete({
+        where: { orderId },
+      });
+
+      const customer = await prisma.book.delete({
+        where: { id: bookId },
+        include: {
+          order: {
+            select: {
+              customer: { select: { name: true, email: true } },
+              number: true,
+            },
+          },
+        },
+      });
+
+      if (!customer || !customer.order?.customer.email) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "failed on book delete",
+        });
+      }
+
+      await sendCancelOrderMail(
+        customer.order?.customer.email,
+        customer.order?.number
+      );
+
+      return { message: "success" };
     }),
 });

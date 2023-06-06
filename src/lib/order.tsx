@@ -15,11 +15,13 @@ import DialogWithState from "@/components/DialogWithState";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
-import { orderStatusClass } from "./magic_strings";
+import { ORDER_STATUS, orderStatusClass } from "./magic_strings";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
 import { useState, type MouseEvent } from "react";
+import { Label } from "@/components/ui/label";
+import { api } from "@/utils/api";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -150,11 +152,19 @@ const DynamicButton = dynamic<{ order: Order }>(() =>
 const OrderActionsDropMenu = ({ order }: { order: Order }) => {
   const { register, handleSubmit } = useForm<{ file: FileList }>();
 
+  const ctx = api.useContext();
+  const { mutate } = api.order.setOrderDelivered.useMutation();
+
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
 
   const onSubmit = async (data: { file: FileList }) => {
-    if (!data.file[0] || !order.customer.email) return;
+    setError("");
+
+    if (!data.file[0] || !order.customer.email) {
+      setError("Debes adjuntar el remito con el contrato");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("pdf", data.file[0]);
@@ -167,7 +177,15 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
     });
 
     if (response.ok) {
-      setShowModal(false);
+      mutate(
+        { orderId: order.id },
+        {
+          onSuccess: () => {
+            setShowModal(false);
+            ctx.order.getCalendarOrders.invalidate();
+          },
+        }
+      );
     } else {
       setError("Failed to send email");
     }
@@ -186,7 +204,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
             Enviar correo
           </Button>
         </form>
-        {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </DialogWithState>
 
       <DropdownMenu>
@@ -204,8 +222,21 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
           <DropdownMenuItem>
             <DynamicButton order={order} />
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowModal(true)}>
-            Marcar retirado
+          <DropdownMenuItem
+            onClick={() => setShowModal(true)}
+            className="flex cursor-pointer gap-1"
+          >
+            <div className="m-0 p-0 ">
+              <Input
+                type="checkbox"
+                id="delivered"
+                className="h-4"
+                checked={order.status === ORDER_STATUS.DELIVERED}
+              />
+            </div>
+            <Label className="cursor-pointer font-normal" htmlFor="delivered">
+              Marcar retirado
+            </Label>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
