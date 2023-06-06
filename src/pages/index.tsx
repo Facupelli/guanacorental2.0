@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useInView } from "react-intersection-observer";
 import superjason from "superjson";
 import { getServerSession } from "next-auth";
 import { type GetServerSideProps, type NextPage } from "next";
@@ -9,7 +10,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { authOptions } from "@/server/auth";
 import { useBoundStore } from "@/zustand/store";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 
 import Nav from "@/components/Nav";
 import {
@@ -48,6 +49,8 @@ type Props = {
 };
 
 const Home: NextPage<Props> = ({ locations, categories }: Props) => {
+  const { ref, inView } = useInView();
+
   const [showCart, setShowCart] = useState(false);
   const [sort, setSort] = useState<string>("default");
   const [category, setCategory] = useState<string>("");
@@ -78,6 +81,12 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const handleLoadMore = async () => {
     await fetchNextPage();
   };
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView]);
 
   const equipments = data?.pages
     .map((page) => page.equipments)
@@ -169,7 +178,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 )}
               </section>
               {equipments && equipments.length > 0 && hasNextPage && (
-                <div className="flex justify-center py-6">
+                <div className="flex justify-center py-6" ref={ref}>
                   <Button onClick={handleLoadMore}>cargar más</Button>
                 </div>
               )}
