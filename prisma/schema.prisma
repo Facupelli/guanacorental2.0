@@ -187,7 +187,7 @@ model Book {
 model BookOnEquipment {
   equipment         EquipmentOnOwner       @relation(fields: [equipmentId], references: [id])
   equipmentId       String
-  book              Book                   @relation(fields: [bookId], references: [id])
+  book              Book                   @relation(fields: [bookId], references: [id], onDelete: Cascade)
   bookId            String
   quantity          Int
   created_at        DateTime               @default(now())
@@ -209,27 +209,28 @@ model Cart {
 }
 
 model Order {
-  id              String                @default(cuid()) @id
-  number          Int                   @default(autoincrement())
-  customer        User                  @relation(fields: [customerId], references: [id])
-  customerId      String
-  book            Book                  @relation(fields: [bookId], references: [id])
-  bookId          String                @unique
-  location        Location              @relation(fields: [locationId], references: [id])
-  locationId      String
-  equipments      EquipmentOnOwner[]
-  status          String
-  earning         Earning?             
-  discount        Discount?             @relation(fields: [discount_id], references: [id])
-  discount_id     String?
+  id                String                @default(cuid()) @id
+  number            Int                   @default(autoincrement())
+  customer          User                  @relation(fields: [customerId], references: [id])
+  customerId        String
+  book              Book                  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId            String                @unique
+  location          Location              @relation(fields: [locationId], references: [id])
+  locationId        String
+  equipments        EquipmentOnOwner[]
+  deliver_status    String
+  return_status     String
+  earning           Earning?             
+  discount          Discount?             @relation(fields: [discount_id], references: [id])
+  discount_id       String?
   // cart            Cart?                 @relation(fields: [cartId], references: [id])
   // cartId          String?               @unique
-  subtotal        Int
-  total           Int
-  message         String?
+  subtotal          Int
+  total             Int
+  message           String?
 
-  created_at      DateTime              @default(now())
-  updated_at      DateTime              @updatedAt
+  created_at        DateTime              @default(now())
+  updated_at        DateTime              @updatedAt
 
 }
 
