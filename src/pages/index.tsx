@@ -86,7 +86,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
     if (inView) {
       void fetchNextPage();
     }
-  }, [inView]);
+  }, [inView, fetchNextPage]);
 
   const equipments = data?.pages
     .map((page) => page.equipments)
