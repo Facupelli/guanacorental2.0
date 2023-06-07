@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
 import Calendar from "react-calendar";
 import { useBoundStore } from "@/zustand/store";
@@ -26,8 +27,11 @@ import SelectPickupHour from "./SelectPickupHour";
 import { disableWeekend } from "@/lib/dates";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
+import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
 const SelectDateButton = () => {
+  const { data: session } = useSession();
+
   const [isOpen, setOpen] = useState(false);
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
@@ -46,8 +50,13 @@ const SelectDateButton = () => {
 
   const datesAreWeekend = disableWeekend(startDate, endDate);
 
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
   const disableAccordingToRentalSchedule = ({ date }: { date: Date }) => {
-    console.log(date);
+    if (isAdmin || isEmployee) {
+      return false;
+    }
 
     const now = dayjs(); // Obtiene la fecha y hora actual
     const calendarDate = dayjs(date);
