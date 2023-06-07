@@ -1,7 +1,10 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { CalendarDays, Info } from "lucide-react";
 import Calendar from "react-calendar";
 import { useBoundStore } from "@/zustand/store";
 import { useState } from "react";
+dayjs.extend(customParseFormat);
 
 import {
   Dialog,
@@ -43,11 +46,36 @@ const SelectDateButton = () => {
 
   const datesAreWeekend = disableWeekend(startDate, endDate);
 
-  // const disableEquipmentBooked = ({ date }: { date: Date }) => {
-  //   if (startDate && endDate) {
-  //     const datesInRange = getDatesInRange(startDate, endDate);
-  //   }
-  // };
+  const disableAccordingToRentalSchedule = ({ date }: { date: Date }) => {
+    console.log(date);
+
+    const now = dayjs(); // Obtiene la fecha y hora actual
+    const calendarDate = dayjs(date);
+
+    if (now.isSame(calendarDate, "day")) {
+      if (now.day() === 5) {
+        const startTime = dayjs()
+          .set("hour", 15)
+          .set("minute", 0)
+          .set("second", 0); // Establece las 8:00 AM como hora de inicio
+
+        if (now.isAfter(startTime)) {
+          return true;
+        }
+      }
+
+      const startTime = dayjs()
+        .set("hour", 8)
+        .set("minute", 0)
+        .set("second", 0); // Establece las 8:00 AM como hora de inicio
+
+      if (now.isAfter(startTime)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -72,7 +100,7 @@ const SelectDateButton = () => {
             locale="es-ES"
             minDate={new Date()}
             onChange={(e) => handleDateChange(e)}
-            // tileDisabled={disableWeekend}
+            tileDisabled={disableAccordingToRentalSchedule}
           />
 
           {datesAreWeekend && (
