@@ -273,7 +273,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
                 type="checkbox"
                 id="delivered"
                 className="h-4"
-                checked={
+                defaultChecked={
                   order.deliver_status === ORDER_DELIVER_STATUS.DELIVERED
                 }
               />
@@ -292,7 +292,9 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
                 type="checkbox"
                 id="returned"
                 className="h-4"
-                checked={order.return_status === ORDER_RETURN_STATUS.RETURNED}
+                defaultChecked={
+                  order.return_status === ORDER_RETURN_STATUS.RETURNED
+                }
               />
             </div>
             <Label className="cursor-pointer font-normal" htmlFor="returned">

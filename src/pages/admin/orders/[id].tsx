@@ -39,6 +39,7 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Location, Prisma, Role } from "@prisma/client";
+import dayjs from "dayjs";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -88,6 +89,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   }
 
   const isAdmin = getIsAdmin(session);
+  const canCancel = dayjs().isBefore(order?.book.start_date);
 
   return (
     <>
@@ -143,7 +145,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                   orderId={order.id}
                 />
 
-                {isAdmin && (
+                {isAdmin && canCancel && (
                   <>
                     <EarningsInfo
                       oscar={order.earning?.oscar ?? 0}
