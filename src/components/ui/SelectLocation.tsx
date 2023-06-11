@@ -26,7 +26,7 @@ const SelectLocation = ({
 }: SelectLocationProps) => {
   return (
     <Select onValueChange={(e) => onValueChange(e)} value={defaultValue}>
-      <SelectTrigger>
+      <SelectTrigger className="font-bold">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

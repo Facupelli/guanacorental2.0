@@ -32,7 +32,7 @@ const Nav = () => {
 
         <div className="ml-auto">
           <Link href="/" className="text-white">
-            INICIO
+            RESERVAS
           </Link>
         </div>
 
