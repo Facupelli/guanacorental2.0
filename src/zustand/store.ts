@@ -129,10 +129,17 @@ const createAdminSlice: StateCreator<
 export const useBoundStore = create<
   LocationSlice & DateSlice & CartSlice & AdminSlice
 >()(
-  devtools((...a) => ({
-    ...createLocationSlice(...a),
-    ...createDateSlice(...a),
-    ...createCartSlice(...a),
-    ...createAdminSlice(...a),
-  }))
+  process.env.NODE_ENV === "production"
+    ? (...a) => ({
+        ...createLocationSlice(...a),
+        ...createDateSlice(...a),
+        ...createCartSlice(...a),
+        ...createAdminSlice(...a),
+      })
+    : devtools((...a) => ({
+        ...createLocationSlice(...a),
+        ...createDateSlice(...a),
+        ...createCartSlice(...a),
+        ...createAdminSlice(...a),
+      }))
 );
