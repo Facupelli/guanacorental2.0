@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { FacebookIcon, Menu, UserCog } from "lucide-react";
+import { FacebookIcon, LogOut, Menu, UserCog } from "lucide-react";
 
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import Cart from "./Cart";
@@ -31,18 +31,8 @@ const Nav = () => {
         </div>
 
         <div className="ml-auto">
-          <Link href="/" className="text-white">
-            RESERVAS
-          </Link>
+          <Cart trigger />
         </div>
-
-        <div>
-          <Link href="/faq" className="text-white">
-            FAQ
-          </Link>
-        </div>
-
-        <Cart trigger />
 
         <input
           type="checkbox"
@@ -55,6 +45,18 @@ const Nav = () => {
         </label>
 
         <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
+          <li>
+            <Link href="/" className="text-white">
+              RESERVAS
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/faq" className="text-white">
+              FAQ
+            </Link>
+          </li>
+
           {(isAdmin || isEmployee) && (
             <li className="cursor-pointer">
               <button
@@ -68,8 +70,14 @@ const Nav = () => {
           )}
 
           {session ? (
-            <li className="">
-              <button onClick={() => void signOut()}>SALIR</button>
+            <li>
+              <button
+                onClick={() => void signOut()}
+                className="flex items-center gap-2"
+              >
+                SALIR
+                <LogOut className="h-4 w-4" />
+              </button>
             </li>
           ) : (
             <>
