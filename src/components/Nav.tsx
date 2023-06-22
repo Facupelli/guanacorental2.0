@@ -17,79 +17,81 @@ const Nav = () => {
 
   return (
     <header>
-      <nav className="fixed z-30 flex h-[70px] w-full items-center gap-6 bg-primary px-6">
-        <div>
-          <Link href="/">
-            <div className="relative aspect-square w-12 sm:w-14">
-              <Image
-                src="/guanaco-rental-logo.svg"
-                alt="guanaco rental logo"
-                fill
-              />
-            </div>
-          </Link>
-        </div>
+      <nav className="fixed z-30 w-full items-center bg-primary px-6">
+        <div className="mx-auto flex h-[70px] w-full max-w-7xl items-center gap-6">
+          <div>
+            <Link href="/">
+              <div className="relative aspect-square w-12 sm:w-14">
+                <Image
+                  src="/guanaco-rental-logo.svg"
+                  alt="guanaco rental logo"
+                  fill
+                />
+              </div>
+            </Link>
+          </div>
 
-        <div className="ml-auto">
-          <Cart trigger />
-        </div>
-
-        <input
-          type="checkbox"
-          name="click"
-          className="peer hidden"
-          id="click"
-        />
-        <label htmlFor="click" className="text-white sm:hidden">
-          <Menu className="h-6 w-6" />
-        </label>
-
-        <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
-          <li>
+          <div className="ml-auto">
             <Link href="/" className="text-white">
               RESERVAS
             </Link>
-          </li>
+          </div>
 
-          <li>
-            <Link href="/faq" className="text-white">
-              FAQ
-            </Link>
-          </li>
+          <div>
+            <Cart trigger />
+          </div>
 
-          {(isAdmin || isEmployee) && (
-            <li className="cursor-pointer">
-              <button
-                className="flex items-center gap-2"
-                onClick={() => void router.push("/admin")}
-              >
-                ADMIN
-                <UserCog className="h-4 w-4" />
-              </button>
-            </li>
-          )}
+          <input
+            type="checkbox"
+            name="click"
+            className="peer hidden"
+            id="click"
+          />
+          <label htmlFor="click" className="text-white sm:hidden">
+            <Menu className="h-6 w-6" />
+          </label>
 
-          {session ? (
+          <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
             <li>
-              <button
-                onClick={() => void signOut()}
-                className="flex items-center gap-2"
-              >
-                SALIR
-                <LogOut className="h-4 w-4" />
-              </button>
+              <Link href="/faq" className="text-white">
+                FAQ
+              </Link>
             </li>
-          ) : (
-            <>
-              <li>
-                <GoogleButton />
+
+            {(isAdmin || isEmployee) && (
+              <li className="cursor-pointer">
+                <button
+                  className="flex items-center gap-2"
+                  onClick={() => void router.push("/admin")}
+                >
+                  ADMIN
+                  <UserCog className="h-4 w-4" />
+                </button>
               </li>
+            )}
+
+            {session ? (
               <li>
-                <FacebookButton />
+                <button
+                  onClick={() => void signOut()}
+                  className="flex items-center gap-2"
+                >
+                  SALIR
+                  <LogOut className="h-4 w-4" />
+                </button>
               </li>
-            </>
-          )}
-        </ul>
+            ) : (
+              <>
+                <li>
+                  <GoogleButton />
+                </li>
+                <li>
+                  <FacebookButton />
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
       </nav>
     </header>
   );
