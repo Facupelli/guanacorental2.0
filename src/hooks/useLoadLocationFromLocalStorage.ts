@@ -25,7 +25,10 @@ export const useLoadLocationFromLocalStorage = () => {
         ) as LocationData;
         if (parsedLocation.locationId && parsedLocation.locationName) {
           setPickupHour("09:00");
-          return setLocation(parsedLocation);
+
+          if (parsedLocation) return setLocation(parsedLocation);
+        } else {
+          localStorage.removeItem("location");
         }
       }
 
