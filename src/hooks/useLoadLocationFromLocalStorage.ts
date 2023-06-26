@@ -23,6 +23,7 @@ export const useLoadLocationFromLocalStorage = () => {
         const parsedLocation: LocationData = JSON.parse(
           location
         ) as LocationData;
+        console.log(parsedLocation);
         if (parsedLocation.locationId && parsedLocation.locationName) {
           setPickupHour("09:00");
 
