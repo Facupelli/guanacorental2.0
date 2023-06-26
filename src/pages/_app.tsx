@@ -9,7 +9,7 @@ import { api } from "@/utils/api";
 import "@/styles/globals.css";
 import "../styles/reactcalendar.css";
 import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
-import { useLoadCartFromLocalStorage } from "@/hooks/useLoadCartFromLocalStorage";
+// import { useLoadCartFromLocalStorage } from "@/hooks/useLoadCartFromLocalStorage";
 
 const panton = localFont({
   src: [

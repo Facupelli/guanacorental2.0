@@ -37,6 +37,7 @@ const config = {
         },
       },
     ],
+    "@typescript-eslint/no-unsafe-assignment": "off",
   },
 };
 
