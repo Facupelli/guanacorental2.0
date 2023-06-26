@@ -58,7 +58,7 @@ const AdminRents: NextPage = () => {
     const fetch4nodeBuffer = () =>
       fetch(
         process.env.NODE_ENV === "production"
-          ? "https://guanacorental.onrender.com/api/4node"
+          ? "https://guanacorental.shop/api/4node"
           : `http://localhost:3000/api/4node`,
         options
       );

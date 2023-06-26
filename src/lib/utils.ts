@@ -70,7 +70,7 @@ export const handleLocationChange = (
   if (locationId && locationName) {
     setLocation({ locationId, locationName });
     localStorage.setItem(
-      "location",
+      "location.v2",
       JSON.stringify({ locationId, locationName })
     );
     if (toggleModal) {

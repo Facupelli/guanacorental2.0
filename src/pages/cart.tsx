@@ -309,16 +309,6 @@ const Item = ({ item, endDate, startDate }: ItemProps) => {
 
   const handleRemoveFromCart = (itemId: string) => {
     deleteFromCart(itemId);
-
-    //LOCALSTORAGE
-    // const localCart = localStorage.getItem("cart");
-    // if (localCart) {
-    //   const parsedCart = JSON.parse(localCart) as Equipment[];
-    //   const updatedCart = parsedCart.filter(
-    //     (localItem: Equipment) => localItem.id !== item.id
-    //   );
-    //   localStorage.setItem("cart", JSON.stringify([...updatedCart]));
-    // }
   };
 
   const available = isEquipmentAvailable(item, { startDate, endDate });

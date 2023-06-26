@@ -17,7 +17,7 @@ export const useLoadLocationFromLocalStorage = () => {
     if (!didLocationInit) {
       didLocationInit = true;
 
-      const location = localStorage.getItem("location");
+      const location = localStorage.getItem("location.v2");
 
       if (location) {
         const parsedLocation: LocationData = JSON.parse(
@@ -29,7 +29,7 @@ export const useLoadLocationFromLocalStorage = () => {
 
           if (parsedLocation) return setLocation(parsedLocation);
         } else {
-          localStorage.removeItem("location");
+          localStorage.removeItem("location.v2");
         }
       }
 

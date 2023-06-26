@@ -13,7 +13,7 @@ export const useLoadCartFromLocalStorage = () => {
       didCartInit = true;
 
       if (cart?.length === 0) {
-        const localCart = localStorage.getItem("cart");
+        const localCart = localStorage.getItem("cart.v2");
         if (localCart) {
           const parsedCart = JSON.parse(localCart) as Equipment[];
           setCart(parsedCart);
