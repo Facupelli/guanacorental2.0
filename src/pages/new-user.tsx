@@ -515,6 +515,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  if (session.user.customerApproved) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
   const { user } = session;
 
   return {
