@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
     FacebookProvider({
       clientId: env.FACEBOOK_CLIENT_ID,
       clientSecret: env.FACEBOOK_CLIENT_SECRET,
-      checks: ["none"],
+      allowDangerousEmailAccountLinking: true,
     }),
     /**
      * ...add more providers here.
