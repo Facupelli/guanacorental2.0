@@ -1,10 +1,15 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import utcPlugin from "dayjs/plugin/utc";
+import timezonePlugin from "dayjs/plugin/timezone";
 import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
 import Calendar from "react-calendar";
 import { useBoundStore } from "@/zustand/store";
 import { useState } from "react";
+
+dayjs.extend(utcPlugin);
+dayjs.extend(timezonePlugin);
 dayjs.extend(customParseFormat);
 
 import {
@@ -43,20 +48,13 @@ const SelectDateButton = () => {
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      setStartDate(
-        new Date(
-          e[0]?.toLocaleDateString("es-AR", {
-            timeZone: "America/Argentina/Buenos_Aires",
-          }) as string
-        )
-      );
-      setEndDate(
-        new Date(
-          e[1]?.toLocaleDateString("es-AR", {
-            timeZone: "America/Argentina/Buenos_Aires",
-          }) as string
-        )
-      );
+      const startDate = dayjs(e[0])
+        .tz("America/Argentina/Buenos_Aires")
+        .toDate();
+      const endDate = dayjs(e[1]).tz("America/Argentina/Buenos_Aires").toDate();
+
+      setStartDate(startDate);
+      setEndDate(endDate);
     }
   };
 
