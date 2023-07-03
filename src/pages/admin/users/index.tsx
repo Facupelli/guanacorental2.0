@@ -63,11 +63,7 @@ const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
     cell: (rowData) => (
-      <div>
-        {rowData.address?.created_at.toLocaleDateString("es-ES", {
-          timeZone: "UTC",
-        })}
-      </div>
+      <div>{rowData.address?.created_at.toLocaleDateString("es-ES")}</div>
     ),
   },
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },

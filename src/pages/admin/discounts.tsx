@@ -95,17 +95,13 @@ const columns: Columns<Discount, CellProps>[] = [
   {
     title: "Empieza",
     cell: (rowData) => (
-      <div>
-        {rowData.starts_at?.toLocaleDateString("es-ES", { timeZone: "UTC" })}
-      </div>
+      <div>{rowData.starts_at?.toLocaleDateString("es-ES")}</div>
     ),
   },
   {
     title: "Termina",
     cell: (rowData) => (
-      <div>
-        {rowData.ends_at?.toLocaleDateString("es-ES", { timeZone: "UTC" })}
-      </div>
+      <div>{rowData.ends_at?.toLocaleDateString("es-ES")}</div>
     ),
   },
   {

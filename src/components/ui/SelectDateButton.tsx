@@ -109,6 +109,7 @@ const SelectDateButton = () => {
             locale="es-ES"
             minDate={new Date()}
             onChange={(e) => handleDateChange(e)}
+            // value={[startDate, endDate]}
             tileDisabled={disableAccordingToRentalSchedule}
           />
 

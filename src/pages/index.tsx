@@ -235,9 +235,7 @@ const LeftBar = ({
             <p>Retiro:</p>
             <p className="font-semibold">
               {(startDate &&
-                new Date(startDate).toLocaleDateString("es-ES", {
-                  timeZone: "UTC",
-                })) ?? (
+                new Date(startDate).toLocaleDateString("es-ES")) ?? (
                 <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
               )}
             </p>
@@ -245,10 +243,7 @@ const LeftBar = ({
           <div className="flex items-center justify-between">
             <p>Devolución:</p>
             <p className="font-semibold">
-              {(endDate &&
-                new Date(endDate).toLocaleDateString("es-ES", {
-                  timeZone: "UTC",
-                })) ?? (
+              {(endDate && new Date(endDate).toLocaleDateString("es-ES")) ?? (
                 <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
               )}
             </p>

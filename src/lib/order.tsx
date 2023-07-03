@@ -69,9 +69,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
           <p className={isToday ? "font-bold" : ""}>
             {isToday
               ? "HOY"
-              : rowData.book.start_date.toLocaleDateString("es-ES", {
-                  timeZone: "UTC",
-                })}
+              : rowData.book.start_date.toLocaleDateString("es-ES")}
           </p>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
@@ -89,9 +87,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
           <p className={isToday ? "font-bold" : ""}>
             {isToday
               ? "HOY"
-              : rowData.book.end_date.toLocaleDateString("es-ES", {
-                  timeZone: "UTC",
-                })}
+              : rowData.book.end_date.toLocaleDateString("es-ES")}
           </p>
           <span className={orderReturnedClass[statusValue]}>{statusValue}</span>
         </div>
