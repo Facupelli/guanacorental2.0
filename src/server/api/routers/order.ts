@@ -21,6 +21,7 @@ import {
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
 import { sendCancelOrderMail, sendMail } from "@/server/utils/mailer";
+import { toArgentinaDate } from "@/lib/dates";
 
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
@@ -579,8 +580,8 @@ export const orderRouter = createTRPCRouter({
           email: newOrder.customer.email,
           phone: newOrder.customer.address?.phone,
           number: newOrder.number,
-          startDate: startDate.toLocaleDateString("es-ES"),
-          endDate: endDate.toLocaleDateString("es-ES"),
+          startDate: toArgentinaDate(startDate),
+          endDate: toArgentinaDate(endDate),
           pickupHour,
           equipmentList,
           total: formatPrice(newOrder.total),

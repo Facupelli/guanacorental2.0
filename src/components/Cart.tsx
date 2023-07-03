@@ -20,6 +20,7 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { type Equipment } from "@/types/models";
 import { type Dispatch, type SetStateAction } from "react";
 import { type CartItem } from "@/types/cart";
+import { toArgentinaDate } from "@/lib/dates";
 
 const Cart = ({
   trigger,
@@ -61,9 +62,9 @@ const Cart = ({
               <SelectDateButton />
             ) : (
               <div className="flex items-center justify-between">
-                <p>{new Date(startDate).toLocaleDateString("es-ES")}</p>
+                <p>{toArgentinaDate(startDate)}</p>
                 <ArrowRight className="h-4 w-4" />{" "}
-                <p>{new Date(endDate).toLocaleDateString("es-ES")}</p>
+                <p>{toArgentinaDate(endDate)}</p>
               </div>
             )}
           </SheetDescription>

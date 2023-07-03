@@ -27,6 +27,7 @@ import {
   disableWeekend,
   getDatesInRange,
   getTotalWorkingDays,
+  toArgentinaDate,
 } from "@/lib/dates";
 import { api } from "@/utils/api";
 import {
@@ -186,6 +187,7 @@ const CartPage: NextPage = () => {
                 year: "numeric",
                 day: "numeric",
                 month: "short",
+                timeZone: "America/Argentina/Buenos_Aires",
               })}
             </strong>{" "}
             a las <strong>{pickupHour}hs</strong> por el rental!
@@ -400,14 +402,14 @@ const RightBar = ({
               <div className="flex w-full justify-between ">
                 <p className="font-semibold">Retiro:</p>
                 <p className="font-bold">
-                  {new Date(startDate).toLocaleDateString("es-ES")}{" "}
+                  {toArgentinaDate(startDate)}{" "}
                   <span className="font-semibold">{pickupHour}hs</span>
                 </p>
               </div>
               <div className="flex justify-between">
                 <p className="font-semibold">Devolución: </p>
                 <p className="font-bold">
-                  {new Date(endDate).toLocaleDateString("es-ES")}{" "}
+                  {toArgentinaDate(endDate)}{" "}
                   <span className="font-semibold">09:00hs</span>
                 </p>
               </div>

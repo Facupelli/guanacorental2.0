@@ -1,6 +1,12 @@
 import dayjs from "dayjs";
 import { SCHEDULES } from "./magic_strings";
 
+export const toArgentinaDate = (date: Date) => {
+  return new Date(date).toLocaleDateString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+};
+
 export const getDatesInRange = (startDate: Date, endDate: Date) => {
   const dates = [];
   const currentDate = new Date(startDate);

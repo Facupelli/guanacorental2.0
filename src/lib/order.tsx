@@ -28,6 +28,7 @@ import { type Prisma } from "@prisma/client";
 import { useState, type MouseEvent } from "react";
 import { Label } from "@/components/ui/label";
 import { api } from "@/utils/api";
+import { toArgentinaDate } from "./dates";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -67,9 +68,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div className={`flex items-center gap-2`}>
           <p className={isToday ? "font-bold" : ""}>
-            {isToday
-              ? "HOY"
-              : rowData.book.start_date.toLocaleDateString("es-ES")}
+            {isToday ? "HOY" : toArgentinaDate(rowData.book.start_date)}
           </p>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
@@ -85,9 +84,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div className={`flex items-center gap-2`}>
           <p className={isToday ? "font-bold" : ""}>
-            {isToday
-              ? "HOY"
-              : rowData.book.end_date.toLocaleDateString("es-ES")}
+            {isToday ? "HOY" : toArgentinaDate(rowData.book.end_date)}
           </p>
           <span className={orderReturnedClass[statusValue]}>{statusValue}</span>
         </div>

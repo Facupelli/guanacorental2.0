@@ -42,6 +42,7 @@ import useDebounce from "@/hooks/useDebounce";
 
 import { type Location, type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { toArgentinaDate } from "@/lib/dates";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -63,7 +64,7 @@ const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
     cell: (rowData) => (
-      <div>{rowData.address?.created_at.toLocaleDateString("es-ES")}</div>
+      <div>{toArgentinaDate(rowData.address?.created_at)}</div>
     ),
   },
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },

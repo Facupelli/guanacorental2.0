@@ -147,10 +147,12 @@ export default async function handler(
         order?.book.start_date.toLocaleDateString("es-AR", {
           day: "numeric",
           month: "short",
+          timeZone: "America/Argentina/Buenos_Aires",
         }),
         order?.book.end_date.toLocaleDateString("es-AR", {
           day: "numeric",
           month: "short",
+          timeZone: "America/Argentina/Buenos_Aires",
         }),
         order?.subtotal,
         order?.total,

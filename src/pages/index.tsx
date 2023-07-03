@@ -42,6 +42,7 @@ import useDebounce from "@/hooks/useDebounce";
 import type { Category, Equipment, Location } from "@/types/models";
 import Calendar from "react-calendar";
 import dayjs from "dayjs";
+import { toArgentinaDate } from "@/lib/dates";
 
 type Props = {
   locations: Location[];
@@ -234,8 +235,7 @@ const LeftBar = ({
           <div className="flex items-center justify-between">
             <p>Retiro:</p>
             <p className="font-semibold">
-              {(startDate &&
-                new Date(startDate).toLocaleDateString("es-ES")) ?? (
+              {(startDate && toArgentinaDate(startDate)) ?? (
                 <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
               )}
             </p>
@@ -243,7 +243,7 @@ const LeftBar = ({
           <div className="flex items-center justify-between">
             <p>Devolución:</p>
             <p className="font-semibold">
-              {(endDate && new Date(endDate).toLocaleDateString("es-ES")) ?? (
+              {(endDate && toArgentinaDate(endDate)) ?? (
                 <span className="text-xs text-gray-500">DD/MM/YYYYY</span>
               )}
             </p>

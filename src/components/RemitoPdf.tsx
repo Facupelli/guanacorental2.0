@@ -15,6 +15,7 @@ import type {
   Owner,
   Prisma,
 } from "@prisma/client";
+import { toArgentinaDate } from "@/lib/dates";
 
 Font.register({
   family: "Open Sans",
@@ -225,7 +226,7 @@ export const RemitoPdf = ({ order, pdfEquipmentRows }: Props) => (
           <Text>
             FECHA DE RETIRO:{" "}
             <Text style={styles.bold}>
-              {order.book.start_date.toLocaleDateString("es-ES")}
+              {toArgentinaDate(order.book.start_date)}
             </Text>
           </Text>
         </View>
@@ -233,7 +234,7 @@ export const RemitoPdf = ({ order, pdfEquipmentRows }: Props) => (
           <Text>
             FECHA DE DEVOLUCIÓN:{" "}
             <Text style={styles.bold}>
-              {order.book.end_date.toLocaleDateString("es-ES")}
+              {toArgentinaDate(order.book.end_date)}
             </Text>
           </Text>
         </View>

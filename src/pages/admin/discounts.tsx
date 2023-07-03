@@ -35,6 +35,7 @@ import { discountStatusClass } from "@/lib/magic_strings";
 
 import type { DiscountType, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
+import { toArgentinaDate } from "@/lib/dates";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {
@@ -94,15 +95,11 @@ const columns: Columns<Discount, CellProps>[] = [
   },
   {
     title: "Empieza",
-    cell: (rowData) => (
-      <div>{rowData.starts_at?.toLocaleDateString("es-ES")}</div>
-    ),
+    cell: (rowData) => <div>{toArgentinaDate(rowData.starts_at!)}</div>,
   },
   {
     title: "Termina",
-    cell: (rowData) => (
-      <div>{rowData.ends_at?.toLocaleDateString("es-ES")}</div>
-    ),
+    cell: (rowData) => <div>{toArgentinaDate(rowData.ends_at!)}</div>,
   },
   {
     title: "Usado",

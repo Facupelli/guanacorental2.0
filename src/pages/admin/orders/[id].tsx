@@ -255,6 +255,7 @@ const CustomerInfo = ({ order, customer }: CustomerInfo) => {
             year: "numeric",
             day: "numeric",
             month: "short",
+            timeZone: "America/Argentina/Buenos_Aires",
           })}
         </p>
       </div>
@@ -643,6 +644,7 @@ const OrderInfo = ({
                 year: "numeric",
                 day: "numeric",
                 month: "short",
+                timeZone: "America/Argentina/Buenos_Aires",
               })}
             </p>
           </div>
@@ -653,6 +655,7 @@ const OrderInfo = ({
                 year: "numeric",
                 day: "numeric",
                 month: "short",
+                timeZone: "America/Argentina/Buenos_Aires",
               })}
             </p>
           </div>
