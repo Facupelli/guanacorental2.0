@@ -186,6 +186,7 @@ const CartPage: NextPage = () => {
                 year: "numeric",
                 day: "numeric",
                 month: "short",
+                timeZone: "UTC",
               })}
             </strong>{" "}
             a las <strong>{pickupHour}hs</strong> por el rental!
@@ -400,14 +401,18 @@ const RightBar = ({
               <div className="flex w-full justify-between ">
                 <p className="font-semibold">Retiro:</p>
                 <p className="font-bold">
-                  {new Date(startDate).toLocaleDateString()}{" "}
+                  {new Date(startDate).toLocaleDateString("es-ES", {
+                    timeZone: "UTC",
+                  })}{" "}
                   <span className="font-semibold">{pickupHour}hs</span>
                 </p>
               </div>
               <div className="flex justify-between">
                 <p className="font-semibold">Devolución: </p>
                 <p className="font-bold">
-                  {new Date(endDate).toLocaleDateString()}{" "}
+                  {new Date(endDate).toLocaleDateString("es-ES", {
+                    timeZone: "UTC",
+                  })}{" "}
                   <span className="font-semibold">09:00hs</span>
                 </p>
               </div>

@@ -67,7 +67,11 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div className={`flex items-center gap-2`}>
           <p className={isToday ? "font-bold" : ""}>
-            {isToday ? "HOY" : rowData.book.start_date.toLocaleDateString()}
+            {isToday
+              ? "HOY"
+              : rowData.book.start_date.toLocaleDateString("es-ES", {
+                  timeZone: "UTC",
+                })}
           </p>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
@@ -83,7 +87,11 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div className={`flex items-center gap-2`}>
           <p className={isToday ? "font-bold" : ""}>
-            {isToday ? "HOY" : rowData.book.end_date.toLocaleDateString()}
+            {isToday
+              ? "HOY"
+              : rowData.book.end_date.toLocaleDateString("es-ES", {
+                  timeZone: "UTC",
+                })}
           </p>
           <span className={orderReturnedClass[statusValue]}>{statusValue}</span>
         </div>

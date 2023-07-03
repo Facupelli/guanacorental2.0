@@ -61,9 +61,17 @@ const Cart = ({
               <SelectDateButton />
             ) : (
               <div className="flex items-center justify-between">
-                <p>{new Date(startDate).toLocaleDateString()}</p>
+                <p>
+                  {new Date(startDate).toLocaleDateString("es-ES", {
+                    timeZone: "UTC",
+                  })}
+                </p>
                 <ArrowRight className="h-4 w-4" />{" "}
-                <p>{new Date(endDate).toLocaleDateString()}</p>
+                <p>
+                  {new Date(endDate).toLocaleDateString("es-ES", {
+                    timeZone: "UTC",
+                  })}
+                </p>
               </div>
             )}
           </SheetDescription>
