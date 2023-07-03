@@ -68,7 +68,8 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div className={`flex items-center gap-2`}>
           <p className={isToday ? "font-bold" : ""}>
-            {isToday ? "HOY" : toArgentinaDate(rowData.book.start_date)}
+            {isToday ? "HOY" : toArgentinaDate(rowData.book.start_date)}{" "}
+            <span className="text-xs">{rowData.book.pickup_hour}hs</span>
           </p>
           <span className={orderStatusClass[statusValue]}>{statusValue}</span>
         </div>
