@@ -48,13 +48,8 @@ const SelectDateButton = () => {
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      const startDate = dayjs(e[0])
-        .tz("America/Argentina/Buenos_Aires")
-        .toDate();
-      const endDate = dayjs(e[1]).tz("America/Argentina/Buenos_Aires").toDate();
-
-      setStartDate(startDate);
-      setEndDate(endDate);
+      setStartDate(e[0]);
+      setEndDate(e[1]);
     }
   };
 
