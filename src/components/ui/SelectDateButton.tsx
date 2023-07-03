@@ -24,7 +24,7 @@ import {
 import { Button } from "./button";
 import SelectPickupHour from "./SelectPickupHour";
 
-import { disableWeekend } from "@/lib/dates";
+import { disableWeekend, toArgentinaDate } from "@/lib/dates";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
@@ -43,8 +43,20 @@ const SelectDateButton = () => {
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      setStartDate(e[0]);
-      setEndDate(e[1]);
+      setStartDate(
+        new Date(
+          e[0]?.toLocaleDateString("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+          }) as string
+        )
+      );
+      setEndDate(
+        new Date(
+          e[1]?.toLocaleDateString("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+          }) as string
+        )
+      );
     }
   };
 

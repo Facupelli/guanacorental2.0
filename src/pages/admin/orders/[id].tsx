@@ -137,6 +137,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                     subtotal: order.subtotal,
                     workingDays: order.book.working_days,
                     discount: order.discount,
+                    pickupHour: order.book.pickup_hour,
                   }}
                   discount={discount}
                   setDiscount={setDiscount}
@@ -587,6 +588,7 @@ type OrderInfoProps = {
     message: string | null;
     workingDays: number;
     discount: Discount | null;
+    pickupHour: string | null;
   };
   location: Location;
   setDiscount: Dispatch<SetStateAction<DiscountState | null>>;
@@ -645,7 +647,8 @@ const OrderInfo = ({
                 day: "numeric",
                 month: "short",
                 timeZone: "America/Argentina/Buenos_Aires",
-              })}
+              })}{" "}
+              - <span className="text-sm">{info.pickupHour}hs</span>
             </p>
           </div>
           <div className="grid gap-1">
