@@ -515,7 +515,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  if (session.user.customerApproved) {
+  const isAdmin = getIsAdmin(session);
+
+  if (session.user.customerApproved && !isAdmin) {
     return {
       redirect: {
         destination: "/",
