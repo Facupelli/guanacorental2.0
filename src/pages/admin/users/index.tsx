@@ -64,7 +64,7 @@ const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
     cell: (rowData) => (
-      <div>{toArgentinaDate(rowData.address?.created_at!)}</div>
+      <div>{toArgentinaDate(rowData.address?.created_at || new Date())}</div>
     ),
   },
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },

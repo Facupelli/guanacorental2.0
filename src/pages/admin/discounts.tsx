@@ -95,11 +95,15 @@ const columns: Columns<Discount, CellProps>[] = [
   },
   {
     title: "Empieza",
-    cell: (rowData) => <div>{toArgentinaDate(rowData.starts_at!)}</div>,
+    cell: (rowData) => (
+      <div>{toArgentinaDate(rowData.starts_at || new Date())}</div>
+    ),
   },
   {
     title: "Termina",
-    cell: (rowData) => <div>{toArgentinaDate(rowData.ends_at!)}</div>,
+    cell: (rowData) => (
+      <div>{toArgentinaDate(rowData.ends_at || new Date())}</div>
+    ),
   },
   {
     title: "Usado",
