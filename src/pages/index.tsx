@@ -362,6 +362,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
               fill
               style={{ objectFit: "contain" }}
               sizes="(max-width: 468px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
+              priority={equipment.name === "FX3 Cinema Line 4K 120 FPS"}
             />
           </div>
         )}
@@ -394,6 +395,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
             variant="secondary"
             className="font-bold"
             onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
+            aria-label="add-to-cart-button"
           >
             {isAlreadyInCart ? (
               "Agregado"
