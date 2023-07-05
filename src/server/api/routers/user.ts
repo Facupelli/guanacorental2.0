@@ -145,7 +145,7 @@ export const userRouter = createTRPCRouter({
         };
         petition_sent: boolean;
         customer_approved: boolean;
-        name?: { contains: string };
+        name?: { contains: string; mode: "insensitive" };
       };
 
       const wherePipe: wherePipe = {
@@ -158,7 +158,7 @@ export const userRouter = createTRPCRouter({
       }
 
       if (search) {
-        wherePipe.name = { contains: search };
+        wherePipe.name = { contains: search, mode: "insensitive" };
       }
 
       const users = await prisma.user.findMany({

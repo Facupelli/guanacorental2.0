@@ -19,17 +19,20 @@ type WherePipe = {
   OR?: [
     {
       name: {
-        search: string;
+        contains: string;
+        mode: "insensitive";
       };
     },
     {
       brand: {
-        search: string;
+        contains: string;
+        mode: "insensitive";
       };
     },
     {
       model: {
-        search: string;
+        contains: string;
+        mode: "insensitive";
       };
     }
   ];
@@ -192,9 +195,9 @@ export const equipmentRouter = createTRPCRouter({
 
       if (search) {
         wherePipe.OR = [
-          { name: { search } },
-          { brand: { search } },
-          { model: { search } },
+          { name: { contains: search, mode: "insensitive" } },
+          { brand: { contains: search, mode: "insensitive" } },
+          { model: { contains: search, mode: "insensitive" } },
         ];
       }
 
@@ -265,9 +268,9 @@ export const equipmentRouter = createTRPCRouter({
 
       if (input.search) {
         wherePipe.OR = [
-          { name: { search: input.search } },
-          { brand: { search: input.search } },
-          { model: { search: input.search } },
+          { name: { contains: input.search, mode: "insensitive" } },
+          { brand: { contains: input.search, mode: "insensitive" } },
+          { model: { contains: input.search, mode: "insensitive" } },
         ];
       }
 
