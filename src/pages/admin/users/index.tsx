@@ -147,7 +147,7 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
               </TabsList>
               <TabsContent value="customers">
                 <div className="grid grid-cols-12 gap-6">
-                  <div className="col-span-12 flex gap-4">
+                  <div className="col-span-12 flex flex-wrap gap-4">
                     <div className="flex w-full items-center gap-4 rounded-md bg-white p-4">
                       <Input
                         type="search"
@@ -194,19 +194,19 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
               </TabsContent>
               <TabsContent value="petitions">
                 <div className="grid grid-cols-3 gap-6">
-                  <div className="col-span-1 overflow-y-auto">
+                  <div className="col-span-3 overflow-y-auto sm:col-span-1">
                     {petitionUsers.data?.map((user) => (
                       <div
-                        className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg p-4 hover:bg-white/40 ${
+                        className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg bg-white/60 p-4 hover:bg-white/40 ${
                           petitionUserSelected?.id === user.id
-                            ? "border-secondary bg-white/90"
+                            ? "border-secondary bg-white"
                             : ""
                         }`}
                         onClick={() => setPetitionUser(user)}
                         key={user.id}
                       >
                         {user.image && (
-                          <div className="relative h-10 w-10 rounded-full">
+                          <div className="relative h-10 w-10 rounded-full ">
                             <Image
                               src={user.image}
                               fill
@@ -321,9 +321,12 @@ const UserPetitionInfo = ({
   };
 
   return (
-    <div key={user.id} className="col-span-2 grid gap-5 rounded-md bg-white">
+    <div
+      key={user.id}
+      className="col-span-3 grid gap-5 rounded-md bg-white sm:col-span-2"
+    >
       <div className="grid gap-6 p-6">
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4">
           <div>
             <p className="text-sm text-primary/60">DNI</p>
             <p className="font-semibold">{user.address?.dni_number}</p>
@@ -355,6 +358,30 @@ const UserPetitionInfo = ({
             <p className="text-sm text-primary/60">Provincia</p>
             <p className="font-semibold">{user.address?.province}</p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-y-4">
+          {user.address?.dni_front && (
+            <div className="relative col-span-4 aspect-video w-full rounded sm:col-span-2 sm:w-[260px]">
+              <Image
+                src={user.address?.dni_front}
+                alt="dni_front"
+                fill
+                style={{ borderRadius: 5 }}
+              />
+            </div>
+          )}
+
+          {user.address?.dni_back && (
+            <div className="relative col-span-4 aspect-video w-full rounded sm:col-span-2 sm:w-[260px]">
+              <Image
+                src={user.address?.dni_back}
+                alt="dni_front"
+                fill
+                style={{ borderRadius: 5 }}
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-4 gap-y-2">
