@@ -131,6 +131,21 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
+  signImage: {
+    width: 90,
+    height: 90,
+    position: "absolute",
+    zIndex: 0,
+    bottom: "60px",
+    right: 70,
+  },
+  signName: {
+    position: "absolute",
+    zIndex: 0,
+    bottom: "90px",
+    right: "55px",
+    fontSize: 9,
+  },
   bottomSigns: {
     position: "absolute",
     bottom: 0,
@@ -303,6 +318,12 @@ export const RemitoPdf = ({ order, pdfEquipmentRows }: Props) => (
           </View>
         );
       })}
+      <View style={styles.signImage} fixed>
+        <Image src="/remito/firma.png" style={styles.bgImage} />
+      </View>
+      <View style={styles.signName}>
+        <Text>Federico Giaccaglia 40.593.572</Text>
+      </View>
       <View fixed style={styles.bottomSigns}>
         <Text style={styles.signs}>FIRMA DEL RESPONSABLE DE PRODUCCIÓN</Text>
         <Text style={styles.signs}>FIRMA DEL RESPONSABLE DEl RENTAL</Text>
@@ -417,6 +438,12 @@ export const RemitoPdf = ({ order, pdfEquipmentRows }: Props) => (
         </Text>
       </View>
 
+      <View style={styles.signImage} fixed>
+        <Image src="/remito/firma.png" style={styles.bgImage} />
+      </View>
+      <View style={styles.signName}>
+        <Text>Federico Giaccaglia 40.593.572</Text>
+      </View>
       <View fixed style={styles.bottomSigns}>
         <Text style={styles.signs}>FIRMA DEL RESPONSABLE DE PRODUCCIÓN</Text>
         <Text style={styles.signs}>FIRMA DEL RESPONSABLE DEl RENTAL</Text>
