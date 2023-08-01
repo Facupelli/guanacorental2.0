@@ -44,8 +44,6 @@ const Cart = ({
     void router.push("/cart");
   };
 
-  console.log("cart");
-
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {trigger && (
