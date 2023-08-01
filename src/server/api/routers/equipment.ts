@@ -10,6 +10,7 @@ import { SORT_TYPES } from "@/lib/magic_strings";
 import { TRPCError } from "@trpc/server";
 
 type WherePipe = {
+  deleted: boolean;
   available?: boolean;
   categoryId?: string;
   owner?: {
@@ -143,6 +144,21 @@ export const equipmentRouter = createTRPCRouter({
       return { message: "success" };
     }),
 
+  deleteEquipment: protectedProcedure
+    .input(z.object({ equipmentId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { equipmentId } = input;
+
+      const equipment = await prisma.equipment.update({
+        where: { id: equipmentId },
+        data: {
+          deleted: true,
+        },
+      });
+
+      return { message: "success", equipment };
+    }),
+
   createEquipmentOnOwner: protectedProcedure
     .input(
       z.object({
@@ -191,7 +207,7 @@ export const equipmentRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { search, locationId, categoryId, take, skip } = input;
 
-      const wherePipe: WherePipe = {};
+      const wherePipe: WherePipe = { deleted: false };
 
       if (search) {
         wherePipe.OR = [
@@ -246,7 +262,7 @@ export const equipmentRouter = createTRPCRouter({
       const { limit, skip, cursor } = input;
 
       const sortPipe: Array<object> = [];
-      const wherePipe: WherePipe = {};
+      const wherePipe: WherePipe = { deleted: false };
 
       wherePipe.available = true;
 

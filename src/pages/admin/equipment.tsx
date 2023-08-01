@@ -63,6 +63,7 @@ type CellProps = {
   setShowAddEquipmentModal: Dispatch<SetStateAction<boolean>>;
   setEquipment: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal: Dispatch<SetStateAction<boolean>>;
+  handleDeleteEquipment: (equipmentId: string) => void;
 };
 
 const equipmentColumns: Columns<Equipment, CellProps>[] = [
@@ -126,6 +127,7 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
         setShowAddEquipmentModal={cellData.cellProps?.setShowAddEquipmentModal}
         setEquipment={cellData.cellProps?.setEquipment}
         setShowStockModal={cellData.cellProps?.setShowStockModal}
+        handleDeleteEquipment={cellData.cellProps?.handleDeleteEquipment}
       />
     ),
   },
@@ -148,6 +150,8 @@ const EquipmentAdmin: NextPage<Props> = ({
     categoryId: string;
   }>();
 
+  const ctx = api.useContext();
+
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
@@ -169,10 +173,24 @@ const EquipmentAdmin: NextPage<Props> = ({
     search,
   });
 
+  const deleteEquipment = api.equipment.deleteEquipment.useMutation();
+
+  const handleDeleteEquipment = (equipmentId: string) => {
+    deleteEquipment.mutate(
+      { equipmentId },
+      {
+        onSuccess: () => {
+          void ctx.equipment.adminGetEquipment.invalidate();
+        },
+      }
+    );
+  };
+
   const cellProps = {
     setShowAddEquipmentModal,
     setEquipment,
     setShowStockModal,
+    handleDeleteEquipment,
   };
 
   return (
@@ -523,6 +541,7 @@ type ActionsProps = {
   setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
   setEquipment?: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal?: Dispatch<SetStateAction<boolean>>;
+  handleDeleteEquipment?: (equipmentId: string) => void;
 };
 
 const ActionsDropMenu = ({
@@ -530,6 +549,7 @@ const ActionsDropMenu = ({
   setShowAddEquipmentModal,
   equipment,
   setShowStockModal,
+  handleDeleteEquipment,
 }: ActionsProps) => {
   return (
     <>
@@ -557,6 +577,14 @@ const ActionsDropMenu = ({
             }}
           >
             Editar stock
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              handleDeleteEquipment && handleDeleteEquipment(equipment.id);
+            }}
+            className="text-red-500"
+          >
+            Eliminar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
