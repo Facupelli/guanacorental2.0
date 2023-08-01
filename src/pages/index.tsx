@@ -334,6 +334,8 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
+  console.log(equipment);
+
   return (
     <>
       <DialogWithState isOpen={showCalendar} setOpen={setShowCalendar} title="">
@@ -364,7 +366,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
               fill
               style={{ objectFit: "contain" }}
               sizes="(max-width: 468px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
-              priority={equipment.name === "FX3 Cinema Line 4K 120 FPS"}
+              priority={equipment.model === "FX3 Cinema Line 4K 120 FPS"}
             />
           </div>
         )}
