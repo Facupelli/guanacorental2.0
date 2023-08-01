@@ -44,6 +44,8 @@ const Cart = ({
     void router.push("/cart");
   };
 
+  console.log("cart");
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {trigger && (
@@ -57,6 +59,7 @@ const Cart = ({
           </Button>
         </SheetTrigger>
       )}
+
       <SheetContent position="right" size={sheetSize}>
         <SheetHeader>
           <SheetTitle>MI PEDIDO</SheetTitle>
@@ -85,7 +88,12 @@ const Cart = ({
             )}
           </div>
 
-          <div className="absolute bottom-0 grid w-full ">
+          <div className="absolute bottom-0 grid w-full gap-2">
+            <SheetTrigger asChild className="p-0">
+              <Button size="sm" variant="secondary">
+                CONTINUAR ALQUILANDO
+              </Button>
+            </SheetTrigger>
             <Button size="sm" onClick={handleGoToCartPage}>
               VER CARRITO
             </Button>

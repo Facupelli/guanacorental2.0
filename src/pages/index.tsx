@@ -208,6 +208,7 @@ const LeftBar = ({
   const endDate = useBoundStore((state) => state.endDate);
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
+  const emptyCart = useBoundStore((state) => state.emptyCart);
 
   return (
     <>
@@ -226,7 +227,10 @@ const LeftBar = ({
           defaultValue={
             location.id ? `${location.id}-${location.name}` : undefined
           }
-          onValueChange={(e) => handleLocationChange(e, setLocation)}
+          onValueChange={(e) => {
+            handleLocationChange(e, setLocation);
+            emptyCart();
+          }}
         />
 
         <SelectDateButton />
@@ -334,8 +338,6 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
-  console.log(equipment);
-
   return (
     <>
       <DialogWithState isOpen={showCalendar} setOpen={setShowCalendar} title="">
@@ -357,6 +359,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
           }}
         />
       </DialogWithState>
+
       <article className="grid gap-2 rounded-sm bg-white p-4 shadow-sm">
         {equipment.image && (
           <div className="relative h-[200px] w-auto">
