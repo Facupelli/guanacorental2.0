@@ -63,7 +63,7 @@ type CellProps = {
   setShowAddEquipmentModal: Dispatch<SetStateAction<boolean>>;
   setEquipment: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal: Dispatch<SetStateAction<boolean>>;
-  handleDeleteEquipment: (equipmentId: string) => void;
+  setShowDeleteModal: Dispatch<SetStateAction<boolean>>;
 };
 
 const equipmentColumns: Columns<Equipment, CellProps>[] = [
@@ -127,7 +127,7 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
         setShowAddEquipmentModal={cellData.cellProps?.setShowAddEquipmentModal}
         setEquipment={cellData.cellProps?.setEquipment}
         setShowStockModal={cellData.cellProps?.setShowStockModal}
-        handleDeleteEquipment={cellData.cellProps?.handleDeleteEquipment}
+        setShowDeleteModal={cellData.cellProps?.setShowDeleteModal}
       />
     ),
   },
@@ -155,6 +155,7 @@ const EquipmentAdmin: NextPage<Props> = ({
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
@@ -181,6 +182,10 @@ const EquipmentAdmin: NextPage<Props> = ({
       {
         onSuccess: () => {
           void ctx.equipment.adminGetEquipment.invalidate();
+          setShowDeleteModal(false);
+        },
+        onError: () => {
+          setShowDeleteModal(false);
         },
       }
     );
@@ -190,7 +195,7 @@ const EquipmentAdmin: NextPage<Props> = ({
     setShowAddEquipmentModal,
     setEquipment,
     setShowStockModal,
-    handleDeleteEquipment,
+    setShowDeleteModal,
   };
 
   return (
@@ -220,6 +225,21 @@ const EquipmentAdmin: NextPage<Props> = ({
           equipment={equipment}
           setShowAddEquipmentModal={setShowAddEquipmentModal}
         />
+      </DialogWithState>
+
+      <DialogWithState
+        isOpen={showDeleteModal}
+        setOpen={setShowDeleteModal}
+        title={"Seguro que deseas eliminar el equipo?"}
+      >
+        <div className="flex justify-end">
+          <Button
+            onClick={() => equipment && handleDeleteEquipment(equipment.id)}
+            variant="destructive"
+          >
+            Eliminar
+          </Button>
+        </div>
       </DialogWithState>
 
       <Nav />
@@ -541,7 +561,7 @@ type ActionsProps = {
   setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
   setEquipment?: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal?: Dispatch<SetStateAction<boolean>>;
-  handleDeleteEquipment?: (equipmentId: string) => void;
+  setShowDeleteModal?: Dispatch<SetStateAction<boolean>>;
 };
 
 const ActionsDropMenu = ({
@@ -549,7 +569,7 @@ const ActionsDropMenu = ({
   setShowAddEquipmentModal,
   equipment,
   setShowStockModal,
-  handleDeleteEquipment,
+  setShowDeleteModal,
 }: ActionsProps) => {
   return (
     <>
@@ -580,7 +600,8 @@ const ActionsDropMenu = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              handleDeleteEquipment && handleDeleteEquipment(equipment.id);
+              setEquipment && setEquipment(equipment);
+              setShowDeleteModal && setShowDeleteModal(true);
             }}
             className="text-red-500"
           >
