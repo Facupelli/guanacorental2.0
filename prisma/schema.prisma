@@ -171,6 +171,7 @@ model Equipment {
   categoryId          String 
   owner               EquipmentOnOwner[]
   available           Boolean             @default(true)
+  deleted             Boolean             @default(false)
 }
 
 model Book {
