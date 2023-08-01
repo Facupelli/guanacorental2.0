@@ -1,6 +1,7 @@
 export type Category = {
   id: string;
   name: string;
+  order: number;
 };
 
 export type Location = {

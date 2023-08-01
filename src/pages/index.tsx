@@ -263,19 +263,21 @@ const LeftBar = ({
             >
               Todos
             </li>
-            {categories.map((category) => (
-              <li
-                key={category.id}
-                onClick={() => setCategory(category.id)}
-                className={`cursor-pointer rounded-sm px-2 py-1 ${
-                  selectedCategory === category.id
-                    ? "bg-secondary font-bold text-secondary-foreground"
-                    : ""
-                }`}
-              >
-                {category.name}
-              </li>
-            ))}
+            {categories
+              .sort((a, b) => (a.order > b.order ? 1 : -1))
+              .map((category) => (
+                <li
+                  key={category.id}
+                  onClick={() => setCategory(category.id)}
+                  className={`cursor-pointer rounded-sm px-2 py-1 ${
+                    selectedCategory === category.id
+                      ? "bg-secondary font-bold text-secondary-foreground"
+                      : ""
+                  }`}
+                >
+                  {category.name}
+                </li>
+              ))}
           </ul>
         </div>
       </section>

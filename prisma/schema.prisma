@@ -114,6 +114,7 @@ model Category {
   id                      String       @default(cuid()) @id
   name                    String
   equipments              Equipment[]
+  order                   Int          @default(1)
 }
 
 // model Schedule {
