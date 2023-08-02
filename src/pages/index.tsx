@@ -16,7 +16,6 @@ import {
   useState,
   useEffect,
   useRef,
-  type ChangeEvent,
 } from "react";
 
 import Nav from "@/components/Nav";
@@ -50,6 +49,7 @@ import type { Category, Equipment, Location } from "@/types/models";
 import Calendar from "react-calendar";
 import dayjs from "dayjs";
 import { toArgentinaDate } from "@/lib/dates";
+import { useSideMenu } from "@/hooks/useSideMenu";
 
 type Props = {
   locations: Location[];
@@ -211,7 +211,7 @@ const LeftBar = ({
   setCategory,
   selectedCategory,
 }: LeftBarProps) => {
-  const [showFilters, setShowFilters] = useState(false);
+  const { showSideMenu, handleShowSideMenu, setShowSideMenu } = useSideMenu();
 
   const filtersSectionRef = useRef<HTMLElement | null>(null);
 
@@ -221,19 +221,14 @@ const LeftBar = ({
   const location = useBoundStore((state) => state.location);
   const emptyCart = useBoundStore((state) => state.emptyCart);
 
-  const handleShowFilters = (event: ChangeEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    setShowFilters(event.target.checked);
-  };
-
   return (
     <>
       <input
         className="peer hidden"
         id="filters"
         type="checkbox"
-        checked={showFilters}
-        onChange={handleShowFilters}
+        checked={showSideMenu}
+        onChange={handleShowSideMenu}
       />
       <label
         htmlFor="filters"
@@ -310,9 +305,9 @@ const LeftBar = ({
           </ul>
         </div>
       </section>
-      {showFilters && (
+      {showSideMenu && (
         <div
-          onClick={() => setShowFilters(false)}
+          onClick={() => setShowSideMenu(false)}
           className="fixed right-0 top-0 z-10 h-screen w-full bg-background/30 backdrop-blur-sm"
         />
       )}
