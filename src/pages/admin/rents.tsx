@@ -29,16 +29,21 @@ type RentForm = { month: string; year: string; location: string };
 const AdminRents: NextPage = () => {
   const locations = api.location.getAllLocations.useQuery();
 
+  const currentMonth = dayjs().month() + 1;
+  const formatedCurrentMonth = currentMonth.toString().padStart(2, "0");
+
   const { setValue, watch } = useForm<RentForm>({
     defaultValues: {
-      month: "all",
+      month: formatedCurrentMonth,
       year: String(dayjs().year()),
     },
   });
 
   const year = watch("year", "2023");
-  const month = watch("month", "all");
+  const month = watch("month", formatedCurrentMonth);
   const location = watch("location", "all");
+
+  console.log(month);
 
   const { data } = api.rent.getTotal.useQuery({
     year,
@@ -107,11 +112,11 @@ const AdminRents: NextPage = () => {
               <div className="flex w-full items-center gap-6 rounded-md bg-white p-4 md:w-1/2">
                 <div className="flex w-full items-center gap-2">
                   <Label>Mes</Label>
-                  <SelectMonth setValue={setValue} />
+                  <SelectMonth setValue={setValue} value={month} />
                 </div>
                 <div className="flex w-full items-center gap-2">
                   <Label>Año</Label>
-                  <SelectYear setValue={setValue} />
+                  <SelectYear setValue={setValue} value={year} />
                 </div>
               </div>
               <div className="ml-auto">
@@ -176,11 +181,12 @@ const AdminRents: NextPage = () => {
 
 type SelectProps = {
   setValue: UseFormSetValue<RentForm>;
+  value: string;
 };
 
-const SelectMonth = ({ setValue }: SelectProps) => {
+const SelectMonth = ({ setValue, value }: SelectProps) => {
   return (
-    <Select onValueChange={(e) => setValue("month", e)}>
+    <Select onValueChange={(e) => setValue("month", e)} value={value}>
       <SelectTrigger>
         <SelectValue placeholder="elegir mes" />
       </SelectTrigger>
