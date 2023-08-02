@@ -43,8 +43,6 @@ const AdminRents: NextPage = () => {
   const month = watch("month", formatedCurrentMonth);
   const location = watch("location", "all");
 
-  console.log(month);
-
   const { data } = api.rent.getTotal.useQuery({
     year,
     month,
