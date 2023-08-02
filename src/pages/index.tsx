@@ -10,7 +10,14 @@ import Head from "next/head";
 import Image from "next/image";
 import { authOptions } from "@/server/auth";
 import { useBoundStore } from "@/zustand/store";
-import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useState,
+  useEffect,
+  useRef,
+  type ChangeEvent,
+} from "react";
 
 import Nav from "@/components/Nav";
 import {
@@ -204,15 +211,30 @@ const LeftBar = ({
   setCategory,
   selectedCategory,
 }: LeftBarProps) => {
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filtersSectionRef = useRef<HTMLElement | null>(null);
+
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
   const setLocation = useBoundStore((state) => state.setLocation);
   const location = useBoundStore((state) => state.location);
   const emptyCart = useBoundStore((state) => state.emptyCart);
 
+  const handleShowFilters = (event: ChangeEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    setShowFilters(event.target.checked);
+  };
+
   return (
     <>
-      <input className="peer hidden" id="filters" type="checkbox" />
+      <input
+        className="peer hidden"
+        id="filters"
+        type="checkbox"
+        checked={showFilters}
+        onChange={handleShowFilters}
+      />
       <label
         htmlFor="filters"
         className="col-span-3 col-start-10 flex justify-end gap-2 pb-2 peer-checked:text-secondary-foreground md:hidden"
@@ -220,7 +242,10 @@ const LeftBar = ({
         Filtros
         <FilterIcon className="h-5 w-5" />
       </label>
-      <section className="fixed left-[-110%] top-[70px] z-10 flex h-screen w-[60%] flex-col justify-start gap-6 overflow-y-auto bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 lg:relative lg:left-0 lg:top-0 lg:col-span-3 lg:flex lg:h-[calc(100vh_-_148px)] lg:w-full lg:flex-col lg:gap-4 lg:rounded-md lg:bg-white lg:p-4 lg:text-primary lg:shadow-sm">
+      <section
+        ref={filtersSectionRef}
+        className="fixed left-[-110%] top-[70px] z-30  flex h-screen w-[60%] flex-col justify-start gap-6 overflow-y-auto bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 lg:relative lg:left-0 lg:top-0 lg:col-span-3 lg:flex lg:h-[calc(100vh_-_148px)] lg:w-full lg:flex-col lg:gap-4 lg:rounded-md lg:bg-white lg:p-4 lg:text-primary lg:shadow-sm"
+      >
         <SelectLocation
           locations={locations}
           placeholder="Elegir sucursal"
@@ -285,6 +310,12 @@ const LeftBar = ({
           </ul>
         </div>
       </section>
+      {showFilters && (
+        <div
+          onClick={() => setShowFilters(false)}
+          className="fixed right-0 top-0 z-10 h-screen w-full bg-background/30 backdrop-blur-sm"
+        />
+      )}
     </>
   );
 };
