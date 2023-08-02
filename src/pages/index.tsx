@@ -158,7 +158,7 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
                 <div className="flex w-full items-center ">
                   <Input
                     type="search"
-                    placeholder="Buscar equipos por nombre, marca o modelo"
+                    placeholder="Buscar por nombre, marca o modelo"
                     className="rounded-br-none rounded-tr-none focus-visible:outline focus-visible:ring-0"
                     {...register("search")}
                   />
