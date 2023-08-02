@@ -7,10 +7,13 @@ import { FacebookIcon, LogOut, Menu, UserCog } from "lucide-react";
 
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import Cart from "./Cart";
+import { useSideMenu } from "@/hooks/useSideMenu";
 
 const Nav = () => {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const { showSideMenu, handleShowSideMenu, setShowSideMenu } = useSideMenu();
 
   const isAdmin = getIsAdmin(session);
   const isEmployee = getIsEmployee(session);
@@ -46,12 +49,14 @@ const Nav = () => {
             name="click"
             className="peer hidden"
             id="click"
+            checked={showSideMenu}
+            onChange={handleShowSideMenu}
           />
           <label htmlFor="click" className="text-white sm:hidden">
             <Menu className="h-6 w-6" />
           </label>
 
-          <ul className="fixed left-[-110%] top-[70px] flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
+          <ul className="fixed left-[-110%] top-[70px] z-20 flex h-screen w-[60%] flex-col justify-start gap-6 bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:relative sm:left-0 sm:top-0 sm:h-[70px] sm:w-auto sm:flex-row sm:items-center sm:justify-end sm:p-0 sm:text-white">
             <li>
               <Link href="/faq" className="text-white">
                 FAQ
@@ -91,6 +96,13 @@ const Nav = () => {
               </>
             )}
           </ul>
+
+          {showSideMenu && (
+            <div
+              onClick={() => setShowSideMenu(false)}
+              className="fixed right-0 top-[70px] z-10 h-screen w-full bg-background/30 backdrop-blur-sm"
+            />
+          )}
         </div>
       </nav>
     </header>
