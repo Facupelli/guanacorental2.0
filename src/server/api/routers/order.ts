@@ -655,6 +655,10 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
+      await prisma.order.delete({
+        where: { id: orderId },
+      });
+
       await sendCancelOrderMail(
         customer.order.customer.email,
         customer.order.number
