@@ -188,7 +188,7 @@ const CancelOrderAlert = ({
   orderId: string;
 }) => {
   const router = useRouter();
-  const { mutate } = api.order.deleteOrderById.useMutation();
+  const { mutate, isLoading } = api.order.deleteOrderById.useMutation();
 
   const handleCancelOrder = (orderId: string, bookId: string) => {
     mutate(
@@ -222,10 +222,11 @@ const CancelOrderAlert = ({
         <AlertDialogFooter>
           <AlertDialogCancel>No</AlertDialogCancel>
           <AlertDialogAction
+            disabled={isLoading}
             onClick={() => handleCancelOrder(orderId, bookId)}
             className="bg-red-600"
           >
-            Cancelar pedido
+            {isLoading ? "Cancelando..." : "Cancelar pedido"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
