@@ -262,8 +262,8 @@ const CustomerInfo = ({ order, customer }: CustomerInfo) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-4">
-        <div className="grid gap-1">
+      <div className="grid md:grid-cols-2 md:gap-2 lg:grid-cols-4">
+        <div className="grid gap-1 ">
           <p className="text-xs text-primary/60">Cliente</p>
           <p>{customer?.name}</p>
         </div>
@@ -391,8 +391,8 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
           </div>
         </div>
 
-        <div className="grid gap-3">
-          <div className="grid grid-cols-9 items-baseline gap-x-2 text-sm text-primary/60">
+        <div className="grid gap-3 overflow-x-auto">
+          <div className="grid min-w-[600px] grid-cols-9 items-baseline gap-x-2  text-sm text-primary/60">
             <div className="col-span-1" />
             <p className="col-span-3">Equipo</p>
             <p className="col-span-1">Cantidad</p>
@@ -401,7 +401,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
             <p className="col-span-2 text-xs">Precio * Días * Cantidad</p>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-4 ">
             {equipments.map((ownerEquipment) => (
               <div
                 key={ownerEquipment.id}
@@ -419,7 +419,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                   <div />
                 )}
 
-                <div className="col-span-3 grid min-w-[300px]">
+                <div className="col-span-3 grid md:min-w-[300px]">
                   <div className="flex gap-2">
                     <p>{ownerEquipment.equipment.name}</p>
                     <p>{ownerEquipment.equipment.brand}</p>
@@ -639,8 +639,8 @@ const OrderInfo = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-y-4">
-          <div className="grid gap-1">
+        <div className="grid grid-cols-2 gap-y-4 md:grid-cols-3">
+          <div className="col-span-3 grid gap-1 sm:col-span-1">
             <p className="text-xs text-primary/60">Retiro</p>
             <p>
               {info.startDate.toLocaleDateString("es-AR", {
@@ -652,7 +652,7 @@ const OrderInfo = ({
               - <span className="text-sm">{info.pickupHour}hs</span>
             </p>
           </div>
-          <div className="grid gap-1">
+          <div className="col-span-3 grid gap-1 sm:col-span-1">
             <p className="text-xs text-primary/60">Devolución</p>
             <p>
               {info.endDate.toLocaleDateString("es-AR", {
@@ -699,7 +699,7 @@ const OrderInfo = ({
             <p>{formatPrice(info?.subtotal)}</p>
           </div>
 
-          <div className="grid gap-1">
+          <div className="grid gap-1 ">
             <p className="text-xs text-primary/60">Total</p>
             <p className="font-bold">{formatPrice(info?.total)}</p>
           </div>
