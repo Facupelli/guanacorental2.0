@@ -127,18 +127,23 @@ const SelectDateButton = () => {
 
           <div>
             <SelectPickupHour />
-            <div className="hidden items-center text-xs sm:flex">
-              <div className="flex items-center">
-                <RentWeekendTip />
-                Fin de semana
-              </div>
-              <div className="flex items-center">
-                <RentHourTip />
-                Horarios
-              </div>
-              <div className="flex items-center">
-                <RentPriceTip />
-                Precios
+            <div className="pt-2">
+              <p className="text-sm text-secondary-foreground sm:text-base">
+                Importante leer antes de alquilar
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center">
+                  <RentWeekendTip />
+                  Fin de semana
+                </div>
+                <div className="flex items-center">
+                  <RentHourTip />
+                  Horarios
+                </div>
+                <div className="flex items-center">
+                  <RentPriceTip />
+                  Precios
+                </div>
               </div>
             </div>
           </div>
@@ -155,8 +160,8 @@ const RentWeekendTip = () => {
   return (
     <Popover>
       <PopoverTrigger className=" border-none p-0" asChild>
-        <Button variant="outline" className="w-10 rounded-full p-0">
-          <Info className="h-4 w-4" />
+        <Button variant="outline" className="w-6 rounded-full  p-0">
+          <Info className="h-4 w-4 text-secondary-foreground" />
           <span className="sr-only">Info</span>
         </Button>
       </PopoverTrigger>
@@ -178,8 +183,8 @@ const RentHourTip = () => {
   return (
     <Popover>
       <PopoverTrigger className="border-none" asChild>
-        <Button variant="outline" className="w-10 rounded-full p-0">
-          <Info className="h-4 w-4" />
+        <Button variant="outline" className="w-6 rounded-full p-0">
+          <Info className="h-4 w-4 text-secondary-foreground" />
           <span className="sr-only">Info</span>
         </Button>
       </PopoverTrigger>
@@ -198,8 +203,8 @@ const RentPriceTip = () => {
   return (
     <Popover>
       <PopoverTrigger className="border-none" asChild>
-        <Button variant="outline" className="w-10 rounded-full p-0">
-          <Info className="h-4 w-4" />
+        <Button variant="outline" className="w-6 rounded-full p-0">
+          <Info className="h-4 w-4 text-secondary-foreground" />
           <span className="sr-only">Info</span>
         </Button>
       </PopoverTrigger>
