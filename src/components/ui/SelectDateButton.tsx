@@ -53,8 +53,10 @@ const SelectDateButton = () => {
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      setStartDate(dayjs(e[0]).tz("America/Argentina/Buenos_Aires").toDate());
-      setEndDate(dayjs(e[1]).tz("America/Argentina/Buenos_Aires").toDate());
+      setStartDate(
+        dayjs.utc(e[0]).tz("America/Argentina/Buenos_Aires").toDate()
+      );
+      setEndDate(dayjs.utc(e[1]).tz("America/Argentina/Buenos_Aires").toDate());
     }
   };
 
