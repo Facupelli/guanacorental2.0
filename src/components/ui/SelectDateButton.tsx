@@ -29,10 +29,12 @@ import {
 import { Button } from "./button";
 import SelectPickupHour from "./SelectPickupHour";
 
-import { disableWeekend, toArgentinaDate } from "@/lib/dates";
+import { disableWeekend } from "@/lib/dates";
+import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 
 import { type Value } from "react-calendar/dist/cjs/shared/types";
-import { getIsAdmin, getIsEmployee } from "@/lib/utils";
+
+dayjs.tz.setDefault("America/Argentina/Buenos_Aires");
 
 const SelectDateButton = () => {
   const { data: session } = useSession();
@@ -41,15 +43,18 @@ const SelectDateButton = () => {
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  const endDate = useBoundStore((state) => state.startDate);
-  const startDate = useBoundStore((state) => state.endDate);
+  const endDate = useBoundStore((state) => state.endDate);
+  const startDate = useBoundStore((state) => state.startDate);
 
   // const [modal, setModal] = useState(isOpen);
 
+  console.log("START", startDate);
+  console.log("END", endDate);
+
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      setStartDate(e[0]);
-      setEndDate(e[1]);
+      setStartDate(dayjs(e[0]).toDate());
+      setEndDate(dayjs(e[1]).toDate());
     }
   };
 
