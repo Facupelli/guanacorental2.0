@@ -53,8 +53,8 @@ const SelectDateButton = () => {
 
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
-      setStartDate(dayjs(e[0]).toDate());
-      setEndDate(dayjs(e[1]).toDate());
+      setStartDate(dayjs(e[0]).utc().toDate());
+      setEndDate(dayjs(e[1]).utc().toDate());
     }
   };
 
