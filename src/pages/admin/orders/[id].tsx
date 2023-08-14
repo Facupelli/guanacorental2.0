@@ -146,7 +146,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                   orderId={order.id}
                 />
 
-                {isAdmin && canCancel && (
+                {isAdmin && (
                   <>
                     <EarningsInfo
                       oscar={order.earning?.oscar ?? 0}
@@ -154,21 +154,23 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                       sub={order.earning?.sub ?? 0}
                     />
 
-                    <section className="grid gap-2 rounded-md border border-red-400 p-4">
-                      <h2 className="pb-2 text-lg font-semibold">
-                        Cancelar Pedido
-                      </h2>
-                      <p>
-                        El pedido será cancelado. Se notificará al usuario via
-                        correo electrónico.
-                      </p>
-                      <div>
-                        <CancelOrderAlert
-                          bookId={order.bookId}
-                          orderId={order.id}
-                        />
-                      </div>
-                    </section>
+                    {canCancel && (
+                      <section className="grid gap-2 rounded-md border border-red-400 p-4">
+                        <h2 className="pb-2 text-lg font-semibold">
+                          Cancelar Pedido
+                        </h2>
+                        <p>
+                          El pedido será cancelado. Se notificará al usuario via
+                          correo electrónico.
+                        </p>
+                        <div>
+                          <CancelOrderAlert
+                            bookId={order.bookId}
+                            orderId={order.id}
+                          />
+                        </div>
+                      </section>
+                    )}
                   </>
                 )}
               </div>
