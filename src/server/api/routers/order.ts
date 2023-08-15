@@ -23,6 +23,28 @@ import dayjs from "dayjs";
 import { sendCancelOrderMail, sendMail } from "@/server/utils/mailer";
 import { toArgentinaDate } from "@/lib/dates";
 
+type GetClaendarOrdersQuery = {
+  where: {
+    book: {
+      start_date: { gte: Date };
+    };
+    locationId?: string;
+  };
+  include: {
+    customer: {
+      include: {
+        address: boolean;
+      };
+    };
+    location: boolean;
+    book: boolean;
+    equipments: {
+      include: { books: boolean; owner: boolean; equipment: boolean };
+    };
+    earning: boolean;
+  };
+};
+
 type Query = {
   orderBy?: Prisma.OrderOrderByWithRelationAndSearchRelevanceInput;
   where?: {
@@ -156,7 +178,7 @@ export const orderRouter = createTRPCRouter({
       ) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Some equipment is not available",
+          message: "Alguno de los equipos no está disponible para la fecha",
         });
       }
 
@@ -259,12 +281,11 @@ export const orderRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const date = dayjs().subtract(1, "month").toDate();
 
-      const orders = await prisma.order.findMany({
+      const query: GetClaendarOrdersQuery = {
         where: {
           book: {
             start_date: { gte: date },
           },
-          locationId: input.location,
         },
         include: {
           customer: {
@@ -279,7 +300,13 @@ export const orderRouter = createTRPCRouter({
           },
           earning: true,
         },
-      });
+      };
+
+      if (input.location !== "all") {
+        query.where.locationId = input.location;
+      }
+
+      const orders = await prisma.order.findMany(query);
 
       return orders;
     }),
@@ -426,7 +453,7 @@ export const orderRouter = createTRPCRouter({
       ) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Some equipment is not available",
+          message: "Alguno de los equipos no está disponible para la fecha",
         });
       }
 
