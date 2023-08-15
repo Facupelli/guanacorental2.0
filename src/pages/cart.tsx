@@ -477,6 +477,7 @@ const RightBar = ({
           <div className="grid gap-2">
             <Button
               disabled={
+                cart.length <= 0 ||
                 !startDate ||
                 !endDate ||
                 isLoading ||
@@ -486,9 +487,10 @@ const RightBar = ({
               onClick={handleBookOrder}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {!startDate || !endDate
-                ? "Selecciona una fecha para alquilar!"
-                : "Agendar Pedido"}
+              {(!startDate || !endDate) &&
+                "Selecciona una fecha para alquilar!"}
+              {cart.length <= 0 && "Tu carrito está vacío!"}
+              {cart.length > 0 && startDate && endDate && "Agendar Pedido"}
             </Button>
           </div>
         </div>

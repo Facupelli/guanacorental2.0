@@ -80,13 +80,6 @@ export const rentRouter = createTRPCRouter({
 
       const orders = await prisma.order.findMany(orderQuery);
 
-      console.log(
-        orders.map((order) => ({
-          total: order.total,
-          subtotal: order.subtotal,
-        }))
-      );
-
       const totalFromOrders = orders.reduce((acc, curr) => {
         return acc + curr.total;
       }, 0);
