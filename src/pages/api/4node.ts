@@ -8,13 +8,14 @@ import "dayjs/locale/es";
 dayjs.locale("es");
 
 type Query = {
-  where?: {
-    book: {
+  where: {
+    book?: {
       start_date: {
         gte: Date;
         lte: Date;
       };
     };
+    locationId?: string;
   };
   include: {
     customer: {
@@ -32,9 +33,14 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     // Process a POST request
-    const { year, month }: { year: string; month: string } = req.body;
+    const {
+      year,
+      month,
+      location,
+    }: { year: string; month: string; location: string } = req.body;
 
     const query: Query = {
+      where: {},
       include: {
         customer: {
           include: { address: true },
@@ -49,8 +55,8 @@ export default async function handler(
       const firstMonthDay = dayjs(`${year}-01`).startOf("month").toDate();
       const lastMonthDay = dayjs(`${year}-12`).endOf("month").toDate();
 
-      query.where = {
-        book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
+      query.where.book = {
+        start_date: { gte: firstMonthDay, lte: lastMonthDay },
       };
     }
 
@@ -61,6 +67,10 @@ export default async function handler(
       query.where = {
         book: { start_date: { gte: firstMonthDay, lte: lastMonthDay } },
       };
+    }
+
+    if (location !== "all") {
+      query.where.locationId = location;
     }
 
     const orders = await prisma.order.findMany(query);

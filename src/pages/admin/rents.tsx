@@ -55,7 +55,7 @@ const AdminRents: NextPage = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ year, month }),
+      body: JSON.stringify({ year, month, location }),
     };
 
     const fetch4nodeBuffer = () =>
