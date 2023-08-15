@@ -48,9 +48,6 @@ const SelectDateButton = () => {
 
   // const [modal, setModal] = useState(isOpen);
 
-  console.log("START", startDate);
-  console.log("END", endDate);
-
   const handleDateChange = (e: Value) => {
     if (e && Array.isArray(e)) {
       setStartDate(
