@@ -34,8 +34,6 @@ export default async function handler(
     // Process a POST request
     const { year, month }: { year: string; month: string } = req.body;
 
-    console.log("4NODE BUFFER", year, month);
-
     const query: Query = {
       include: {
         customer: {
