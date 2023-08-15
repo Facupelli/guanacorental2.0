@@ -50,18 +50,19 @@ type Order = Prisma.OrderGetPayload<{
 }>;
 
 const AdminOrders: NextPage = () => {
+  const setLocation = useBoundStore((state) => state.setLocation);
+  const location = useBoundStore((state) => state.location);
+  const currentPage = useBoundStore((state) => state.ordersCurrentPage);
+  const setCurrentPage = useBoundStore((state) => state.setOrdersCurrentPage);
+
   const [, setOrder] = useState<Order | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   const { setValue, watch, register } = useForm<{
     sort: string;
     search: string;
   }>();
-
-  const setLocation = useBoundStore((state) => state.setLocation);
-  const location = useBoundStore((state) => state.location);
 
   const locations = api.location.getAllLocations.useQuery();
 

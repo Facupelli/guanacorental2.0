@@ -114,6 +114,8 @@ const createCartSlice: StateCreator<
 interface AdminSlice {
   calendarDay: Date;
   setCalendarDay: (day: Date) => void;
+  ordersCurrentPage: number;
+  setOrdersCurrentPage: (page: number) => void;
 }
 
 const createAdminSlice: StateCreator<
@@ -124,6 +126,8 @@ const createAdminSlice: StateCreator<
 > = (set) => ({
   calendarDay: new Date(),
   setCalendarDay: (day) => set(() => ({ calendarDay: day })),
+  ordersCurrentPage: 1,
+  setOrdersCurrentPage: (page) => set(() => ({ ordersCurrentPage: page })),
 });
 
 export const useBoundStore = create<
