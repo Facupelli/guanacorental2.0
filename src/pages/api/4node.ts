@@ -8,6 +8,11 @@ import "dayjs/locale/es";
 dayjs.locale("es");
 
 type Query = {
+  orderBy?: {
+    book?: {
+      end_date: "asc" | "desc";
+    };
+  };
   where: {
     book?: {
       start_date: {
@@ -41,6 +46,11 @@ export default async function handler(
 
     const query: Query = {
       where: {},
+      orderBy: {
+        book: {
+          end_date: "asc",
+        },
+      },
       include: {
         customer: {
           include: { address: true },
