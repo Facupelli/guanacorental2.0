@@ -153,9 +153,10 @@ model EquipmentOnOwner {
   ownerId                 String 
   location                Location            @relation(fields: [locationId], references: [id])
   locationId              String              
+  deleted                 Boolean             @default(false)
   created_at              DateTime            @default(now())
 
-  @@unique([equipmentId, ownerId, locationId])
+  // @@id([equipmentId, ownerId, locationId])
 }
 
 model Equipment {

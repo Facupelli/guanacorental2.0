@@ -134,11 +134,17 @@ export const equipmentRouter = createTRPCRouter({
       const { ownerId } = input;
 
       if (!ownerId) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "missin ownerId" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "missing ownerId",
+        });
       }
 
-      await prisma.equipmentOnOwner.delete({
+      await prisma.equipmentOnOwner.update({
         where: { id: ownerId },
+        data: {
+          deleted: true,
+        },
       });
 
       return { message: "success" };
@@ -234,7 +240,10 @@ export const equipmentRouter = createTRPCRouter({
         take,
         skip,
         include: {
-          owner: { include: { owner: true, location: true } },
+          owner: {
+            where: { deleted: false },
+            include: { owner: true, location: true },
+          },
           category: true,
         },
       });
@@ -298,6 +307,9 @@ export const equipmentRouter = createTRPCRouter({
         orderBy: sortPipe,
         include: {
           owner: {
+            where: {
+              deleted: false,
+            },
             include: {
               owner: true,
               location: true,

@@ -42,6 +42,9 @@ export const getUpdatedCart = async (cart: Cart) => {
     where: { id: { in: equipmentIds } },
     include: {
       owner: {
+        where: {
+          deleted: false,
+        },
         include: {
           owner: true,
           location: true,

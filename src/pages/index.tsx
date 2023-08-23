@@ -86,6 +86,8 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
       }
     );
 
+  console.log(data);
+
   const handleLoadMore = async () => {
     await fetchNextPage();
   };
