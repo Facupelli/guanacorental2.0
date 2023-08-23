@@ -200,6 +200,29 @@ export const equipmentRouter = createTRPCRouter({
       return { message: "owner missing" };
     }),
 
+  getAdminEquipmentById: protectedProcedure
+    .input(z.object({ equipmentId: z.string().nullable() }))
+    .query(async ({ input }) => {
+      const { equipmentId } = input;
+
+      if (!equipmentId) {
+        return null;
+      }
+
+      return await prisma.equipment.findUnique({
+        where: {
+          id: equipmentId,
+        },
+        include: {
+          owner: {
+            where: { deleted: false },
+            include: { owner: true, location: true },
+          },
+          category: true,
+        },
+      });
+    }),
+
   adminGetEquipment: protectedProcedure
     .input(
       z.object({
