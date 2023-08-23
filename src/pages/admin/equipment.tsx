@@ -51,6 +51,17 @@ import type { Location, Owner } from "@/types/models";
 import type { Category, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
 import { type OwnerequipmentForm } from "@/types/ownerEquipment";
+import {
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -61,7 +72,8 @@ type Equipment = Prisma.EquipmentGetPayload<{
 
 type CellProps = {
   setShowAddEquipmentModal: Dispatch<SetStateAction<boolean>>;
-  setEquipment: Dispatch<SetStateAction<Equipment | null>>;
+  setEquipmentId: Dispatch<SetStateAction<string | null>>;
+  setEquipmentToEdit: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal: Dispatch<SetStateAction<boolean>>;
   setShowDeleteModal: Dispatch<SetStateAction<boolean>>;
 };
@@ -125,7 +137,8 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
       <ActionsDropMenu
         equipment={rowData}
         setShowAddEquipmentModal={cellData.cellProps?.setShowAddEquipmentModal}
-        setEquipment={cellData.cellProps?.setEquipment}
+        setEquipmentId={cellData.cellProps?.setEquipmentId}
+        setEquipmentToEdit={cellData.cellProps?.setEquipmentToEdit}
         setShowStockModal={cellData.cellProps?.setShowStockModal}
         setShowDeleteModal={cellData.cellProps?.setShowDeleteModal}
       />
@@ -152,7 +165,9 @@ const EquipmentAdmin: NextPage<Props> = ({
 
   const ctx = api.useContext();
 
-  const [equipment, setEquipment] = useState<Equipment | null>(null);
+  const [equipmentToEdit, setEquipmentToEdit] = useState<Equipment | null>(
+    null
+  );
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -160,11 +175,16 @@ const EquipmentAdmin: NextPage<Props> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
-  // const location = useBoundStore((state) => state.location);
-
   const search = useDebounce(watch("search", ""), 500);
   const locationId = watch("location");
   const categoryId = watch("categoryId", "all");
+
+  const [equipmentId, setEquipmentId] = useState<string | null>(null);
+  const equipment = api.equipment.getAdminEquipmentById.useQuery({
+    equipmentId,
+  });
+
+  console.log("EQUIPMENT TO UPDATE", equipment.data);
 
   const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
@@ -193,7 +213,8 @@ const EquipmentAdmin: NextPage<Props> = ({
 
   const cellProps = {
     setShowAddEquipmentModal,
-    setEquipment,
+    setEquipmentId,
+    setEquipmentToEdit,
     setShowStockModal,
     setShowDeleteModal,
   };
@@ -206,11 +227,11 @@ const EquipmentAdmin: NextPage<Props> = ({
         <link rel="icon" href="/logo-favicon.ico" />
       </Head>
 
-      {equipment && (
+      {equipment.data && (
         <OwnerLocationStockModal
           isOpen={showStockModal}
           setOpen={setShowStockModal}
-          equipment={equipment}
+          equipment={equipment.data}
           locations={locations}
           owners={owners}
         />
@@ -222,25 +243,30 @@ const EquipmentAdmin: NextPage<Props> = ({
         title={equipment ? "Editar equipo" : "Agregar equipo"}
       >
         <AddEquipment
-          equipment={equipment}
+          equipment={equipmentToEdit}
+          setEquipmentToEdit={setEquipmentToEdit}
           setShowAddEquipmentModal={setShowAddEquipmentModal}
         />
       </DialogWithState>
 
-      <DialogWithState
-        isOpen={showDeleteModal}
-        setOpen={setShowDeleteModal}
-        title={"Seguro que deseas eliminar el equipo?"}
-      >
-        <div className="flex justify-end">
-          <Button
-            onClick={() => equipment && handleDeleteEquipment(equipment.id)}
-            variant="destructive"
-          >
-            Eliminar
-          </Button>
-        </div>
-      </DialogWithState>
+      {equipmentToEdit && (
+        <DialogWithState
+          isOpen={showDeleteModal}
+          setOpen={setShowDeleteModal}
+          title={"Seguro que deseas eliminar el equipo?"}
+        >
+          <div className="flex justify-end">
+            <Button
+              onClick={() =>
+                equipment && handleDeleteEquipment(equipmentToEdit.id)
+              }
+              variant="destructive"
+            >
+              Eliminar
+            </Button>
+          </div>
+        </DialogWithState>
+      )}
 
       <Nav />
 
@@ -272,7 +298,7 @@ const EquipmentAdmin: NextPage<Props> = ({
               <p>total: {data?.totalCount}</p>
               <Button
                 onClick={() => {
-                  setEquipment(null);
+                  setEquipmentId(null);
                   setShowAddEquipmentModal(true);
                 }}
                 size="sm"
@@ -287,7 +313,7 @@ const EquipmentAdmin: NextPage<Props> = ({
               <DataTable
                 columns={equipmentColumns}
                 data={data.equipment}
-                setRowData={setEquipment}
+                setRowData={setEquipmentToEdit}
                 cellProps={cellProps}
               />
             )}
@@ -336,6 +362,7 @@ const OwnerLocationStockModal = ({
   });
 
   const ctx = api.useContext();
+
   const { mutate, isLoading } =
     api.equipment.createEquipmentOnOwner.useMutation();
   const deleteEquipmenOnOwner =
@@ -352,7 +379,8 @@ const OwnerLocationStockModal = ({
     mutate(mutateData, {
       onSuccess: () => {
         void ctx.equipment.adminGetEquipment.invalidate();
-        setOpen(false);
+        void ctx.equipment.getAdminEquipmentById.invalidate();
+        // setOpen(false);
       },
       onError: (err) => {
         console.error(err);
@@ -366,85 +394,127 @@ const OwnerLocationStockModal = ({
       {
         onSuccess: () => {
           void ctx.equipment.adminGetEquipment.invalidate();
-          setOpen(false);
+          void ctx.equipment.getAdminEquipmentById.invalidate();
+          // setOpen(false);
         },
       }
     );
   };
 
   return (
-    <DialogWithState
-      title={`${equipment.name} ${equipment.brand}`}
-      description={equipment.model}
-      isOpen={isOpen}
-      setOpen={setOpen}
-    >
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
-          <Label className="col-span-2">Dueño</Label>
-          <Label className="col-span-2">Sucursal</Label>
-          <Label className="col-span-2">Stock</Label>
-        </div>
-        <div>
-          {equipment.owner?.map((owner) => (
-            <div key={owner.id} className="grid grid-cols-7 items-center gap-2">
-              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                {owner.owner?.name}
-              </p>
-              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                {owner.location.name}
-              </p>
-              <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                {owner.stock}
-              </p>
-              <Button
-                type="button"
-                variant="link"
-                className="text-gray-800"
-                onClick={() => handleDeleteStock(owner.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <div className="pt-4">
-            {fields?.map((field, index) => (
-              <FieldArray
-                key={field.id}
-                remove={remove}
-                locations={locations}
-                owners={owners}
-                register={register}
-                setValue={setValue}
-                index={index}
-              />
-            ))}
+    <>
+      <DialogWithState
+        title={`${equipment.name} ${equipment.brand}`}
+        description={equipment.model}
+        isOpen={isOpen}
+        setOpen={setOpen}
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-7 gap-4 pb-2 text-sm font-semibold">
+            <Label className="col-span-2">Dueño</Label>
+            <Label className="col-span-2">Sucursal</Label>
+            <Label className="col-span-2">Stock</Label>
           </div>
-        </div>
+          <div className="grid gap-2">
+            {equipment.owner?.map((owner) => (
+              <div
+                key={owner.id}
+                className="grid grid-cols-7 items-center gap-2"
+              >
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.owner?.name}
+                </p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.location.name}
+                </p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
+                  {owner.stock}
+                </p>
+                <RemoveStockAlert
+                  isLoading={isLoading}
+                  handleDeleteStock={() => handleDeleteStock(owner.id)}
+                />
+              </div>
+            ))}
+            <div className="pt-4">
+              {fields?.map((field, index) => (
+                <FieldArray
+                  key={field.id}
+                  remove={remove}
+                  locations={locations}
+                  owners={owners}
+                  register={register}
+                  setValue={setValue}
+                  index={index}
+                />
+              ))}
+            </div>
+          </div>
 
-        <div className="flex justify-center pt-6">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => append({ ownerId: "", stock: 1, locationId: "" })}
-            className="flex items-center gap-2 "
+          <div className="flex justify-center pt-6">
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => append({ ownerId: "", stock: 1, locationId: "" })}
+              className="flex items-center gap-2 "
+            >
+              Agregar dueño <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Actualizar"
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogWithState>
+    </>
+  );
+};
+
+type RemoveStockAlert = {
+  handleDeleteStock: () => void;
+  isLoading: boolean;
+};
+
+const RemoveStockAlert = ({
+  handleDeleteStock,
+  isLoading,
+}: RemoveStockAlert) => {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghost" className="ml-auto h-7 w-7 p-0">
+          <Trash2 className="h-4 w-4 text-red-500" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            Estas seguro que quieres eliminar este stock?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Marcará el stock como eliminado, y podrás crear uno nuevo.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>No</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={isLoading}
+            onClick={handleDeleteStock}
+            className="bg-red-600"
           >
-            Agregar dueño <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              "Actualizar"
-            )}
-          </Button>
-        </div>
-      </form>
-    </DialogWithState>
+            {isLoading ? "Eliminando..." : "Eliminar"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
@@ -559,13 +629,15 @@ const SelectOwner = ({
 type ActionsProps = {
   equipment: Equipment;
   setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
-  setEquipment?: Dispatch<SetStateAction<Equipment | null>>;
+  setEquipmentId?: Dispatch<SetStateAction<string | null>>;
+  setEquipmentToEdit?: Dispatch<SetStateAction<Equipment | null>>;
   setShowStockModal?: Dispatch<SetStateAction<boolean>>;
   setShowDeleteModal?: Dispatch<SetStateAction<boolean>>;
 };
 
 const ActionsDropMenu = ({
-  setEquipment,
+  setEquipmentId,
+  setEquipmentToEdit,
   setShowAddEquipmentModal,
   equipment,
   setShowStockModal,
@@ -584,7 +656,7 @@ const ActionsDropMenu = ({
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => {
-              setEquipment && setEquipment(equipment);
+              setEquipmentToEdit && setEquipmentToEdit(equipment);
               setShowAddEquipmentModal && setShowAddEquipmentModal(true);
             }}
           >
@@ -592,7 +664,7 @@ const ActionsDropMenu = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              setEquipment && setEquipment(equipment);
+              setEquipmentId && setEquipmentId(equipment.id);
               setShowStockModal && setShowStockModal(true);
             }}
           >
@@ -600,7 +672,7 @@ const ActionsDropMenu = ({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              setEquipment && setEquipment(equipment);
+              setEquipmentToEdit && setEquipmentToEdit(equipment);
               setShowDeleteModal && setShowDeleteModal(true);
             }}
             className="text-red-500"
@@ -625,11 +697,13 @@ type AddEquipmentForm = {
 
 type AddEquipmentProps = {
   equipment: Equipment | null;
+  setEquipmentToEdit: Dispatch<SetStateAction<Equipment | null>>;
   setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
 };
 
 const AddEquipment = ({
   equipment,
+  setEquipmentToEdit,
   setShowAddEquipmentModal,
 }: AddEquipmentProps) => {
   const { register, handleSubmit, setValue } = useForm<AddEquipmentForm>();
@@ -649,6 +723,7 @@ const AddEquipment = ({
         {
           onSuccess: () => {
             void ctx.equipment.adminGetEquipment.invalidate();
+            setEquipmentToEdit(null);
             setShowAddEquipmentModal && setShowAddEquipmentModal(false);
           },
         }
