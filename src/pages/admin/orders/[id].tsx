@@ -39,7 +39,6 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Location, Prisma, Role } from "@prisma/client";
-import dayjs from "dayjs";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -89,7 +88,6 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   }
 
   const isAdmin = getIsAdmin(session);
-  const canCancel = dayjs().isBefore(order?.book.start_date);
 
   return (
     <>
@@ -154,23 +152,21 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                       sub={order.earning?.sub ?? 0}
                     />
 
-                    {canCancel && (
-                      <section className="grid gap-2 rounded-md border border-red-400 p-4">
-                        <h2 className="pb-2 text-lg font-semibold">
-                          Cancelar Pedido
-                        </h2>
-                        <p>
-                          El pedido será cancelado. Se notificará al usuario via
-                          correo electrónico.
-                        </p>
-                        <div>
-                          <CancelOrderAlert
-                            bookId={order.bookId}
-                            orderId={order.id}
-                          />
-                        </div>
-                      </section>
-                    )}
+                    <section className="grid gap-2 rounded-md border border-red-400 p-4">
+                      <h2 className="pb-2 text-lg font-semibold">
+                        Cancelar Pedido
+                      </h2>
+                      <p>
+                        El pedido será cancelado. Se notificará al usuario via
+                        correo electrónico.
+                      </p>
+                      <div>
+                        <CancelOrderAlert
+                          bookId={order.bookId}
+                          orderId={order.id}
+                        />
+                      </div>
+                    </section>
                   </>
                 )}
               </div>
