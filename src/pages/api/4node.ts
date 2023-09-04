@@ -130,6 +130,7 @@ export default async function handler(
     });
 
     const headers = [
+      "N°",
       "Nombre",
       "Retiro",
       "Devolución",
@@ -141,7 +142,7 @@ export default async function handler(
     ];
 
     worksheet
-      .cell(1, 1, 1, 8, true)
+      .cell(1, 1, 1, 9, true)
       .string(
         `Resumen rental ${dayjs()
           .month(Number(month) - 1)
@@ -156,13 +157,14 @@ export default async function handler(
         .style(headerStyle);
     });
 
-    worksheet.column(1).setWidth(20);
+    worksheet.column(2).setWidth(20);
     worksheet.row(1).setHeight(30);
     worksheet.row(2).setHeight(20);
 
     const ordersData: (string | number | null | undefined)[][] = [];
     orders.map((order) => {
       const rowData = [
+        order.number,
         order?.customer.name,
         order?.book.start_date.toLocaleDateString("es-AR", {
           day: "numeric",
@@ -185,18 +187,14 @@ export default async function handler(
 
     ordersData.forEach((rowOrder, rowIndex) => {
       rowOrder.forEach((cellValue, columnIndex) => {
-        if (typeof cellValue === "number") {
-          worksheet
-            .cell(rowIndex + 3, columnIndex + 1)
-            .number(cellValue)
-            .style(priceStyle)
-            .style(bodyStyle);
-        }
-        if (typeof cellValue === "string") {
-          worksheet
-            .cell(rowIndex + 3, columnIndex + 1)
-            .string(cellValue)
-            .style(bodyStyle);
+        const cell = worksheet.cell(rowIndex + 3, columnIndex + 1);
+
+        if (columnIndex === 0 && typeof cellValue === "number") {
+          cell.number(cellValue).style(bodyStyle);
+        } else if (typeof cellValue === "number") {
+          cell.number(cellValue).style(priceStyle).style(bodyStyle);
+        } else if (typeof cellValue === "string") {
+          cell.string(cellValue).style(bodyStyle);
         }
       });
     });
