@@ -184,8 +184,6 @@ const EquipmentAdmin: NextPage<Props> = ({
     equipmentId,
   });
 
-  console.log("EQUIPMENT TO UPDATE", equipment.data);
-
   const { data } = api.equipment.adminGetEquipment.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,

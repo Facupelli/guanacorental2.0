@@ -20,7 +20,11 @@ import {
   updateEarnings,
 } from "@/server/utils/updateOrder";
 import dayjs from "dayjs";
-import { sendCancelOrderMail, sendMail } from "@/server/utils/mailer";
+import {
+  sendCancelOrderMail,
+  sendMail,
+  sendMailToGuanaco,
+} from "@/server/utils/mailer";
 import { toArgentinaDate } from "@/lib/dates";
 
 type GetClaendarOrdersQuery = {
@@ -618,6 +622,11 @@ export const orderRouter = createTRPCRouter({
           "newOrder.handlebars",
           `NUEVO PEDIDO REALIZADO #${newOrder.number}`
         );
+
+        await sendMailToGuanaco(
+          mailData,
+          `NUEVO PEDIDO REALIZADO #${newOrder.number}`
+        );
       }
 
       return { newOrder, earnings };
@@ -662,6 +671,10 @@ export const orderRouter = createTRPCRouter({
         where: { orderId },
       });
 
+      await prisma.order.delete({
+        where: { id: orderId },
+      });
+
       const customer = await prisma.book.delete({
         where: { id: bookId },
         include: {
@@ -680,10 +693,6 @@ export const orderRouter = createTRPCRouter({
           message: "failed on book delete",
         });
       }
-
-      await prisma.order.delete({
-        where: { id: orderId },
-      });
 
       await sendCancelOrderMail(
         customer.order.customer.email,
