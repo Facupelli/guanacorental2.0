@@ -429,6 +429,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
             className="font-bold"
             onClick={() => handleAddToCart(isAlreadyInCart, equipment)}
             aria-label="add-to-cart-button"
+            disabled={!available}
           >
             {isAlreadyInCart ? (
               "Agregado"
