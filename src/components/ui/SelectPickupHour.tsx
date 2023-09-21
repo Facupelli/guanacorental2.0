@@ -15,14 +15,23 @@ const SelectPickupHour = () => {
   const setPickupHour = useBoundStore((state) => state.setPickupHour);
   const startDate = useBoundStore((state) => state.startDate);
   const location = useBoundStore((state) => state.location);
+  const pickup = useBoundStore((state) => state.pickupHour);
 
   const schedules = Object.keys(SCHEDULES[location.name]!);
+
+  console.log("START DATE", startDate);
+  console.log(pickup);
+
+  if (dayjs(startDate).day() !== 5) {
+    setPickupHour(schedules[0]!);
+  }
 
   return (
     <Select
       onValueChange={(e) => setPickupHour(e)}
       disabled={dayjs(startDate).day() !== 5 || !startDate}
       defaultValue="09:00"
+      value={pickup}
     >
       <SelectTrigger>
         <SelectValue placeholder="seleccionar hora de retiro" />
