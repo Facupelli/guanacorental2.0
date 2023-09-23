@@ -46,6 +46,7 @@ export type EquipmentOnOwner = {
   location: Location;
   locationId: string;
   created_at: Date;
+  deleted: boolean;
 };
 
 export type Book = {

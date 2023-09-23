@@ -330,9 +330,9 @@ export const equipmentRouter = createTRPCRouter({
         orderBy: sortPipe,
         include: {
           owner: {
-            where: {
-              deleted: false,
-            },
+            // where: {
+            //   deleted: false,
+            // },
             include: {
               owner: true,
               location: true,

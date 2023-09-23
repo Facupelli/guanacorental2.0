@@ -441,7 +441,7 @@ export const orderRouter = createTRPCRouter({
 
       const updatedCart = await getUpdatedCart(cart);
 
-      const removeOwnersLocations = updatedCart.map((item) => ({
+      const sameLocationEquipmentCart = updatedCart.map((item) => ({
         ...item,
         owner: item.owner.filter(
           (ownerOnEquipment) => ownerOnEquipment.locationId === locationId
@@ -450,7 +450,7 @@ export const orderRouter = createTRPCRouter({
 
       //CHECK ALL EQUIPMENT AVAILABILITY
       if (
-        !removeOwnersLocations.every((item) =>
+        !sameLocationEquipmentCart.every((item) =>
           isEquipmentAvailable(item, { startDate, endDate })
         )
       ) {
@@ -479,7 +479,7 @@ export const orderRouter = createTRPCRouter({
 
       //CHOOSE THE EQUIPMENT TO BOOK
 
-      const equipmentOnOwnerIds = removeOwnersLocations
+      const equipmentOnOwnerIds = sameLocationEquipmentCart
         .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
         .flat();
 

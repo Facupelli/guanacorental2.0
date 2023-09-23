@@ -21,7 +21,9 @@ export const formatPrice = (price: number) => {
 const checkStock = (owners: EquipmentOnOwner[], quantity: number) => {
   let totalStock = 0;
   for (const owner of owners) {
-    totalStock += owner.stock;
+    if (!owner.deleted) {
+      totalStock += owner.stock;
+    }
   }
   if (totalStock < quantity) {
     return false;
@@ -35,7 +37,9 @@ export const isEquipmentAvailable = (
 ) => {
   if (dates.startDate && dates.endDate) {
     // Verificar si el stock es suficiente
+
     const stock = checkStock(equipment.owner!, equipment.quantity);
+
     if (!stock) {
       return false;
     }

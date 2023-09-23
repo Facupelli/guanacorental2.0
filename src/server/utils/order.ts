@@ -32,7 +32,9 @@ export const getEquipmentOnOwnerIds = (item: CartItem, quantity: number) => {
     });
   };
 
-  const owners = sortByOwnerPriority(item.owner);
+  const owners = sortByOwnerPriority(
+    item.owner.filter((owner) => !owner.deleted)
+  );
 
   // Recorre cada dueño para obtener la cantidad deseada
   let remainingQuantity = quantity;
