@@ -19,7 +19,7 @@ const CartItemCounter = ({ item }: Props) => {
   ) => {
     if (owner) {
       return owner
-        .filter((owner) => owner.location.id === location)
+        .filter((owner) => owner.location.id === location && !owner.deleted)
         .reduce((acc, curr) => {
           return acc + curr.stock;
         }, 0);

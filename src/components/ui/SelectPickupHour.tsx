@@ -19,9 +19,6 @@ const SelectPickupHour = () => {
 
   const schedules = Object.keys(SCHEDULES[location.name]!);
 
-  console.log("START DATE", startDate);
-  console.log(pickup);
-
   if (dayjs(startDate).day() !== 5) {
     setPickupHour(schedules[0]!);
   }
