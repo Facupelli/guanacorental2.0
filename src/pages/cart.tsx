@@ -35,6 +35,7 @@ import {
   calculateTotalWithDiscount,
   formatPrice,
   getIsAdmin,
+  getIsEmployee,
   isEquipmentAvailable,
 } from "@/lib/utils";
 
@@ -98,6 +99,7 @@ const CartPage: NextPage = () => {
   }, [workingDays, discount, subtotal]);
 
   const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
 
   const handleBookOrder = () => {
     if (!session?.user) {
@@ -262,6 +264,7 @@ const CartPage: NextPage = () => {
               isLoading={isLoading}
               cart={cartItems}
               isAdmin={isAdmin}
+              isEmployee={isEmployee}
               setDiscount={setDiscount}
               discount={discount}
               subtotal={subtotal}
@@ -357,6 +360,7 @@ type RightBarProps = {
   isLoading: boolean;
   cart: Equipment[];
   isAdmin: boolean | undefined;
+  isEmployee: boolean | undefined;
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
   discount: Discount | null;
   subtotal: number;
@@ -371,6 +375,7 @@ const RightBar = ({
   isLoading,
   cart,
   isAdmin,
+  isEmployee,
   setDiscount,
   discount,
   subtotal,
@@ -459,7 +464,7 @@ const RightBar = ({
               </p>
             </div>
 
-            {isAdmin && (
+            {(isAdmin || isEmployee) && (
               <div className="flex items-center justify-between font-semibold">
                 <div className="flex items-center">
                   <p>Email cliente:</p>

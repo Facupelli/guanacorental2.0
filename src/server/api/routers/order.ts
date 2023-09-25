@@ -671,11 +671,27 @@ export const orderRouter = createTRPCRouter({
         where: { orderId },
       });
 
-      await prisma.order.delete({
+      const order = await prisma.order.delete({
         where: { id: orderId },
+        include: {
+          customer: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
       });
 
-      const customer = await prisma.book.delete({
+      if (!order || !order.customer.email) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "failed on book delete",
+        });
+      }
+      await sendCancelOrderMail(order.customer.email, order.number);
+
+      await prisma.book.delete({
         where: { id: bookId },
         include: {
           order: {
@@ -686,18 +702,6 @@ export const orderRouter = createTRPCRouter({
           },
         },
       });
-
-      if (!customer || !customer.order?.customer.email) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "failed on book delete",
-        });
-      }
-
-      await sendCancelOrderMail(
-        customer.order.customer.email,
-        customer.order.number
-      );
 
       return { message: "success" };
     }),
