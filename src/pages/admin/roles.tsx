@@ -107,7 +107,7 @@ const AdminRoles: NextPage = () => {
       <main className="">
         <AdminLayout route="Roles">
           <h1 className="text-lg font-bold">Roles</h1>
-          <div className="grid gap-6 pt-6">
+          <div className="flex flex-col gap-6 pt-6">
             <div className="flex items-center gap-4 rounded-md bg-white p-4">
               <Label htmlFor="search" className="w-[150px]">
                 Buscar usuario
@@ -123,13 +123,15 @@ const AdminRoles: NextPage = () => {
               />
             </div>
 
-            {data?.users && (
-              <DataTable
-                data={search ? data.users : []}
-                setRowData={setUser}
-                columns={userColumns}
-              />
-            )}
+            <div>
+              {data?.users && (
+                <DataTable
+                  data={search ? data.users : []}
+                  setRowData={setUser}
+                  columns={userColumns}
+                />
+              )}
+            </div>
           </div>
         </AdminLayout>
       </main>
