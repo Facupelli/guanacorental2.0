@@ -193,13 +193,15 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
       </DialogTrigger>
       <DialogContent className="md:min-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{user.name}</DialogTitle>
-          <DialogDescription className="text-md">
+          <DialogTitle className="font-bold md:text-2xl">
+            {user.name}
+          </DialogTitle>
+          <DialogDescription className="md:text-md">
             Asigna | Elimina Roles
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 pt-4 md:gap-8 md:p-3 md:pt-0">
-          <div className="border-r border-t-zinc-400">
+        <div className="grid grid-cols-2 gap-4 gap-y-8 pt-4 md:gap-8 md:p-3 md:pt-0">
+          <div className="col-span-2 border-r-0 border-t-zinc-400 md:col-span-1 md:border-r">
             <p className="pb-4 font-semibold">Roles activos</p>
             <div className="grid gap-2 ">
               {user.role.map((role) => (
@@ -213,8 +215,8 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
             </div>
           </div>
 
-          <div>
-            <p className="pb-4 font-semibold">Roles</p>
+          <div className="col-span-2 border-t border-t-zinc-300 md:col-span-1 md:border-t-0">
+            <p className="pb-4 pt-4 font-semibold md:pt-0">Roles</p>
             <div className="grid gap-2">
               {rolesAvailableToAssign?.map((role) => (
                 <div key={role.id} className="flex items-center gap-2">
@@ -266,10 +268,12 @@ const RemoveStockAlert = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild className="h-6 ">
-        <Button variant="outline" className="border-red-500 px-1.5">
+        <Button
+          variant="outline"
+          className="basis-1/2 border-red-500 px-1.5 md:basis-0"
+        >
           <div className="flex items-center gap-2 text-red-500">
-            <Trash2 className="h-4 w-4 " />{" "}
-            <span className="hidden md:block">Eliminar</span>
+            <Trash2 className="h-4 w-4 " /> Eliminar
           </div>
         </Button>
       </AlertDialogTrigger>
