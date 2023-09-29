@@ -154,7 +154,6 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
                         placeholder="buscar por nombre y apellido"
                         {...register("search")}
                       />
-                      <Label>Sucursal</Label>
 
                       <Label className="whitespace-nowrap">
                         Rol del cliente
@@ -256,7 +255,7 @@ const SelectRole = ({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Sucursales</SelectLabel>
+          <SelectLabel>Roles</SelectLabel>
           {roles.map((role) => (
             <SelectItem value={role.id} key={role.id}>
               {role.name}

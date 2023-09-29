@@ -4,6 +4,7 @@ import { buttonVariants } from "../ui/button";
 import {
   CalendarDays,
   Camera,
+  CrownIcon,
   Percent,
   PiggyBank,
   ShoppingBag,
@@ -61,6 +62,11 @@ const adminRoutes = [
     name: "Descuentos",
     icon: <Percent className="h-5 w-5" />,
   },
+  {
+    route: "/admin/roles",
+    name: "Roles",
+    icon: <CrownIcon className="h-5 w-5" />,
+  },
 ];
 
 const AdminNav = ({ activeRoute }: { activeRoute: string | undefined }) => {
@@ -73,7 +79,9 @@ const AdminNav = ({ activeRoute }: { activeRoute: string | undefined }) => {
         {adminRoutes.map((route, i) => {
           if (
             isEmployee &&
-            (route.name === "Rentas" || route.name === "Equipos")
+            (route.name === "Rentas" ||
+              route.name === "Equipos" ||
+              route.name === "Roles")
           )
             return null;
 

@@ -131,7 +131,7 @@ export const userRouter = createTRPCRouter({
         take: z.number(),
         skip: z.number(),
         roleId: z.string().optional(),
-        search: z.string(),
+        search: z.string().optional(),
       })
     )
     .query(async ({ input }) => {

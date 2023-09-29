@@ -116,6 +116,8 @@ interface AdminSlice {
   setCalendarDay: (day: Date) => void;
   ordersCurrentPage: number;
   setOrdersCurrentPage: (page: number) => void;
+  rolesUserSearch: string;
+  setRolesUserSearch: (userSearch: string) => void;
 }
 
 const createAdminSlice: StateCreator<
@@ -128,6 +130,9 @@ const createAdminSlice: StateCreator<
   setCalendarDay: (day) => set(() => ({ calendarDay: day })),
   ordersCurrentPage: 1,
   setOrdersCurrentPage: (page) => set(() => ({ ordersCurrentPage: page })),
+  rolesUserSearch: "",
+  setRolesUserSearch: (userSearch) =>
+    set(() => ({ rolesUserSearch: userSearch })),
 });
 
 export const useBoundStore = create<
