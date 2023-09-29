@@ -196,7 +196,7 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
             Asigna | Elimina Roles
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-8 p-3">
+        <div className="grid grid-cols-2 gap-4 pt-4 md:gap-8 md:p-3 md:pt-0">
           <div className="border-r border-t-zinc-400">
             <p className="pb-4 font-semibold">Roles activos</p>
             <div className="grid gap-2 ">
@@ -266,7 +266,8 @@ const RemoveStockAlert = ({
       <AlertDialogTrigger asChild className="h-6 ">
         <Button variant="outline" className="border-red-500 px-1.5">
           <div className="flex items-center gap-2 text-red-500">
-            <Trash2 className="h-4 w-4 " /> Eliminar
+            <Trash2 className="h-4 w-4 " />{" "}
+            <span className="hidden md:block">Eliminar</span>
           </div>
         </Button>
       </AlertDialogTrigger>
