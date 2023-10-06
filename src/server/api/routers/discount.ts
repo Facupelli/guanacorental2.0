@@ -153,9 +153,9 @@ export const discountRouter = createTRPCRouter({
       await prisma.earning.update({
         where: { orderId },
         data: {
-          federico: earnings?.federicoEarnings,
-          oscar: earnings?.oscarEarnings,
-          sub: earnings?.subEarnings,
+          federico: parseFloat(earnings?.federicoEarnings.toFixed(2) ?? ""),
+          oscar: parseFloat(earnings?.oscarEarnings.toFixed(2) ?? ""),
+          sub: parseFloat(earnings?.subEarnings.toFixed(2) ?? ""),
         },
       });
     }),
