@@ -134,7 +134,7 @@ export const calculateTotalWithDiscount = (
     return total - total * (discount.value / 100);
   }
 
-  return total;
+  return Math.ceil(total);
 };
 
 type Discount = Prisma.DiscountGetPayload<{
