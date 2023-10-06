@@ -718,7 +718,7 @@ const EarningsInfo = ({ oscar, federico, sub }: EarningsInfoProps) => {
     <section className="grid gap-6 rounded-md border border-app-bg p-4">
       <h2 className="text-lg font-semibold">División</h2>
 
-      <div className="grid max-w-[50%] grid-cols-3">
+      <div className="grid grid-cols-3 md:max-w-[50%]">
         <div className="grid gap-1">
           <p className="text-xs text-primary/60">Federico</p>
           <p>{formatPrice(federico)}</p>

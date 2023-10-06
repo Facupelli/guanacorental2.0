@@ -202,7 +202,7 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4 gap-y-8 pt-4 md:gap-8 md:p-3 md:pt-0">
           <div className="col-span-2 border-r-0 border-t-zinc-400 md:col-span-1 md:border-r">
-            <p className="pb-4 font-semibold">Roles activos</p>
+            <p className="pb-4 font-semibold">Activos</p>
             <div className="grid gap-2 ">
               {user.role.map((role) => (
                 <div key={role.id} className="flex items-center gap-2">
