@@ -127,14 +127,14 @@ export const calculateTotalWithDiscount = (
   discount: DiscountProp
 ) => {
   if (discount.typeName === DISCOUNT_TYPES.FIXED) {
-    return total - discount.value;
+    return Math.ceil(total - discount.value);
   }
 
   if (discount.typeName === DISCOUNT_TYPES.PERCENTAGE) {
-    return total - total * (discount.value / 100);
+    return Math.ceil(total - total * (discount.value / 100));
   }
 
-  return Math.ceil(total);
+  return total;
 };
 
 type Discount = Prisma.DiscountGetPayload<{
