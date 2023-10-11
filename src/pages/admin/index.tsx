@@ -1,7 +1,8 @@
+import { es } from "date-fns/locale";
 import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
-import Calendar from "react-calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { useBoundStore } from "@/zustand/store";
@@ -16,6 +17,7 @@ import DataTable from "@/components/ui/data-table";
 import { authOptions } from "@/server/auth";
 import { api } from "@/utils/api";
 import {
+  cn,
   getIsAdmin,
   getIsEmployee,
   handleAdminLocationChange,
@@ -25,6 +27,7 @@ import { equipmentsList, orderColumns } from "@/lib/order";
 
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
+import { buttonVariants } from "@/components/ui/button";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -90,6 +93,42 @@ const Admin: NextPage = () => {
     ? dayjs().subtract(1, "month").startOf("day").toDate()
     : dayjs().startOf("day").toDate();
 
+  const isPickupDay = (date: Date) => {
+    if (
+      data?.find((order) =>
+        dayjs(order.book.start_date).isSame(dayjs(date), "day")
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  const isReturnDay = (date: Date) => {
+    if (
+      data?.find((order) =>
+        dayjs(order.book.end_date).isSame(dayjs(date), "day")
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
+  const isPickupAndReturnDay = (date: Date) => {
+    if (
+      data?.find(
+        (order) =>
+          dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
+          data.find((order) =>
+            dayjs(order.book.start_date).isSame(dayjs(date), "day")
+          )
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       <Head>
@@ -122,6 +161,43 @@ const Admin: NextPage = () => {
             </div>
             <div className="col-span-12 flex max-w-[650px] gap-6">
               <Calendar
+                mode="single"
+                locale={es}
+                selected={calendarDay}
+                onSelect={(date) => {
+                  if (date) {
+                    setCalendarDay(date);
+                  }
+                }}
+                fixedWeeks
+                initialFocus
+                className="rounded-md bg-white"
+                classNames={{
+                  day: cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "h-12 w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-secondary rounded-none"
+                  ),
+                  day_selected:
+                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground ",
+                }}
+                modifiers={{
+                  disabled: [
+                    {
+                      before: calendarMinDate,
+                    },
+                  ],
+                  pickAndReturn: isPickupAndReturnDay,
+                  pickup: isPickupDay,
+                  return: isReturnDay,
+                }}
+                modifiersClassNames={{
+                  pickAndReturn: "pickup-and-return",
+                  pickup: "pickup-day",
+                  return: "return-day",
+                }}
+              />
+
+              {/* <Calendar
                 locale="es-ES"
                 minDate={calendarMinDate}
                 onClickDay={handleClickDay}
@@ -159,7 +235,7 @@ const Admin: NextPage = () => {
 
                   return "";
                 }}
-              />
+              /> */}
               <div className="hidden w-[300px] flex-col gap-2 rounded-md bg-white/50 p-4 text-sm font-semibold sm:flex">
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full bg-green-400" />

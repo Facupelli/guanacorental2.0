@@ -60,8 +60,8 @@ export const getTotalWorkingDays = (dates: Date[], pickupHour: string) => {
 };
 
 export const disableWeekend = (
-  startDate: Date | null,
-  endDate: Date | null
+  startDate: Date | undefined,
+  endDate: Date | undefined
 ) => {
   if (
     dayjs(startDate).day() === 6 ||

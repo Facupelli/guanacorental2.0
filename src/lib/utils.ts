@@ -33,7 +33,7 @@ const checkStock = (owners: EquipmentOnOwner[], quantity: number) => {
 
 export const isEquipmentAvailable = (
   equipment: Equipment,
-  dates: { startDate: Date | null; endDate: Date | null }
+  dates: { startDate: Date | undefined; endDate: Date | undefined }
 ) => {
   if (dates.startDate && dates.endDate) {
     // Verificar si el stock es suficiente

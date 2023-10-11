@@ -32,10 +32,10 @@ const createLocationSlice: StateCreator<
 interface DateSlice {
   pickupHour: string;
   setPickupHour: (hour: string) => void;
-  startDate: Date | null;
-  endDate: Date | null;
-  setStartDate: (date: Date | null) => void;
-  setEndDate: (date: Date | null) => void;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+  setStartDate: (date: Date | undefined) => void;
+  setEndDate: (date: Date | undefined) => void;
 }
 
 const createDateSlice: StateCreator<
@@ -44,8 +44,8 @@ const createDateSlice: StateCreator<
   [],
   DateSlice
 > = (set) => ({
-  startDate: null,
-  endDate: null,
+  startDate: undefined,
+  endDate: undefined,
   pickupHour: "",
   setPickupHour: (hour) => set(() => ({ pickupHour: hour })),
   setStartDate: (startDate) => set(() => ({ startDate })),

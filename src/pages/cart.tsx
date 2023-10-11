@@ -278,8 +278,8 @@ const CartPage: NextPage = () => {
 
 type ItemsListProps = {
   items: Equipment[];
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 };
 const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
   return (
@@ -305,8 +305,8 @@ const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
 
 type ItemProps = {
   item: Equipment;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 };
 
 const Item = ({ item, endDate, startDate }: ItemProps) => {
