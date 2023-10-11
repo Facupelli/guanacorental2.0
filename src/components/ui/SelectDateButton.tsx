@@ -1,10 +1,12 @@
+import { type DateRange } from "react-day-picker";
+import { es } from "date-fns/locale";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utcPlugin from "dayjs/plugin/utc";
 import timezonePlugin from "dayjs/plugin/timezone";
 import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
-import Calendar from "react-calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { useBoundStore } from "@/zustand/store";
 import { useState } from "react";
 
@@ -28,11 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "./button";
 import SelectPickupHour from "./SelectPickupHour";
-
-import { disableWeekend } from "@/lib/dates";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
-
-import { type Value } from "react-calendar/dist/cjs/shared/types";
 
 dayjs.tz.setDefault("America/Argentina/Buenos_Aires");
 
@@ -43,31 +41,20 @@ const SelectDateButton = () => {
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  const endDate = useBoundStore((state) => state.endDate);
-  const startDate = useBoundStore((state) => state.startDate);
+  const [range, setRange] = useState<DateRange | undefined>();
 
-  // const [modal, setModal] = useState(isOpen);
-
-  const handleDateChange = (e: Value) => {
-    if (e && Array.isArray(e)) {
-      setStartDate(
-        dayjs.utc(e[0]).tz("America/Argentina/Buenos_Aires").toDate()
-      );
-      setEndDate(dayjs.utc(e[1]).tz("America/Argentina/Buenos_Aires").toDate());
-    }
-  };
-
-  const datesAreWeekend = disableWeekend(startDate, endDate);
+  setStartDate(range?.from);
+  setEndDate(range?.to);
 
   const isAdmin = getIsAdmin(session);
   const isEmployee = getIsEmployee(session);
 
-  const disableAccordingToRentalSchedule = ({ date }: { date: Date }) => {
+  const disableAccordingToRentalSchedule = (date: Date) => {
     if (isAdmin || isEmployee) {
       return false;
     }
 
-    const now = dayjs(); // Obtiene la fecha y hora actual
+    const now = dayjs();
     const calendarDate = dayjs(date);
 
     if (now.isSame(calendarDate, "day")) {
@@ -75,7 +62,7 @@ const SelectDateButton = () => {
         const startTime = dayjs()
           .set("hour", 15)
           .set("minute", 0)
-          .set("second", 0); // Establece las 8:00 AM como hora de inicio
+          .set("second", 0);
 
         if (now.isAfter(startTime)) {
           return true;
@@ -85,7 +72,7 @@ const SelectDateButton = () => {
       const startTime = dayjs()
         .set("hour", 8)
         .set("minute", 0)
-        .set("second", 0); // Establece las 8:00 AM como hora de inicio
+        .set("second", 0);
 
       if (now.isAfter(startTime)) {
         return true;
@@ -114,21 +101,24 @@ const SelectDateButton = () => {
         </DialogHeader>
         <div className="grid justify-center gap-2 sm:gap-6">
           <Calendar
-            selectRange={true}
-            locale="es-ES"
-            minDate={new Date()}
-            onChange={(e) => handleDateChange(e)}
-            // value={[startDate, endDate]}
-            tileDisabled={disableAccordingToRentalSchedule}
+            locale={es}
+            mode="range"
+            selected={range}
+            onSelect={setRange}
+            fixedWeeks
+            initialFocus
+            modifiers={{
+              disabled: [
+                {
+                  dayOfWeek: [0, 6],
+                },
+                {
+                  before: new Date(),
+                },
+                disableAccordingToRentalSchedule,
+              ],
+            }}
           />
-
-          {datesAreWeekend && (
-            <div className="text-sm text-red-600">
-              Los equipos no pueden ser retirados ni devueltos los días sábados
-              y domingos. El rental abre de lunes a viernes.
-            </div>
-          )}
-
           <div>
             <SelectPickupHour />
             <div className="pt-2">
