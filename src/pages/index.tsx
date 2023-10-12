@@ -388,7 +388,7 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
           classNames={{
             day: cn(
               buttonVariants({ variant: "ghost" }),
-              "h-12 w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-secondary rounded-none"
+              "w-10 h-10 md:h-12 md:w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-secondary rounded-none"
             ),
             day_selected:
               "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground ",
