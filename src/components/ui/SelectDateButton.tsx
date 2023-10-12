@@ -89,7 +89,7 @@ const SelectDateButton = () => {
           <CalendarDays className="mr-2 h-4 w-4" /> Seleccionar Fecha
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="md:w-[470px]">
         <DialogHeader>
           <DialogTitle>Selecciona tu fecha de alquiler</DialogTitle>
           <DialogDescription>
@@ -102,6 +102,7 @@ const SelectDateButton = () => {
         <div className="grid justify-center gap-2 sm:gap-6">
           <Calendar
             locale={es}
+            className="rounded-md border border-input"
             mode="range"
             selected={range}
             onSelect={setRange}
