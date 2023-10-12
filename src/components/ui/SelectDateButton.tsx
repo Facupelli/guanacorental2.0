@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { useBoundStore } from "@/zustand/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 dayjs.extend(utcPlugin);
 dayjs.extend(timezonePlugin);
@@ -41,10 +41,13 @@ const SelectDateButton = () => {
 
   const setStartDate = useBoundStore((state) => state.setStartDate);
   const setEndDate = useBoundStore((state) => state.setEndDate);
-  const [range, setRange] = useState<DateRange | undefined>();
+  const startDate = useBoundStore((state) => state.startDate);
+  const endDate = useBoundStore((state) => state.endDate);
 
-  setStartDate(range?.from);
-  setEndDate(range?.to);
+  const handleSelectRange = (range: DateRange | undefined) => {
+    setStartDate(range?.from);
+    setEndDate(range?.to);
+  };
 
   const isAdmin = getIsAdmin(session);
   const isEmployee = getIsEmployee(session);
@@ -104,8 +107,11 @@ const SelectDateButton = () => {
             locale={es}
             className="rounded-md border border-input"
             mode="range"
-            selected={range}
-            onSelect={setRange}
+            selected={{
+              from: startDate,
+              to: endDate,
+            }}
+            onSelect={handleSelectRange}
             fixedWeeks
             initialFocus
             modifiers={{

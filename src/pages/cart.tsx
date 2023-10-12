@@ -491,11 +491,16 @@ const RightBar = ({
               }
               onClick={handleBookOrder}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {(!startDate || !endDate) &&
-                "Selecciona una fecha para alquilar!"}
-              {cart.length <= 0 && "Tu carrito está vacío!"}
-              {cart.length > 0 && startDate && endDate && "Agendar Pedido"}
+              <div className="grid">
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {(!startDate || !endDate) && (
+                  <p>Selecciona una fecha para alquilar!</p>
+                )}
+                {cart.length <= 0 && <p>Tu carrito está vacío!</p>}
+                {cart.length > 0 && startDate && endDate && !isLoading && (
+                  <p>Agendar Pedido</p>
+                )}
+              </div>
             </Button>
           </div>
         </div>
