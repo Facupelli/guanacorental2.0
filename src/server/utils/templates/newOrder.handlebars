@@ -4,13 +4,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>Pedido Recibido</title>
     <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Helvetica";
-        font-size: 18px;
-      }
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family:
+      "Helvetica"; font-size: 18px; }
     </style>
   </head>
   <body style="max-width: 800px; margin: auto; position: relative">
@@ -96,20 +91,20 @@
         </thead>
         <tbody>
           {{#each equipmentList}}
-          <tr style="border: 1px solid black">
-            <td
-              style="
+            <tr style="border: 1px solid black">
+              <td
+                style="
                 min-width: 400px;
                 padding: 15px 10px;
                 border: 1px solid black;
               "
-            >
-              {{item}}
-            </td>
-            <td style="padding: 15px 10px; border: 1px solid black">
-              {{quantity}}
-            </td>
-          </tr>
+              >
+                {{item}}
+              </td>
+              <td style="padding: 15px 10px; border: 1px solid black">
+                {{quantity}}
+              </td>
+            </tr>
           {{/each}}
           <tr>
             <td style="padding: 15px 10px">PRECIO FINAL: {{total}}</td>
@@ -125,13 +120,16 @@
       </p>
 
       <p style="font-weight: 700">
-        RETIRO: {{startDate}} a las {{pickupHour}}hs
+        RETIRO:
+        {{startDate}}
+        a las
+        {{pickupHour}}hs
       </p>
       <p style="font-weight: 700">DEVOLUCIÓN: {{endDate}} a las 09:00hs</p>
 
       <p style="padding-top: 25px; padding-bottom: 5px">DIRECCIÓN DE RETIRO:</p>
       <ul style="list-style-position: inside; padding-left: 25px">
-        <li>25 de mayo 668 oeste - San Juan</li>
+        <li>Las Heras Norte 370 (Bs+ Lab) - San Juan</li>
         <li>Chacabuco 171 4ta. Oeste entre Rioja y Salta - Mendoza</li>
       </ul>
 
@@ -164,8 +162,7 @@
               text-decoration: none;
             "
             href="https://www.guanacorental.com/"
-            >WWW.GUANACORENTAL.COM</a
-          >
+          >WWW.GUANACORENTAL.COM</a>
           <a
             style="
               margin-left: auto;
@@ -174,8 +171,7 @@
               color: #cd6328;
               text-decoration: none;
             "
-            >GUANACO.RENTALAUDIOVISUAL</a
-          >
+          >GUANACO.RENTALAUDIOVISUAL</a>
         </div>
         <div>
           <p style="font-size: 14px">
