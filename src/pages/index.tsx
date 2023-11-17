@@ -1,3 +1,5 @@
+import { es } from "date-fns/locale";
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import { useInView } from "react-intersection-observer";
 import superjason from "superjson";
@@ -28,7 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Cart from "@/components/Cart";
 import SelectDateButton from "@/components/ui/SelectDateButton";
@@ -39,6 +42,7 @@ import { FilterIcon, SearchIcon, ShoppingCart } from "lucide-react";
 
 import { api } from "@/utils/api";
 import {
+  cn,
   formatPrice,
   handleLocationChange,
   isEquipmentAvailable,
@@ -46,8 +50,6 @@ import {
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Category, Equipment, Location } from "@/types/models";
-import Calendar from "react-calendar";
-import dayjs from "dayjs";
 import { toArgentinaDate } from "@/lib/dates";
 import { useSideMenu } from "@/hooks/useSideMenu";
 
@@ -364,24 +366,40 @@ const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
 
   const available = isEquipmentAvailable(equipment, { startDate, endDate });
 
+  const isFreeDay = (date: Date) => {
+    if (
+      isEquipmentAvailable(equipment, {
+        startDate: date,
+        endDate: dayjs(date).add(1, "day").toDate(),
+      })
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       <DialogWithState isOpen={showCalendar} setOpen={setShowCalendar} title="">
         <Calendar
-          minDate={new Date()}
-          tileClassName={({ date }) => {
-            if (date < new Date()) {
-              return;
-            }
-            if (
-              isEquipmentAvailable(equipment, {
-                startDate: date,
-                endDate: dayjs(date).add(1, "day").toDate(),
-              })
-            ) {
-              return "free-day";
-            }
-            return "booked-day";
+          locale={es}
+          fixedWeeks
+          initialFocus
+          classNames={{
+            day: cn(
+              buttonVariants({ variant: "ghost" }),
+              "w-10 h-10 md:h-12 md:w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-secondary rounded-none"
+            ),
+            day_selected:
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground ",
+          }}
+          modifiers={{
+            freeDay: isFreeDay,
+            bookedDay: (date: Date) => !isFreeDay(date),
+          }}
+          modifiersClassNames={{
+            freeDay: "free-day",
+            bookedDay: "booked-day",
           }}
         />
       </DialogWithState>

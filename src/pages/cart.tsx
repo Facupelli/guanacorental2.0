@@ -278,8 +278,8 @@ const CartPage: NextPage = () => {
 
 type ItemsListProps = {
   items: Equipment[];
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 };
 const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
   return (
@@ -305,8 +305,8 @@ const ItemsList = ({ items, startDate, endDate }: ItemsListProps) => {
 
 type ItemProps = {
   item: Equipment;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 };
 
 const Item = ({ item, endDate, startDate }: ItemProps) => {
@@ -491,11 +491,16 @@ const RightBar = ({
               }
               onClick={handleBookOrder}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {(!startDate || !endDate) &&
-                "Selecciona una fecha para alquilar!"}
-              {cart.length <= 0 && "Tu carrito está vacío!"}
-              {cart.length > 0 && startDate && endDate && "Agendar Pedido"}
+              <div className="grid">
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {(!startDate || !endDate) && (
+                  <p>Selecciona una fecha para alquilar!</p>
+                )}
+                {cart.length <= 0 && <p>Tu carrito está vacío!</p>}
+                {cart.length > 0 && startDate && endDate && !isLoading && (
+                  <p>Agendar Pedido</p>
+                )}
+              </div>
             </Button>
           </div>
         </div>
