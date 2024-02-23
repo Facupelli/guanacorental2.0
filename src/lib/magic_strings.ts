@@ -46,7 +46,7 @@ export const ORDER_RETURN_STATUS = {
 export const COUPON_STATUS = {
   PENDING: "Pendiente",
   ENDED: "Finalizado",
-  ACTIVE: "Active",
+  ACTIVE: "Activo",
 };
 
 interface StatusStyles {

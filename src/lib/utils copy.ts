@@ -1,9 +1,9 @@
-import { type Session } from "next-auth";
-import dayjs from "dayjs";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { type Prisma } from "@prisma/client";
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
+import { type Session } from "next-auth";
+import { type Prisma } from "@prisma/client";
+import { type ClassValue, clsx } from "clsx";
+import dayjs from "dayjs";
+import { twMerge } from "tailwind-merge";
 import { COUPON_STATUS, DISCOUNT_TYPES, ROLES } from "./magic_strings";
 
 export function cn(...inputs: ClassValue[]) {
