@@ -63,7 +63,7 @@ export const discountRouter = createTRPCRouter({
 
   getAllDiscounts: protectedProcedure
     .input(z.object({ status: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({}) => {
       const discounts = await prisma.discount.findMany({
         include: {
           rule: {

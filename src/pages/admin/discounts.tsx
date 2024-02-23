@@ -30,7 +30,7 @@ import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { getDiscountStatus, getIsAdmin } from "@/lib/utils";
+import { getIsAdmin } from "@/lib/utils";
 import { COUPON_STATUS, discountStatusClass } from "@/lib/magic_strings";
 
 import type { DiscountType, Prisma } from "@prisma/client";

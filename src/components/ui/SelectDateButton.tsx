@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { useBoundStore } from "@/zustand/store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 dayjs.extend(utcPlugin);
 dayjs.extend(timezonePlugin);
