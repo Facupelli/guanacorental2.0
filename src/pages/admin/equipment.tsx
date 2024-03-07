@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import superjason from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { getServerSession } from "next-auth";
@@ -62,6 +63,8 @@ import {
   AlertDialogContent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+dayjs.locale("es");
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -217,6 +220,40 @@ const EquipmentAdmin: NextPage<Props> = ({
     setShowDeleteModal,
   };
 
+  const handleDownloadExcel = () => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ location: locationId }),
+    };
+
+    const fetch4nodeBuffer = () =>
+      fetch(
+        process.env.NODE_ENV === "production"
+          ? "https://www.guanacorental.shop/api/generateEquipmentsExcel"
+          : `http://localhost:3000/api/generateEquipmentsExcel`,
+        options
+      );
+
+    fetch4nodeBuffer()
+      .then((res) => res.blob())
+      .then((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `listado-equipos-guanaco-${dayjs().format(
+            "DD-MM-YYYY"
+          )}.xlsx`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <Head>
@@ -271,29 +308,37 @@ const EquipmentAdmin: NextPage<Props> = ({
       <main className="">
         <AdminLayout route="Equipos">
           <h1 className="text-lg font-bold">Equipos</h1>
-          <div className="flex flex-wrap items-start gap-4 pt-6">
-            <div className="flex w-full flex-wrap items-center gap-4 rounded-md bg-white p-4 md:w-2/3">
+          <div className="grid items-start gap-6 pt-6 md:flex">
+            <div className="grid grow gap-4 rounded-md bg-white p-4">
               <Input
                 type="search"
                 placeholder="buscar por nombre, marca o modelo"
                 {...register("search")}
               />
-              <Label>Sucursal</Label>
-              <AdminSelectLocation
-                locations={locations}
-                setValue={(e) => setValue("location", e)}
-              >
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="none">Sin sucursal</SelectItem>
-              </AdminSelectLocation>
-              <Label>Categoría</Label>
-              <SelectCategory
-                categories={categories}
-                setValue={(e) => setValue("categoryId", e)}
-              />
+              <div className="flex flex-wrap gap-4 md:flex-nowrap">
+                <div className="w-full">
+                  <Label>Sucursal</Label>
+                  <AdminSelectLocation
+                    locations={locations}
+                    setValue={(e) => setValue("location", e)}
+                  >
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="none">Sin sucursal</SelectItem>
+                  </AdminSelectLocation>
+                </div>
+                <div className="w-full">
+                  <Label>Categoría</Label>
+                  <SelectCategory
+                    categories={categories}
+                    setValue={(e) => setValue("categoryId", e)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="ml-auto flex items-start gap-6">
-              <p>total: {data?.totalCount}</p>
+
+            <p className="shrink-0">total: {data?.totalCount}</p>
+
+            <div className="ml-auto flex items-start gap-4 md:grid">
               <Button
                 onClick={() => {
                   setEquipmentId(null);
@@ -303,6 +348,13 @@ const EquipmentAdmin: NextPage<Props> = ({
                 className="whitespace-nowrap"
               >
                 Agregar equipo
+              </Button>
+              <Button
+                size="sm"
+                // disabled={data?.totalFromOrders === 0}
+                onClick={handleDownloadExcel}
+              >
+                Descargar Excel
               </Button>
             </div>
           </div>
