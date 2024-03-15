@@ -4,6 +4,11 @@ export const ROLES = {
   EMPLOYEE: "Employee",
 };
 
+export const LocationName = {
+  MENDOZA: "Mendoza",
+  SAN_JUAN: "San Juan",
+};
+
 export const DISCOUNT_TYPES = {
   FIXED: "Fixed",
   PERCENTAGE: "Percentage",
