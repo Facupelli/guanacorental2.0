@@ -424,6 +424,13 @@ export const orderRouter = createTRPCRouter({
 
       let customer;
 
+      if (locationId === "clh6ck61q0002e7dopcv0u9rp") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot books in Mendoza",
+        });
+      }
+
       if (email) {
         customer = await prisma.user.findUnique({
           where: { email },
