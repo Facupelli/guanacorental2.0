@@ -482,7 +482,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 
   const categories = await prisma.category.findMany({});
-  const locations = await prisma.location.findMany({});
+  const locations = await prisma.location.findMany({
+    where: {
+      isActive: true,
+    },
+  });
 
   await helpers.equipment.getAllEquipment.prefetch({ sort: "", limit: 20 });
 

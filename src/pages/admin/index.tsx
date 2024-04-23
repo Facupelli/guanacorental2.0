@@ -159,7 +159,7 @@ const Admin: NextPage = () => {
                 </SelectLocation>
               )}
             </div>
-            <div className="col-span-12 flex max-w-[650px] gap-6">
+            <div className="col-span-12 flex max-w-[750px] gap-6 ">
               <Calendar
                 mode="single"
                 locale={es}
@@ -197,46 +197,7 @@ const Admin: NextPage = () => {
                 }}
               />
 
-              {/* <Calendar
-                locale="es-ES"
-                minDate={calendarMinDate}
-                onClickDay={handleClickDay}
-                className="rounded-lg p-4"
-                defaultValue={calendarDay}
-                tileClassName={({ date }: { date: Date }) => {
-                  if (
-                    data?.find(
-                      (order) =>
-                        dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
-                        data.find((order) =>
-                          dayjs(order.book.start_date).isSame(
-                            dayjs(date),
-                            "day"
-                          )
-                        )
-                    )
-                  ) {
-                    return "pickup-and-return";
-                  }
-                  if (
-                    data?.find((order) =>
-                      dayjs(order.book.end_date).isSame(dayjs(date), "day")
-                    )
-                  ) {
-                    return "return-day";
-                  }
-                  if (
-                    data?.find((order) =>
-                      dayjs(order.book.start_date).isSame(dayjs(date), "day")
-                    )
-                  ) {
-                    return "pickup-day";
-                  }
-
-                  return "";
-                }}
-              /> */}
-              <div className="hidden w-[300px] flex-col gap-2 rounded-md bg-white/50 p-4 text-sm font-semibold sm:flex">
+              <div className="hidden flex-col gap-2 rounded-md bg-white/50 p-4 text-sm font-semibold sm:flex">
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full bg-green-400" />
                   <p>Retiro de equipos</p>
