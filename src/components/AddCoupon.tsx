@@ -5,7 +5,6 @@ import { DialogFooter } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { useForm } from "react-hook-form";
 import { api } from "@/utils/api";
-import { type Location } from "@prisma/client";
 import { Label } from "./ui/label";
 import { useSession } from "next-auth/react";
 import { getIsAdmin } from "@/lib/utils";
@@ -17,7 +16,7 @@ type Discount = {
 };
 
 type AddCouponProps = {
-  location: Location;
+  location: { id: string; name: string };
   setDiscount: Dispatch<SetStateAction<Discount | null>>;
   discount: Discount | null;
   total: number;
