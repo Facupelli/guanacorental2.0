@@ -63,6 +63,16 @@ import {
   AlertDialogContent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 dayjs.locale("es");
 
@@ -356,6 +366,7 @@ const EquipmentAdmin: NextPage<Props> = ({
               >
                 Descargar Excel
               </Button>
+              <EquipmentPriceChangeModal categories={categories} />
             </div>
           </div>
           <div className="pt-6">
@@ -381,6 +392,107 @@ const EquipmentAdmin: NextPage<Props> = ({
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const EquipmentPriceChangeModal = ({
+  categories,
+}: {
+  categories: Category[];
+}) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<{
+    categoryId: string;
+    type: string;
+    percent: string;
+  }>();
+
+  const { mutate } = api.equipment.modifyPrices.useMutation();
+
+  const ctx = api.useContext();
+
+  const handleModifyPrice = (data: {
+    categoryId: string;
+    type: string;
+    percent: string;
+  }) => {
+    mutate(data, {
+      onSuccess: () => {
+        void ctx.equipment.adminGetEquipment.invalidate();
+        void ctx.equipment.getAdminEquipmentById.invalidate();
+        reset();
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm">Modificar precio</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Modificar precios por categoría</DialogTitle>
+          <DialogDescription>
+            Aplica un nuevo precio a todos los equipos de una categoría.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleModifyPrice)}>
+          <div className="grid gap-6 py-4">
+            <div>
+              <Label>Categoría</Label>
+              <SelectCategory
+                categories={categories}
+                setValue={(e) => setValue("categoryId", e)}
+              />
+            </div>
+
+            <div>
+              <Label>Tipo</Label>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Label className="font-normal">Aumentar</Label>
+                  <Input
+                    type="radio"
+                    value="increase"
+                    className="h-6 w-4"
+                    {...register("type")}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label className="font-normal">Descontar</Label>
+                  <Input
+                    type="radio"
+                    value="decrease"
+                    className="h-6 w-4"
+                    {...register("type")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label>Porcentaje %</Label>
+              <Input type="text" {...register("percent")} required />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-4">
+            <DialogClose type="button">Cancelar</DialogClose>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Aplicando..." : "Aplicar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
