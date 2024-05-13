@@ -52,7 +52,6 @@ import useDebounce from "@/hooks/useDebounce";
 import type { Category, Equipment, Location } from "@/types/models";
 import { toArgentinaDate } from "@/lib/dates";
 import { useSideMenu } from "@/hooks/useSideMenu";
-import { LocationName } from "@/lib/magic_strings";
 import MendozaAlert from "@/components/MendozaAlert";
 import { useMendozaAlert } from "@/hooks/useMendozaAlert";
 

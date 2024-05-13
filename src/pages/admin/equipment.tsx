@@ -73,6 +73,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SelectCategory } from "@/components/ui/SelectCategory";
 
 dayjs.locale("es");
 
@@ -677,32 +678,6 @@ const RemoveStockAlert = ({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
-};
-
-type SelecCategoryProps = {
-  categories: Category[];
-  setValue: (e: string) => void;
-};
-
-const SelectCategory = ({ categories, setValue }: SelecCategoryProps) => {
-  return (
-    <Select onValueChange={setValue} defaultValue="all">
-      <SelectTrigger>
-        <SelectValue placeholder="elegir" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Categorías</SelectLabel>
-          <SelectItem value="all">Todas</SelectItem>
-          {categories.map((category) => (
-            <SelectItem value={category.id} key={category.id}>
-              {category.name}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
   );
 };
 

@@ -47,6 +47,8 @@
     "nodemailer": "^6.9.2",
     "path": "^0.12.7",
     "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-charts": "^3.0.0-beta.57",
     "react-day-picker": "^8.8.2",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
