@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import {
+  BarChart4,
   CalendarDays,
   Camera,
   CrownIcon,
@@ -67,6 +68,11 @@ const adminRoutes = [
     name: "Roles",
     icon: <CrownIcon className="h-5 w-5" />,
   },
+  {
+    route: "/admin/stats",
+    name: "Estadísticas",
+    icon: <BarChart4 className="h-5 w-5" />,
+  },
 ];
 
 const AdminNav = ({ activeRoute }: { activeRoute: string | undefined }) => {
@@ -81,7 +87,8 @@ const AdminNav = ({ activeRoute }: { activeRoute: string | undefined }) => {
             isEmployee &&
             (route.name === "Rentas" ||
               route.name === "Equipos" ||
-              route.name === "Roles")
+              route.name === "Roles" ||
+              route.name === "Estadísticas")
           )
             return null;
 
