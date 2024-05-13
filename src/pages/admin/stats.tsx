@@ -116,46 +116,6 @@ const StatsPage: NextPage<StatsPageProps> = ({
         <AdminLayout route="Estadísticas">
           <h1 className="text-lg font-bold">Estadísticas</h1>
 
-          <div className="rounded-md bg-white p-4">
-            <div>
-              <Label>Sucursal</Label>
-              <AdminSelectLocation
-                locations={locations}
-                setValue={(e) => setValue("location", e)}
-              >
-                <SelectItem value="all">Todas</SelectItem>
-              </AdminSelectLocation>
-            </div>
-
-            <div>
-              <Label>Categoría</Label>
-              <SelectCategory
-                categories={categories}
-                setValue={(e) => setValue("category", e)}
-              />
-            </div>
-
-            <div>
-              <Label>Cantidad de equipos</Label>
-              <Select
-                onValueChange={(e) => setValue("take", Number(e))}
-                defaultValue="10"
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="elegir" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Sucursales</SelectLabel>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="15">15</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
           <div className="flex flex-col gap-6 pt-6">
             <div>
               <p>
@@ -166,6 +126,36 @@ const StatsPage: NextPage<StatsPageProps> = ({
             </div>
 
             <OrdersByMonth ordersByMonth={monthAverage} />
+
+            <div className="rounded-md bg-white p-4">
+              <div>
+                <Label>Categoría</Label>
+                <SelectCategory
+                  categories={categories}
+                  setValue={(e) => setValue("category", e)}
+                />
+              </div>
+
+              <div>
+                <Label>Cantidad de equipos</Label>
+                <Select
+                  onValueChange={(e) => setValue("take", Number(e))}
+                  defaultValue="10"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="elegir" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Sucursales</SelectLabel>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="15">15</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             {!isLoadingTopBookedEquipments && (
               <>
@@ -185,8 +175,22 @@ const StatsPage: NextPage<StatsPageProps> = ({
               />
             )}
 
+            <div className="rounded-md bg-white p-4">
+              <div>
+                <Label>Sucursal</Label>
+                <AdminSelectLocation
+                  locations={locations}
+                  setValue={(e) => setValue("location", e)}
+                >
+                  <SelectItem value="all">Todas</SelectItem>
+                </AdminSelectLocation>
+              </div>
+            </div>
+
             {!isLoadingCategoryOrders && (
-              <OrdersByCategory orders={topCategoryOrders as Order[]} />
+              <div className="max-w-[600px]">
+                <OrdersByCategory orders={topCategoryOrders as Order[]} />
+              </div>
             )}
           </div>
         </AdminLayout>
