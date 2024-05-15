@@ -7,6 +7,7 @@ export const ROLES = {
 export const LocationName = {
   MENDOZA: "Mendoza",
   SAN_JUAN: "San Juan",
+  SAN_LUIS: "San Luis",
 };
 
 export const DISCOUNT_TYPES = {
@@ -34,6 +35,10 @@ export const SCHEDULES: Schedules = {
   Mendoza: {
     "09:00": "20:00",
     "20:30": "20:30",
+  },
+  "San Luis": {
+    "09:00": "09:00",
+    "20:00": "20:00",
   },
 };
 

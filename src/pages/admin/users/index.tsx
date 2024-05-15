@@ -113,8 +113,6 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
     search,
   });
 
-  const isAdmin = getIsAdmin(session);
-
   const handleCreateUser = () => {
     void router.push("/new-user");
   };
