@@ -14,7 +14,7 @@ type WherePipe = {
   available?: boolean;
   categoryId?: string;
   owner?: {
-    some?: { location: { id: string } };
+    some?: { location: { id: string }; deleted?: boolean };
     none?: { location: { id: { not: undefined } } };
   };
   OR?: [
@@ -311,7 +311,9 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       if (input.location) {
-        wherePipe.owner = { some: { location: { id: input.location } } };
+        wherePipe.owner = {
+          some: { location: { id: input.location }, deleted: false },
+        };
       }
 
       if (input.search) {
