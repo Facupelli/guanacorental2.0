@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SCHEDULES } from "@/lib/magic_strings";
+import { type LocationNames, SCHEDULES } from "@/lib/magic_strings";
 import { useBoundStore } from "@/zustand/store";
 import dayjs from "dayjs";
 import { useEffect } from "react";
@@ -18,11 +18,17 @@ const SelectPickupHour = () => {
   const location = useBoundStore((state) => state.location);
   const pickup = useBoundStore((state) => state.pickupHour);
 
-  const schedules = Object.keys(SCHEDULES[location.name]!);
+  const schedules = Object.values(
+    SCHEDULES[location.name as LocationNames]
+  ) as string[];
 
   useEffect(() => {
     if (dayjs(startDate).day() !== 5) {
-      setPickupHour(schedules[0]!);
+      const pickupHour = schedules[0];
+
+      if (pickupHour) {
+        setPickupHour(pickupHour);
+      }
     }
   }, [startDate, schedules, setPickupHour]);
 
