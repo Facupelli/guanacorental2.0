@@ -127,8 +127,8 @@ const StatsPage: NextPage<StatsPageProps> = ({
 
             <OrdersByMonth ordersByMonth={monthAverage} />
 
-            <div className="rounded-md bg-white p-4">
-              <div>
+            <div className="my-8 flex w-full items-center gap-2 rounded-md bg-white p-4">
+              <div className="flex-1 ">
                 <Label>Categoría</Label>
                 <SelectCategory
                   categories={categories}
@@ -136,7 +136,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
                 />
               </div>
 
-              <div>
+              <div className="flex-1 ">
                 <Label>Cantidad de equipos</Label>
                 <Select
                   onValueChange={(e) => setValue("take", Number(e))}
@@ -155,28 +155,8 @@ const StatsPage: NextPage<StatsPageProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            {!isLoadingTopBookedEquipments && (
-              <>
-                <MostBookedEquipments
-                  equipments={topBookedEquipments as TopBookedEquipment[]}
-                />
-
-                <MostBookedEquipmentsByDay
-                  equipments={topBookedEquipments as TopBookedEquipment[]}
-                />
-              </>
-            )}
-
-            {!isLoadingBookedEquipments && (
-              <BookedEquipment
-                equipments={bookedEquipments as BookedEquipmentType[]}
-              />
-            )}
-
-            <div className="rounded-md bg-white p-4">
-              <div>
+              <div className="flex-1 ">
                 <Label>Sucursal</Label>
                 <AdminSelectLocation
                   locations={locations}
@@ -187,8 +167,28 @@ const StatsPage: NextPage<StatsPageProps> = ({
               </div>
             </div>
 
+            {!isLoadingTopBookedEquipments && (
+              <>
+                <MostBookedEquipments
+                  equipments={topBookedEquipments as TopBookedEquipment[]}
+                />
+
+                {/* NO SE UTILIZARÁ DE MOMENTO */}
+                {/* <MostBookedEquipmentsByDay
+                  equipments={topBookedEquipments as TopBookedEquipment[]}
+                /> */}
+              </>
+            )}
+
+            {/* NO SE UTILIZARÁ DE MOMENTO */}
+            {/* {!isLoadingBookedEquipments && (
+              <BookedEquipment
+                equipments={bookedEquipments as BookedEquipmentType[]}
+              />
+            )} */}
+
             {!isLoadingCategoryOrders && (
-              <div className="max-w-[600px]">
+              <div className="mx-auto mt-8 size-[600px] max-w-[600px]">
                 <OrdersByCategory orders={topCategoryOrders as Order[]} />
               </div>
             )}

@@ -49,6 +49,7 @@ export const statsRouter = createTRPCRouter({
       z.object({
         category: z.string().optional(),
         take: z.number().optional(),
+        location: z.string().optional(),
       })
     )
     .query(async ({ input }) => {
