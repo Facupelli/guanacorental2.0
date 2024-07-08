@@ -81,15 +81,13 @@ const StatsPage: NextPage<StatsPageProps> = ({
 
   const locationId = watch("location");
   const categoryId = watch("category");
-  const take = watch("take");
+  const take = watch("take", 10);
 
   const { data: topBookedEquipments, isLoading: isLoadingTopBookedEquipments } =
     api.stats.getTopBookedEquipments.useQuery({
       category: categoryId,
       take,
     });
-
-  console.log({ length: topBookedEquipments?.length });
 
   // const { data: bookedEquipments, isLoading: isLoadingBookedEquipments } =
   //   api.stats.getEquipmentBookedStat.useQuery({
