@@ -4,6 +4,7 @@ import { Bar } from "react-chartjs-2";
 const options = {
   indexAxis: "y" as const,
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       position: "right" as const,
@@ -16,10 +17,10 @@ const options = {
 };
 
 function groupOwnersByLocation(equipments: TopBookedEquipment[]) {
-  return equipments.map((equipo) => {
+  return equipments.map((equipment) => {
     const ordersByLocation: Record<string, number> = {};
 
-    equipo.owner.forEach((owner) => {
+    equipment.owner.forEach((owner) => {
       if (!ordersByLocation[owner.location.name]) {
         ordersByLocation[owner.location.name] = 0;
       }
@@ -27,7 +28,7 @@ function groupOwnersByLocation(equipments: TopBookedEquipment[]) {
     });
 
     return {
-      ...equipo,
+      ...equipment,
       ordersByLocation,
     };
   });

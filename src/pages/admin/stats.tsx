@@ -19,7 +19,6 @@ import {
   ArcElement,
 } from "chart.js";
 import MostBookedEquipments from "@/components/stats/MostBookedEquipments";
-import MostBookedEquipmentsByDay from "@/components/stats/MostBookedEquipmentsByDay";
 import OrdersByMonth from "@/components/stats/OrdersByMonth";
 import OrdersByCategory from "@/components/stats/OrdersByCategory";
 import { AdminSelectLocation } from "@/components/ui/SelectLocation";
@@ -39,11 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SelectCategory } from "@/components/ui/SelectCategory";
-import BookedEquipment from "@/components/stats/BookedEquipment";
-import {
-  type BookedEquipment as BookedEquipmentType,
-  type TopBookedEquipment,
-} from "@/server/api/routers/stats";
+import { type TopBookedEquipment } from "@/server/api/routers/stats";
 
 ChartJS.register(
   CategoryScale,
@@ -94,10 +89,12 @@ const StatsPage: NextPage<StatsPageProps> = ({
       take,
     });
 
-  const { data: bookedEquipments, isLoading: isLoadingBookedEquipments } =
-    api.stats.getEquipmentBookedStat.useQuery({
-      equipmentId: "cl9h2fv1h0013eoqazquz1j8u",
-    });
+  console.log({ length: topBookedEquipments?.length });
+
+  // const { data: bookedEquipments, isLoading: isLoadingBookedEquipments } =
+  //   api.stats.getEquipmentBookedStat.useQuery({
+  //     equipmentId: "cl9h2fv1h0013eoqazquz1j8u",
+  //   });
 
   const { data: topCategoryOrders, isLoading: isLoadingCategoryOrders } =
     api.stats.getTopCategoryOrders.useQuery({ location: locationId });
@@ -147,10 +144,11 @@ const StatsPage: NextPage<StatsPageProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Sucursales</SelectLabel>
+                      <SelectLabel>Cantidad</SelectLabel>
                       <SelectItem value="10">10</SelectItem>
                       <SelectItem value="15">15</SelectItem>
                       <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="0">Todos</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -168,7 +166,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
             </div>
 
             {!isLoadingTopBookedEquipments && (
-              <>
+              <div className={`${take === 0 ? "h-[4500px]" : "h-[600px]"}`}>
                 <MostBookedEquipments
                   equipments={topBookedEquipments as TopBookedEquipment[]}
                 />
@@ -177,7 +175,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
                 {/* <MostBookedEquipmentsByDay
                   equipments={topBookedEquipments as TopBookedEquipment[]}
                 /> */}
-              </>
+              </div>
             )}
 
             {/* NO SE UTILIZARÁ DE MOMENTO */}
