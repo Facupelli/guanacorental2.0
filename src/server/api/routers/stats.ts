@@ -38,7 +38,7 @@ const getTopE = (equipments: TopBookedEquipment[], take?: number) => {
 
     return bTotal - aTotal;
   });
-  const topE = sortedE.slice(0, take ?? 10);
+  const topE = take === 0 ? sortedE : sortedE.slice(0, take);
 
   return topE;
 };
