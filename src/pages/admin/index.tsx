@@ -94,9 +94,10 @@ const Admin: NextPage = () => {
     : dayjs().startOf("day").toDate();
 
   const isPickupDay = (date: Date) => {
+    const localDate = dayjs(date);
     if (
       data?.find((order) =>
-        dayjs(order.book.start_date).isSame(dayjs(date), "day")
+        dayjs(order.book.start_date).isSame(localDate, "day")
       )
     ) {
       return true;
@@ -105,15 +106,18 @@ const Admin: NextPage = () => {
   };
 
   const isReturnDay = (date: Date) => {
+    const localDate = dayjs(date);
+
     if (
       data?.find((order) =>
-        dayjs(order.book.end_date).isSame(dayjs(date), "day")
+        dayjs(order.book.end_date).isSame(dayjs(localDate), "day")
       )
     ) {
       return true;
     }
     return false;
   };
+
   const isPickupAndReturnDay = (date: Date) => {
     if (
       data?.find(
