@@ -250,7 +250,9 @@ export const equipmentRouter = createTRPCRouter({
         if (locationId === "none") {
           wherePipe.owner = { none: { location: { id: { not: undefined } } } };
         } else {
-          wherePipe.owner = { some: { location: { id: locationId } } };
+          wherePipe.owner = {
+            some: { location: { id: locationId }, deleted: false },
+          };
         }
       }
 
