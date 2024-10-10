@@ -450,7 +450,7 @@ export const RemitoPdf = ({ order, pdfEquipmentRows }: Props) => (
       </View>
       <View fixed style={styles.bottomPage}>
         <Text>2022. GUANACO RENTAL. SAN JUAN, ARGENTINA.</Text>
-        <Text>Telefonos de contacto: 2644162059 - 2644627267</Text>
+        <Text>Telefonos de contacto: +54 264-6278323</Text>
         <Text>www.guanacorental.com hola@guanacorental.com</Text>
       </View>
     </MyPage>

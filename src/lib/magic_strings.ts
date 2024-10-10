@@ -4,6 +4,12 @@ export const ROLES = {
   EMPLOYEE: "Employee",
 };
 
+export const LocationName = {
+  MENDOZA: "Mendoza",
+  SAN_JUAN: "San Juan",
+  SAN_LUIS: "San Luis",
+};
+
 export const DISCOUNT_TYPES = {
   FIXED: "Fixed",
   PERCENTAGE: "Percentage",
@@ -15,20 +21,29 @@ export const SORT_TYPES = {
   ASC: "asc",
 };
 
-interface Schedules {
-  [key: string]: {
-    [key: string]: string;
-  };
+export type LocationNames = "San Juan" | "Mendoza" | "San Luis";
+
+export interface Schedule {
+  am: string;
+  pm: string;
 }
+
+type Schedules = {
+  [K in LocationNames]: Schedule;
+};
 
 export const SCHEDULES: Schedules = {
   "San Juan": {
-    "09:00": "09:00",
-    "20:00": "20:00",
+    am: "09:00",
+    pm: "20:00",
   },
   Mendoza: {
-    "09:00": "20:00",
-    "20:30": "20:30",
+    am: "09:00",
+    pm: "20:30",
+  },
+  "San Luis": {
+    am: "09:00",
+    pm: "18:00",
   },
 };
 
@@ -46,7 +61,7 @@ export const ORDER_RETURN_STATUS = {
 export const COUPON_STATUS = {
   PENDING: "Pendiente",
   ENDED: "Finalizado",
-  ACTIVE: "Active",
+  ACTIVE: "Activo",
 };
 
 interface StatusStyles {

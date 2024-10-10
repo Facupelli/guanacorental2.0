@@ -8,14 +8,9 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  reactStrictMode: true,
-
-  /**
-   * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
-   * out.
-   *
-   * @see https://github.com/vercel/next.js/issues/41980
-   */
+  // Recommended: this will reduce output
+  // Docker image size by 80%+
+  output: "standalone",
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
@@ -33,6 +28,10 @@ const config = {
       },
     ],
   },
+  // Nginx will do gzip compression. We disable
+  // compression here so we can prevent buffering
+  // streaming responses
+  compress: false,
 };
 
 export default config;

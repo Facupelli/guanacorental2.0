@@ -15,7 +15,6 @@ import {
 import { ArrowRight, ShoppingCart, X } from "lucide-react";
 
 import { formatPrice } from "@/lib/utils";
-import { useScreenSize } from "@/hooks/useScreenSize";
 
 import { type Equipment } from "@/types/models";
 import { type Dispatch, type SetStateAction } from "react";
@@ -32,8 +31,6 @@ const Cart = ({
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
-
-  const { sheetSize } = useScreenSize();
 
   const startDate = useBoundStore((state) => state.startDate);
   const endDate = useBoundStore((state) => state.endDate);
@@ -58,7 +55,7 @@ const Cart = ({
         </SheetTrigger>
       )}
 
-      <SheetContent position="right" size={sheetSize}>
+      <SheetContent className="w-full md:w-[400px]">
         <SheetHeader>
           <SheetTitle>MI PEDIDO</SheetTitle>
           <SheetDescription className="grid">

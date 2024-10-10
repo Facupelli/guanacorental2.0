@@ -14,7 +14,7 @@ type WherePipe = {
   available?: boolean;
   categoryId?: string;
   owner?: {
-    some?: { location: { id: string } };
+    some?: { location: { id: string }; deleted?: boolean };
     none?: { location: { id: { not: undefined } } };
   };
   OR?: [
@@ -250,7 +250,9 @@ export const equipmentRouter = createTRPCRouter({
         if (locationId === "none") {
           wherePipe.owner = { none: { location: { id: { not: undefined } } } };
         } else {
-          wherePipe.owner = { some: { location: { id: locationId } } };
+          wherePipe.owner = {
+            some: { location: { id: locationId }, deleted: false },
+          };
         }
       }
 
@@ -311,7 +313,9 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       if (input.location) {
-        wherePipe.owner = { some: { location: { id: input.location } } };
+        wherePipe.owner = {
+          some: { location: { id: input.location }, deleted: false },
+        };
       }
 
       if (input.search) {
@@ -349,5 +353,58 @@ export const equipmentRouter = createTRPCRouter({
       }
 
       return { equipments, nextCursor };
+    }),
+
+  modifyPrices: protectedProcedure
+    .input(
+      z.object({
+        percent: z.string(),
+        type: z.string(),
+        categoryId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { percent, type, categoryId } = input;
+
+      const percentage = Number(percent);
+      if (isNaN(percentage)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "invalid percentage",
+        });
+      }
+
+      const equipments = await prisma.equipment.findMany({
+        where: {
+          categoryId,
+        },
+      });
+
+      const updates = equipments.map((equipment) => {
+        let newPrice;
+        if (type === "increase") {
+          newPrice = equipment.price + equipment.price * (percentage / 100);
+        } else if (type === "decrease") {
+          newPrice = equipment.price - equipment.price * (percentage / 100);
+        } else {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "invalid type",
+          });
+        }
+
+        return prisma.equipment.update({
+          where: {
+            id: equipment.id,
+          },
+          data: {
+            price: newPrice,
+          },
+        });
+      });
+
+      await prisma.$transaction(updates);
+
+      return { success: true };
     }),
 });

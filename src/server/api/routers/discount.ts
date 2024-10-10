@@ -1,4 +1,4 @@
-import { calculateTotalWithDiscount } from "@/lib/utils";
+import { calculateTotalWithDiscount, getDiscountStatus } from "@/lib/utils";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { calculateOwnerEarning } from "@/server/utils/order";
@@ -61,22 +61,29 @@ export const discountRouter = createTRPCRouter({
       return discount;
     }),
 
-  getAllDiscounts: protectedProcedure.query(async () => {
-    const discounts = await prisma.discount.findMany({
-      include: {
-        rule: {
-          include: {
-            type: true,
+  getAllDiscounts: protectedProcedure
+    .input(z.object({ status: z.string() }))
+    .query(async ({}) => {
+      const discounts = await prisma.discount.findMany({
+        include: {
+          rule: {
+            include: {
+              type: true,
+            },
           },
+          location: true,
         },
-        location: true,
-      },
-    });
+      });
 
-    const types = await prisma.discountType.findMany();
+      const discountsWithStatus = discounts.map((discount) => ({
+        ...discount,
+        status: getDiscountStatus(discount),
+      }));
 
-    return { discounts, types };
-  }),
+      const types = await prisma.discountType.findMany();
+
+      return { discounts: discountsWithStatus, types };
+    }),
 
   apllyDiscountToOrder: protectedProcedure
     .input(
@@ -186,8 +193,15 @@ export const discountRouter = createTRPCRouter({
         });
       }
 
+      if (discount.is_disabled) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "El cupón está deshabilitado",
+        });
+      }
+
       if (
-        !discount?.location.map((location) => location.id).includes(location)
+        !discount?.location?.map((location) => location.id).includes(location)
       ) {
         throw new TRPCError({
           code: "BAD_REQUEST",

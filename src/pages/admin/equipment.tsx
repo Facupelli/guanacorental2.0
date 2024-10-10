@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import superjason from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { getServerSession } from "next-auth";
@@ -62,6 +63,19 @@ import {
   AlertDialogContent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { SelectCategory } from "@/components/ui/SelectCategory";
+
+dayjs.locale("es");
 
 type Equipment = Prisma.EquipmentGetPayload<{
   include: {
@@ -217,6 +231,40 @@ const EquipmentAdmin: NextPage<Props> = ({
     setShowDeleteModal,
   };
 
+  const handleDownloadExcel = () => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ location: locationId }),
+    };
+
+    const fetch4nodeBuffer = () =>
+      fetch(
+        process.env.NODE_ENV === "production"
+          ? "https://www.guanacorental.shop/api/generateEquipmentsExcel"
+          : `http://localhost:3000/api/generateEquipmentsExcel`,
+        options
+      );
+
+    fetch4nodeBuffer()
+      .then((res) => res.blob())
+      .then((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `listado-equipos-guanaco-${dayjs().format(
+            "DD-MM-YYYY"
+          )}.xlsx`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
       <Head>
@@ -271,29 +319,37 @@ const EquipmentAdmin: NextPage<Props> = ({
       <main className="">
         <AdminLayout route="Equipos">
           <h1 className="text-lg font-bold">Equipos</h1>
-          <div className="flex flex-wrap items-start gap-4 pt-6">
-            <div className="flex w-full flex-wrap items-center gap-4 rounded-md bg-white p-4 md:w-2/3">
+          <div className="grid items-start gap-6 pt-6 md:flex">
+            <div className="grid grow gap-4 rounded-md bg-white p-4">
               <Input
                 type="search"
                 placeholder="buscar por nombre, marca o modelo"
                 {...register("search")}
               />
-              <Label>Sucursal</Label>
-              <AdminSelectLocation
-                locations={locations}
-                setValue={(e) => setValue("location", e)}
-              >
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="none">Sin sucursal</SelectItem>
-              </AdminSelectLocation>
-              <Label>Categoría</Label>
-              <SelectCategory
-                categories={categories}
-                setValue={(e) => setValue("categoryId", e)}
-              />
+              <div className="flex flex-wrap gap-4 md:flex-nowrap">
+                <div className="w-full">
+                  <Label>Sucursal</Label>
+                  <AdminSelectLocation
+                    locations={locations}
+                    setValue={(e) => setValue("location", e)}
+                  >
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="none">Sin sucursal</SelectItem>
+                  </AdminSelectLocation>
+                </div>
+                <div className="w-full">
+                  <Label>Categoría</Label>
+                  <SelectCategory
+                    categories={categories}
+                    setValue={(e) => setValue("categoryId", e)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="ml-auto flex items-start gap-6">
-              <p>total: {data?.totalCount}</p>
+
+            <p className="shrink-0">total: {data?.totalCount}</p>
+
+            <div className="ml-auto flex items-start gap-4 md:grid">
               <Button
                 onClick={() => {
                   setEquipmentId(null);
@@ -304,6 +360,14 @@ const EquipmentAdmin: NextPage<Props> = ({
               >
                 Agregar equipo
               </Button>
+              <Button
+                size="sm"
+                // disabled={data?.totalFromOrders === 0}
+                onClick={handleDownloadExcel}
+              >
+                Descargar Excel
+              </Button>
+              <EquipmentPriceChangeModal categories={categories} />
             </div>
           </div>
           <div className="pt-6">
@@ -329,6 +393,107 @@ const EquipmentAdmin: NextPage<Props> = ({
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+const EquipmentPriceChangeModal = ({
+  categories,
+}: {
+  categories: Category[];
+}) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<{
+    categoryId: string;
+    type: string;
+    percent: string;
+  }>();
+
+  const { mutate } = api.equipment.modifyPrices.useMutation();
+
+  const ctx = api.useContext();
+
+  const handleModifyPrice = (data: {
+    categoryId: string;
+    type: string;
+    percent: string;
+  }) => {
+    mutate(data, {
+      onSuccess: () => {
+        void ctx.equipment.adminGetEquipment.invalidate();
+        void ctx.equipment.getAdminEquipmentById.invalidate();
+        reset();
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm">Modificar precio</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Modificar precios por categoría</DialogTitle>
+          <DialogDescription>
+            Aplica un nuevo precio a todos los equipos de una categoría.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleModifyPrice)}>
+          <div className="grid gap-6 py-4">
+            <div>
+              <Label>Categoría</Label>
+              <SelectCategory
+                categories={categories}
+                setValue={(e) => setValue("categoryId", e)}
+              />
+            </div>
+
+            <div>
+              <Label>Tipo</Label>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Label className="font-normal">Aumentar</Label>
+                  <Input
+                    type="radio"
+                    value="increase"
+                    className="h-6 w-4"
+                    {...register("type")}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label className="font-normal">Descontar</Label>
+                  <Input
+                    type="radio"
+                    value="decrease"
+                    className="h-6 w-4"
+                    {...register("type")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label>Porcentaje %</Label>
+              <Input type="text" {...register("percent")} required />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-4">
+            <DialogClose type="button">Cancelar</DialogClose>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Aplicando..." : "Aplicar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -513,32 +678,6 @@ const RemoveStockAlert = ({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
-};
-
-type SelecCategoryProps = {
-  categories: Category[];
-  setValue: (e: string) => void;
-};
-
-const SelectCategory = ({ categories, setValue }: SelecCategoryProps) => {
-  return (
-    <Select onValueChange={setValue} defaultValue="all">
-      <SelectTrigger>
-        <SelectValue placeholder="elegir" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Categorías</SelectLabel>
-          <SelectItem value="all">Todas</SelectItem>
-          {categories.map((category) => (
-            <SelectItem value={category.id} key={category.id}>
-              {category.name}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
   );
 };
 

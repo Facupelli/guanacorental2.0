@@ -113,8 +113,6 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
     search,
   });
 
-  const isAdmin = getIsAdmin(session);
-
   const handleCreateUser = () => {
     void router.push("/new-user");
   };
@@ -165,7 +163,6 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
                     <div className="col-span-12 ml-auto">
                       <Button
                         onClick={handleCreateUser}
-                        disabled={!isAdmin}
                         className="whitespace-nowrap"
                       >
                         Crear Cliente

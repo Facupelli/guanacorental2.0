@@ -52,6 +52,8 @@ import useDebounce from "@/hooks/useDebounce";
 import type { Category, Equipment, Location } from "@/types/models";
 import { toArgentinaDate } from "@/lib/dates";
 import { useSideMenu } from "@/hooks/useSideMenu";
+import MendozaAlert from "@/components/MendozaAlert";
+import { useMendozaAlert } from "@/hooks/useMendozaAlert";
 
 type Props = {
   locations: Location[];
@@ -73,6 +75,10 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const showLocationModal = useBoundStore((state) => state.showLocationModal);
   const toggleModal = useBoundStore((state) => state.setToggleModal);
   const setLocation = useBoundStore((state) => state.setLocation);
+
+  const { showMendozaModal, setShowMendozaModal } = useMendozaAlert({
+    location,
+  });
 
   const { data, fetchNextPage, hasNextPage, isLoading } =
     api.equipment.getAllEquipment.useInfiniteQuery(
@@ -124,6 +130,10 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         <link rel="icon" href="/logo-favicon.ico" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
       </Head>
+
+      {/* ----- MENDOZA ALERT ----------- */}
+      <MendozaAlert open={showMendozaModal} setOpen={setShowMendozaModal} />
+      {/* ----- MENDOZA ALERT ----------- */}
 
       <DialogWithState
         title="¿DONDE QUERÉS ALQUILAR?"
@@ -471,7 +481,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
 
   const categories = await prisma.category.findMany({});
-  const locations = await prisma.location.findMany({});
+  const locations = await prisma.location.findMany({
+    where: {
+      isActive: true,
+    },
+  });
 
   await helpers.equipment.getAllEquipment.prefetch({ sort: "", limit: 20 });
 

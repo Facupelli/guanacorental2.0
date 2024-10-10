@@ -30,8 +30,8 @@ import DataTable from "@/components/ui/data-table";
 import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { getDiscountStatus, getIsAdmin } from "@/lib/utils";
-import { discountStatusClass } from "@/lib/magic_strings";
+import { getIsAdmin } from "@/lib/utils";
+import { COUPON_STATUS, discountStatusClass } from "@/lib/magic_strings";
 
 import type { DiscountType, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";
@@ -46,7 +46,7 @@ type Discount = Prisma.DiscountGetPayload<{
     };
     location: true;
   };
-}>;
+}> & { status: string };
 
 type CellProps = {
   setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -84,11 +84,13 @@ const columns: Columns<Discount, CellProps>[] = [
   {
     title: "Estado",
     cell: (rowData) => {
-      const status = getDiscountStatus(rowData);
+      // const status = getDiscountStatus(rowData);
 
       return (
         <div>
-          <span className={discountStatusClass[status]}>{status}</span>
+          <span className={discountStatusClass[rowData.status]}>
+            {rowData.status}
+          </span>
         </div>
       );
     },
@@ -143,12 +145,27 @@ type DiscountForm = {
   minTotal?: number;
 };
 
+interface SelectFilter {
+  status: string;
+}
+
 const AdminDiscounts: NextPage = () => {
   const { data: session } = useSession();
   const [discountSelected, setDiscount] = useState<Discount | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const { data } = api.discount.getAllDiscounts.useQuery();
+  const { setValue, watch } = useForm<SelectFilter>();
+  const status = watch("status", COUPON_STATUS.ACTIVE);
+
+  const { data } = api.discount.getAllDiscounts.useQuery({ status });
+
+  const filteredDiscounts = data?.discounts?.filter((discount) => {
+    if (status === "all") {
+      return true;
+    } else {
+      return discount.status === status;
+    }
+  });
 
   const isAdmin = getIsAdmin(session);
 
@@ -184,8 +201,11 @@ const AdminDiscounts: NextPage = () => {
         <AdminLayout route="Descuentos">
           <h1 className="text-lg font-bold">DESCUENTOS</h1>
           <div className="grid grid-cols-12 gap-6 pt-6">
-            <div className="col-span-12 flex">
-              <div className="ml-auto">
+            <div className="col-span-12 flex items-center gap-4">
+              <div className="ml-auto grow rounded-md bg-white p-1">
+                <SelectFilterDiscount setValue={setValue} value={status} />
+              </div>
+              <div className="">
                 <Button
                   onClick={() => {
                     setDiscount(null);
@@ -200,9 +220,9 @@ const AdminDiscounts: NextPage = () => {
             </div>
 
             <div className="col-span-12">
-              {data?.discounts && (
+              {filteredDiscounts && (
                 <DataTable
-                  data={data.discounts}
+                  data={filteredDiscounts}
                   columns={columns}
                   cellProps={cellProps}
                   setRowData={setDiscount}
@@ -213,6 +233,30 @@ const AdminDiscounts: NextPage = () => {
         </AdminLayout>
       </main>
     </>
+  );
+};
+
+type SelectProps = {
+  setValue: UseFormSetValue<SelectFilter>;
+  value: string;
+};
+
+const SelectFilterDiscount = ({ setValue, value }: SelectProps) => {
+  return (
+    <Select onValueChange={(e) => setValue("status", e)} value={value}>
+      <SelectTrigger>
+        <SelectValue placeholder="Filtrar por" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Mes</SelectLabel>
+          <SelectItem value="all">Todos</SelectItem>
+          <SelectItem value={COUPON_STATUS.ACTIVE}>Activos</SelectItem>
+          <SelectItem value={COUPON_STATUS.ENDED}>Finalizados</SelectItem>
+          <SelectItem value={COUPON_STATUS.PENDING}>Pendientes</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
@@ -332,7 +376,7 @@ const DiscountForm = ({
         <Input
           type="text"
           {...register("value", { valueAsNumber: true })}
-          defaultValue={discountSelected?.rule.value}
+          defaultValue={discountSelected?.rule?.value}
           required
         />
       </div>
@@ -346,7 +390,7 @@ const DiscountForm = ({
         />
       </div>
 
-      <div className="grid pt-4">
+      <div className="grid gap-4 pt-4">
         <Button type="submit">Crear</Button>
       </div>
     </form>
@@ -413,7 +457,7 @@ const ActionsDropMenu = ({
         >
           editar
         </DropdownMenuItem>
-        {/* <DropdownMenuItem>eliminar</DropdownMenuItem> */}
+        <DropdownMenuItem>deshabilitar</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

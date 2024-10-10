@@ -126,6 +126,7 @@ model Category {
 model Location {
   id            String      @default(cuid()) @id
   name          String
+  isActive      Boolean     @default(true)
   equipments    EquipmentOnOwner[]
   orders        Order[]
   discounts     Discount[]
