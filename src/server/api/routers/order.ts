@@ -26,6 +26,7 @@ import {
   sendMailToGuanaco,
 } from "@/server/utils/mailer";
 import { toArgentinaDate } from "@/lib/dates";
+import { isProdEnv } from "@/utils/env.util";
 
 type GetClaendarOrdersQuery = {
   where: {
@@ -596,7 +597,7 @@ export const orderRouter = createTRPCRouter({
       const earnings = await calcualteAndCreateEarnings(newOrder);
 
       //SEND MAIL TO CUSTOMER
-      if (newOrder.customer.email && newOrder.customer.name) {
+      if (isProdEnv() && newOrder.customer.email && newOrder.customer.name) {
         const filteredOrder = {
           ...newOrder,
           equipments: getOrderEquipmentOnOwners(
@@ -696,7 +697,10 @@ export const orderRouter = createTRPCRouter({
           message: "failed on book delete",
         });
       }
-      await sendCancelOrderMail(order.customer.email, order.number);
+
+      if (isProdEnv()) {
+        await sendCancelOrderMail(order.customer.email, order.number);
+      }
 
       await prisma.book.delete({
         where: { id: bookId },
