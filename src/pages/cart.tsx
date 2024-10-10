@@ -40,7 +40,7 @@ import {
 
 import type { Equipment, Location } from "@/types/models";
 import Link from "next/link";
-import { LocationName } from "@/lib/magic_strings";
+import { LocationName } from "@/lib/constants";
 import MendozaAlert from "@/components/MendozaAlert";
 import { useMendozaAlert } from "@/hooks/useMendozaAlert";
 import { useCartItems, useCartStoreActions } from "stores/cart.store";

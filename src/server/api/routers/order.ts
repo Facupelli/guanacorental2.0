@@ -11,7 +11,7 @@ import {
   ADMIN_ORDERS_SORT,
   ORDER_DELIVER_STATUS,
   ORDER_RETURN_STATUS,
-} from "@/lib/magic_strings";
+} from "@/lib/constants";
 import { type Prisma } from "@prisma/client";
 import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
 import {

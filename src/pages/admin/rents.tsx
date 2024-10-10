@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 
 import { api } from "@/utils/api";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
-import { MONTHS, monthList, yearList } from "@/lib/magic_strings";
+import { MONTHS, monthList, yearList } from "@/lib/constants";
 import { AdminSelectLocation } from "@/components/ui/SelectLocation";
 
 type RentForm = { month: string; year: string; location: string };

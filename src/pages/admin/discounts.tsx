@@ -31,7 +31,7 @@ import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
 import { getIsAdmin } from "@/lib/utils";
-import { COUPON_STATUS, discountStatusClass } from "@/lib/magic_strings";
+import { COUPON_STATUS, discountStatusClass } from "@/lib/constants";
 
 import type { DiscountType, Prisma } from "@prisma/client";
 import type { Columns } from "@/types/table";

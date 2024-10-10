@@ -1,4 +1,4 @@
-import { LocationName } from "@/lib/magic_strings";
+import { LocationName } from "@/lib/constants";
 import { type Location } from "@/types/models";
 import { useEffect, useState } from "react";
 

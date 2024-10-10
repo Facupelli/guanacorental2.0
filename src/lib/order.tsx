@@ -21,7 +21,7 @@ import {
   ORDER_RETURN_STATUS,
   orderReturnedClass,
   orderStatusClass,
-} from "./magic_strings";
+} from "./constants";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";

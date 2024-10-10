@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type LocationNames, SCHEDULES } from "@/lib/magic_strings";
+import { type LocationNames, SCHEDULES } from "@/lib/constants";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import {

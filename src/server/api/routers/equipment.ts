@@ -6,7 +6,7 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
-import { SORT_TYPES } from "@/lib/magic_strings";
+import { SORT_TYPES } from "@/lib/constants";
 import { TRPCError } from "@trpc/server";
 
 type WherePipe = {

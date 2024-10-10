@@ -20,7 +20,7 @@ import DataTable from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 
 import { api } from "@/utils/api";
-import { ADMIN_ORDERS_SORT } from "@/lib/magic_strings";
+import { ADMIN_ORDERS_SORT } from "@/lib/constants";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import {
   getIsAdmin,
