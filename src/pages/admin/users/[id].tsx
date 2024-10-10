@@ -1,6 +1,6 @@
 import superjason from "superjson";
 import { getServerSession } from "next-auth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { prisma } from "@/server/db";

@@ -1,7 +1,7 @@
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { type NextPage } from "next";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Head from "next/head";
 
 import { useBoundStore } from "@/zustand/store";

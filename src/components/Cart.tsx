@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useBoundStore } from "@/zustand/store";
 
 import { Button } from "./ui/button";

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";

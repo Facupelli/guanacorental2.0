@@ -1,14 +1,12 @@
-import Nav from "@/components/Nav";
-import Head from "next/head";
+import Nav from "app/_components/nav";
+
+export const metadata = {
+  title: "Guanaco Privacy Policy",
+};
 
 export default function PolicyPage() {
   return (
     <div>
-      <Head>
-        <title>Guanaco - Políticas de privacidad</title>
-        <link rel="icon" href="/logo-favicon.ico" />
-      </Head>
-
       <Nav />
 
       <main className="min-h-screen bg-app-bg px-10 pt-[70px]">

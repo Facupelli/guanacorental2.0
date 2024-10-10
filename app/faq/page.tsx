@@ -1,14 +1,12 @@
-import Nav from "@/components/Nav";
-import Head from "next/head";
+import Nav from "app/_components/nav";
+
+export const metadata = {
+  title: "Guanaco FAQ",
+};
 
 export default function FaqPage() {
   return (
     <div>
-      <Head>
-        <title>Guanaco FAQ</title>
-        <link rel="icon" href="/logo-favicon.ico" />
-      </Head>
-
       <Nav />
 
       <main className="min-h-screen bg-app-bg px-10 pt-[70px]">
@@ -89,9 +87,9 @@ export default function FaqPage() {
                 números de serie, descripción y fotografías de los equipos para
                 la correcta contrata- ción de un seguro. En caso de que el
                 responsable del rental defina por cantidad o valor de equipos
-                retirados la operación como “de riesgo”, se exigirá sin
-                excepción la contratación de un seguro de filmación, teniendo
-                que presentar la póliza para retirar.
+                retirados la operación como &quot;de riesgo&quot;, se exigirá
+                sin excepción la contratación de un seguro de filmación,
+                teniendo que presentar la póliza para retirar.
               </p>
             </details>
             <details open>

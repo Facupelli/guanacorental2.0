@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import { type UseFormSetValue, useForm } from "react-hook-form";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Head from "next/head";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { type GetServerSideProps, type NextPage } from "next";
