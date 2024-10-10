@@ -44,7 +44,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useBoundStore } from "@/zustand/store";
+import {
+  useAdminRolesUserSearch,
+  useAdminStoreActions,
+} from "stores/admin.store";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -78,8 +81,8 @@ const userColumns: Columns<User, CellProps>[] = [
 type RolesForm = { roleId: string; location: string };
 
 const AdminRoles: NextPage = () => {
-  const userSearch = useBoundStore((state) => state.rolesUserSearch);
-  const setUserSearch = useBoundStore((state) => state.setRolesUserSearch);
+  const userSearch = useAdminRolesUserSearch();
+  const { setRolesUserSearch: setUserSearch } = useAdminStoreActions();
 
   const { watch } = useForm<RolesForm>();
   const [, setUser] = useState<User | null>(null);

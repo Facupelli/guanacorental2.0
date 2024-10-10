@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { Calendar } from "@/components/ui/calendar";
 import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
-import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -28,6 +27,8 @@ import { equipmentsList, orderColumns } from "@/lib/order";
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 import { buttonVariants } from "@/components/ui/button";
+import { useAdminCalendarDay, useAdminStoreActions } from "stores/admin.store";
+import { useLocation, useLocationStoreActions } from "stores/location.store";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -50,10 +51,10 @@ const Admin: NextPage = () => {
 
   const [, setOrder] = useState<Order | null>(null);
 
-  const calendarDay = useBoundStore((state) => state.calendarDay);
-  const setCalendarDay = useBoundStore((state) => state.setCalendarDay);
-  const setLocation = useBoundStore((state) => state.setLocation);
-  const location = useBoundStore((state) => state.location);
+  const calendarDay = useAdminCalendarDay();
+  const { setCalendarDay } = useAdminStoreActions();
+  const { setLocation } = useLocationStoreActions();
+  const location = useLocation();
   const [orders, setOrders] = useState<Order[] | null>(null);
 
   const locations = api.location.getAllLocations.useQuery();

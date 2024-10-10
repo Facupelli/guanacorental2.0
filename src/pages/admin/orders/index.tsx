@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Head from "next/head";
 import { useState } from "react";
-import { useBoundStore } from "@/zustand/store";
 
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -34,6 +33,11 @@ import useDebounce from "@/hooks/useDebounce";
 
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
+import { useLocation, useLocationStoreActions } from "stores/location.store";
+import {
+  useAdminOrdersCurrentPage,
+  useAdminStoreActions,
+} from "stores/admin.store";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -50,10 +54,10 @@ type Order = Prisma.OrderGetPayload<{
 }>;
 
 const AdminOrders: NextPage = () => {
-  const setLocation = useBoundStore((state) => state.setLocation);
-  const location = useBoundStore((state) => state.location);
-  const currentPage = useBoundStore((state) => state.ordersCurrentPage);
-  const setCurrentPage = useBoundStore((state) => state.setOrdersCurrentPage);
+  const { setLocation } = useLocationStoreActions();
+  const location = useLocation();
+  const currentPage = useAdminOrdersCurrentPage();
+  const { setOrdersCurrentPage: setCurrentPage } = useAdminStoreActions();
 
   const [, setOrder] = useState<Order | null>(null);
 

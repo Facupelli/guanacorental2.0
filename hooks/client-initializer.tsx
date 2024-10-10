@@ -1,9 +1,16 @@
 "use client";
 
-import { useLoadLocationFromLocalStorage } from "@/hooks/useLoadLocationFromLocalStorage";
+import { useEffect } from "react";
+import { useLocationStoreActions } from "stores/location.store";
 
 export default function ClientInitializer() {
-  useLoadLocationFromLocalStorage();
+  const { initializeLocation } = useLocationStoreActions();
+
+  console.log("client initializer");
+
+  useEffect(() => {
+    initializeLocation();
+  }, [initializeLocation]);
 
   return null;
 }

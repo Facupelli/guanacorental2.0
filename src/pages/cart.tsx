@@ -4,7 +4,6 @@ import { type NextPage } from "next";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
 
-import { useBoundStore } from "@/zustand/store";
 import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 
 import Nav, { FacebookButton, GoogleButton } from "@/components/Nav";
@@ -44,6 +43,9 @@ import Link from "next/link";
 import { LocationName } from "@/lib/magic_strings";
 import MendozaAlert from "@/components/MendozaAlert";
 import { useMendozaAlert } from "@/hooks/useMendozaAlert";
+import { useCartItems, useCartStoreActions } from "stores/cart.store";
+import { useEndDate, usePickupHour, useStartDate } from "stores/date.store";
+import { useLocation } from "stores/location.store";
 
 type Discount = {
   value: number;
@@ -69,13 +71,13 @@ const CartPage: NextPage = () => {
   const [showErrorModal, setErrorModal] = useState(false);
   const [error, setError] = useState("");
 
-  const cartItems = useBoundStore((state) => state.cartItems);
-  const emptyCart = useBoundStore((state) => state.emptyCart);
+  const cartItems = useCartItems();
+  const { emptyCart } = useCartStoreActions();
 
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
-  const location = useBoundStore((state) => state.location);
-  const pickupHour = useBoundStore((state) => state.pickupHour);
+  const startDate = useStartDate();
+  const endDate = useEndDate();
+  const location = useLocation();
+  const pickupHour = usePickupHour();
 
   const { showMendozaModal, setShowMendozaModal } = useMendozaAlert({
     location,
@@ -326,7 +328,7 @@ type ItemProps = {
 };
 
 const Item = ({ item, endDate, startDate }: ItemProps) => {
-  const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
+  const { deleteFromCart } = useCartStoreActions();
 
   const handleRemoveFromCart = (itemId: string) => {
     deleteFromCart(itemId);
@@ -397,8 +399,8 @@ const RightBar = ({
   subtotal,
 }: RightBarProps) => {
   const [showCouponModal, setShowCouponModal] = useState(false);
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
+  const startDate = useStartDate();
+  const endDate = useEndDate();
 
   const areAllItemsAvailable = cart.every((item) =>
     isEquipmentAvailable(item, { startDate, endDate })

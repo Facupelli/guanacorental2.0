@@ -1,5 +1,4 @@
 import { useRouter } from "next/navigation";
-import { useBoundStore } from "@/zustand/store";
 
 import { Button } from "./ui/button";
 import SelectDateButton from "./ui/SelectDateButton";
@@ -20,6 +19,8 @@ import { type Equipment } from "@/types/models";
 import { type Dispatch, type SetStateAction } from "react";
 import { type CartItem } from "@/types/cart";
 import { toArgentinaDate } from "@/lib/dates";
+import { useEndDate, useStartDate } from "stores/date.store";
+import { useCartItems, useCartStoreActions } from "stores/cart.store";
 
 const Cart = ({
   trigger,
@@ -32,10 +33,10 @@ const Cart = ({
 }) => {
   const router = useRouter();
 
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
+  const startDate = useStartDate();
+  const endDate = useEndDate();
 
-  const cartItems = useBoundStore((state) => state.cartItems);
+  const cartItems = useCartItems();
 
   const handleGoToCartPage = () => {
     void router.push("/cart");
@@ -104,20 +105,10 @@ type CartItemProps = {
 };
 
 const CartItem = ({ item }: CartItemProps) => {
-  const deleteFromCart = useBoundStore((state) => state.deleteFromCart);
+  const { deleteFromCart } = useCartStoreActions();
 
   const handleRemoveFromCart = (itemId: string) => {
     deleteFromCart(itemId);
-
-    //LOCALSTORAGE
-    // const localCart = localStorage.getItem("cart");
-    // if (localCart) {
-    //   const parsedCart = JSON.parse(localCart) as Equipment[];
-    //   const updatedCart = parsedCart.filter(
-    //     (localItem: Equipment) => localItem.id !== item.id
-    //   );
-    //   localStorage.setItem("cart", JSON.stringify([...updatedCart]));
-    // }
   };
 
   return (

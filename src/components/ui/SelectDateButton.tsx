@@ -7,7 +7,6 @@ import timezonePlugin from "dayjs/plugin/timezone";
 import { useSession } from "next-auth/react";
 import { CalendarDays, Info } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useBoundStore } from "@/zustand/store";
 import { useState } from "react";
 
 dayjs.extend(utcPlugin);
@@ -31,6 +30,11 @@ import {
 import { Button } from "./button";
 import SelectPickupHour from "./SelectPickupHour";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
+import {
+  useDateStoreActions,
+  useEndDate,
+  useStartDate,
+} from "stores/date.store";
 
 dayjs.tz.setDefault("America/Argentina/Buenos_Aires");
 
@@ -39,10 +43,9 @@ const SelectDateButton = () => {
 
   const [isOpen, setOpen] = useState(false);
 
-  const setStartDate = useBoundStore((state) => state.setStartDate);
-  const setEndDate = useBoundStore((state) => state.setEndDate);
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
+  const startDate = useStartDate();
+  const endDate = useEndDate();
+  const { setStartDate, setEndDate } = useDateStoreActions();
 
   const handleSelectRange = (range: DateRange | undefined) => {
     setStartDate(range?.from);

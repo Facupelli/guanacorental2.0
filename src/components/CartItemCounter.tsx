@@ -1,17 +1,15 @@
 import type { Equipment, EquipmentOnOwner } from "@/types/models";
 import { Button } from "./ui/button";
-import { useBoundStore } from "@/zustand/store";
+import { useLocation } from "stores/location.store";
+import { useCartStoreActions } from "stores/cart.store";
 
 type Props = {
   item: Equipment;
 };
 
 const CartItemCounter = ({ item }: Props) => {
-  const location = useBoundStore((state) => state.location);
-  const addItemQuantity = useBoundStore((state) => state.addItemQuantity);
-  const substractItemQuantity = useBoundStore(
-    (state) => state.substractItemQuantity
-  );
+  const location = useLocation();
+  const { addItemQuantity, substractItemQuantity } = useCartStoreActions();
 
   const getEquipmentStock = (
     owner: EquipmentOnOwner[] | undefined,

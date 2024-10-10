@@ -8,15 +8,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type LocationNames, SCHEDULES } from "@/lib/magic_strings";
-import { useBoundStore } from "@/zustand/store";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import {
+  useDateStoreActions,
+  usePickupHour,
+  useStartDate,
+} from "stores/date.store";
+import { useLocation } from "stores/location.store";
 
 const SelectPickupHour = () => {
-  const setPickupHour = useBoundStore((state) => state.setPickupHour);
-  const startDate = useBoundStore((state) => state.startDate);
-  const location = useBoundStore((state) => state.location);
-  const pickup = useBoundStore((state) => state.pickupHour);
+  const startDate = useStartDate();
+  const location = useLocation();
+  const pickup = usePickupHour();
+  const { setPickupHour } = useDateStoreActions();
 
   const schedules = Object.values(
     SCHEDULES[location.name as LocationNames]

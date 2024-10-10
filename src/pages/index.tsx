@@ -11,7 +11,6 @@ import { prisma } from "@/server/db";
 import Head from "next/head";
 import Image from "next/image";
 import { authOptions } from "@/server/auth";
-import { useBoundStore } from "@/zustand/store";
 import {
   type Dispatch,
   type SetStateAction,
@@ -54,6 +53,13 @@ import { toArgentinaDate } from "@/lib/dates";
 import { useSideMenu } from "@/hooks/useSideMenu";
 import MendozaAlert from "@/components/MendozaAlert";
 import { useMendozaAlert } from "@/hooks/useMendozaAlert";
+import {
+  useLocation,
+  useLocationStoreActions,
+  useShowLocationModal,
+} from "stores/location.store";
+import { useEndDate, useStartDate } from "stores/date.store";
+import { useCartItems, useCartStoreActions } from "stores/cart.store";
 
 type Props = {
   locations: Location[];
@@ -71,10 +77,9 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
 
   const search = useDebounce(watch("search", ""), 500);
 
-  const location = useBoundStore((state) => state.location);
-  const showLocationModal = useBoundStore((state) => state.showLocationModal);
-  const toggleModal = useBoundStore((state) => state.setToggleModal);
-  const setLocation = useBoundStore((state) => state.setLocation);
+  const location = useLocation();
+  const showLocationModal = useShowLocationModal();
+  const { toggleModal, setLocation } = useLocationStoreActions();
 
   const { showMendozaModal, setShowMendozaModal } = useMendozaAlert({
     location,
@@ -227,11 +232,11 @@ const LeftBar = ({
 
   const filtersSectionRef = useRef<HTMLElement | null>(null);
 
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
-  const setLocation = useBoundStore((state) => state.setLocation);
-  const location = useBoundStore((state) => state.location);
-  const emptyCart = useBoundStore((state) => state.emptyCart);
+  const startDate = useStartDate();
+  const endDate = useEndDate();
+  const location = useLocation();
+  const { emptyCart } = useCartStoreActions();
+  const { setLocation } = useLocationStoreActions();
 
   return (
     <>
@@ -359,10 +364,10 @@ type EquipmentCardProps = {
 const EquipmentCard = ({ equipment, setShowCart }: EquipmentCardProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const cartItems = useBoundStore((state) => state.cartItems);
-  const addToCart = useBoundStore((state) => state.addToCart);
-  const startDate = useBoundStore((state) => state.startDate);
-  const endDate = useBoundStore((state) => state.endDate);
+  const cartItems = useCartItems();
+  const { addToCart } = useCartStoreActions();
+  const startDate = useStartDate();
+  const endDate = useEndDate();
 
   const isAlreadyInCart = !!cartItems.find((item) => item.id === equipment.id);
 
