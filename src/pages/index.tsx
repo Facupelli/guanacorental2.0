@@ -51,8 +51,6 @@ import useDebounce from "@/hooks/useDebounce";
 import type { Category, Equipment, Location } from "@/types/models";
 import { toArgentinaDate } from "@/lib/dates";
 import { useSideMenu } from "@/hooks/useSideMenu";
-import MendozaAlert from "@/components/MendozaAlert";
-import { useMendozaAlert } from "@/hooks/useMendozaAlert";
 import {
   useLocation,
   useLocationStoreActions,
@@ -80,10 +78,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
   const location = useLocation();
   const showLocationModal = useShowLocationModal();
   const { toggleModal, setLocation } = useLocationStoreActions();
-
-  const { showMendozaModal, setShowMendozaModal } = useMendozaAlert({
-    location,
-  });
 
   const { data, fetchNextPage, hasNextPage, isLoading } =
     api.equipment.getAllEquipment.useInfiniteQuery(
@@ -135,10 +129,6 @@ const Home: NextPage<Props> = ({ locations, categories }: Props) => {
         <link rel="icon" href="/logo-favicon.ico" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
       </Head>
-
-      {/* ----- MENDOZA ALERT ----------- */}
-      <MendozaAlert open={showMendozaModal} setOpen={setShowMendozaModal} />
-      {/* ----- MENDOZA ALERT ----------- */}
 
       <DialogWithState
         title="¿DONDE QUERÉS ALQUILAR?"

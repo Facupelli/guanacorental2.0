@@ -1,6 +1,6 @@
 import superjason from "superjson";
 import { getServerSession } from "next-auth";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { prisma } from "@/server/db";
@@ -58,7 +58,8 @@ type EditUserForm = {
 };
 
 const AdminUserDetail: NextPage = () => {
-  const router = useRouter();
+  const params = useParams();
+  const userId = params?.id as string;
   const { getValues, register } = useForm<EditUserForm>();
 
   const [editProfile, setEditProfile] = useState(false);
@@ -70,7 +71,7 @@ const AdminUserDetail: NextPage = () => {
   const { data, isLoading } = api.user.getUserById.useQuery({
     take: pageSize,
     skip: (currentPage - 1) * pageSize,
-    userId: router.query.id as string,
+    userId,
   });
 
   const { mutate } = api.user.editUser.useMutation();
