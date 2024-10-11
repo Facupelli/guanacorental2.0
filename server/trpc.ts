@@ -5,6 +5,7 @@ import { equipmentRouter } from "./routers/equipment";
 import { locationRouter } from "./routers/location";
 import { categoryRouter } from "./routers/category";
 import { orderRouter } from "./routers/order";
+import { userRouter } from "./routers/user";
 
 const t = initTRPC.create();
 
@@ -30,6 +31,7 @@ export const appRouter = router({
   location: locationRouter,
   category: categoryRouter,
   order: orderRouter,
+  user: userRouter,
 });
 
 export type AppRouter = typeof appRouter;

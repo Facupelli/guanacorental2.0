@@ -35,7 +35,7 @@ export default async function HomePage() {
                 </Suspense>
               </section>
               <Suspense>
-                <EquipmentList />;
+                <EquipmentList />
               </Suspense>
             </div>
           </section>

@@ -1,14 +1,14 @@
 import { createTRPCRouter } from "@/server/api/trpc";
 import { categoryRouter } from "../../../server/routers/category";
 import { equipmentRouter } from "./routers/equipment";
-import { userRouter } from "./routers/user";
-import { orderRouter } from "./routers/order";
+import { userRouter } from "../../../server/routers/user";
 import { roleRouter } from "./routers/role";
 import { discountRouter } from "./routers/discount";
 import { ownerRouter } from "./routers/owner";
 import { rentRouter } from "./routers/rent";
 import { statsRouter } from "./routers/stats";
 import { locationRouter } from "server/routers/location";
+import { orderRouter } from "server/routers/order";
 
 /**
  * This is the primary router for your server.

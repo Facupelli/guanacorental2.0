@@ -7,6 +7,7 @@ import "@/utils/dayjs-config";
 import { Providers } from "providers/providers";
 import ClientInitializer from "hooks/client-initializer";
 import { type Metadata } from "next";
+import Script from "next/script";
 
 const panton = localFont({
   src: [
@@ -40,8 +41,7 @@ const panton = localFont({
 
 export const metadata: Metadata = {
   title: "Guanaco Rental",
-  description:
-    "Guanaco Rental, alquiler de equipos para cine y fotografía. San Juan, Argentina.",
+  description: "Guanaco Rental, alquiler de equipos para cine y fotografía. San Juan, Argentina.",
   openGraph: {
     title: "Guanaco Rental",
     description: "Aquiler de equipos para cine y fotografía.",
@@ -51,15 +51,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={panton.variable}>
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ?? ""}`}
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ?? ""}');
+              `,
+          }}
+        />
       </head>
       <body className={panton.className}>
         <Providers>
