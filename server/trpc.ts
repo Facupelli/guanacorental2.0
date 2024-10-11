@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { equipmentRouter } from "./routers/equipment";
 import { locationRouter } from "./routers/location";
 import { categoryRouter } from "./routers/category";
+import { orderRouter } from "./routers/order";
 
 const t = initTRPC.create();
 
@@ -28,7 +29,7 @@ export const appRouter = router({
   equipment: equipmentRouter,
   location: locationRouter,
   category: categoryRouter,
-  // Add other routers here
+  order: orderRouter,
 });
 
 export type AppRouter = typeof appRouter;
