@@ -1,6 +1,5 @@
 import { createTRPCRouter } from "@/server/api/trpc";
-import { categoryRouter } from "./routers/category";
-import { locaitonRouter } from "./routers/location";
+import { categoryRouter } from "../../../server/routers/category";
 import { equipmentRouter } from "./routers/equipment";
 import { userRouter } from "./routers/user";
 import { orderRouter } from "./routers/order";
@@ -9,6 +8,7 @@ import { discountRouter } from "./routers/discount";
 import { ownerRouter } from "./routers/owner";
 import { rentRouter } from "./routers/rent";
 import { statsRouter } from "./routers/stats";
+import { locationRouter } from "server/routers/location";
 
 /**
  * This is the primary router for your server.
@@ -17,7 +17,7 @@ import { statsRouter } from "./routers/stats";
  */
 export const appRouter = createTRPCRouter({
   category: categoryRouter,
-  location: locaitonRouter,
+  location: locationRouter,
   equipment: equipmentRouter,
   user: userRouter,
   order: orderRouter,

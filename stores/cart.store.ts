@@ -6,6 +6,7 @@ interface CartStore {
   cartItems: Equipment[];
   showCartModal: boolean;
   actions: {
+    setShowCartModal: (show: boolean) => void;
     setOpenCartModal: () => void;
     setCloseCartModal: () => void;
     addToCart: (equipment: Equipment) => void;
@@ -23,6 +24,7 @@ const useCartStore = create<CartStore>()(
       cartItems: [],
       showCartModal: false,
       actions: {
+        setShowCartModal: (show) => set(() => ({ showCartModal: show })),
         setOpenCartModal: () => set(() => ({ showCartModal: true })),
         setCloseCartModal: () => set(() => ({ showCartModal: false })),
         addToCart: (equipment) =>

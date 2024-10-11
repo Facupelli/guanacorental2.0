@@ -1,3 +1,5 @@
+"use client";
+
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,11 +27,7 @@ const Nav = () => {
           <div>
             <Link href="/">
               <div className="relative aspect-square w-12 sm:w-14">
-                <Image
-                  src="/guanaco-rental-logo.svg"
-                  alt="guanaco rental logo"
-                  fill
-                />
+                <Image src="/guanaco-rental-logo.svg" alt="guanaco rental logo" fill />
               </div>
             </Link>
           </div>
@@ -65,10 +63,7 @@ const Nav = () => {
 
             {(isAdmin || isEmployee) && (
               <li className="cursor-pointer">
-                <button
-                  className="flex items-center gap-2"
-                  onClick={() => void router.push("/admin")}
-                >
+                <button className="flex items-center gap-2" onClick={() => void router.push("/admin")}>
                   ADMIN
                   <UserCog className="h-4 w-4" />
                 </button>
@@ -77,10 +72,7 @@ const Nav = () => {
 
             {session ? (
               <li>
-                <button
-                  onClick={() => void signOut()}
-                  className="flex items-center gap-2"
-                >
+                <button onClick={() => void signOut()} className="flex items-center gap-2">
                   SALIR
                   <LogOut className="h-4 w-4" />
                 </button>
@@ -116,14 +108,9 @@ export const GoogleButton = () => {
       className="flex h-[35px] items-center rounded-[2px] border border-[#dadce0] bg-[#fff] px-[12px] "
     >
       <div className="mr-2 h-[18px] w-[18px]">
-        <Image
-          src="/google/g-logo.png"
-          width={18}
-          height={18}
-          alt="google g logo"
-        />
+        <Image src="/google/g-logo.png" width={18} height={18} alt="google g logo" />
       </div>
-      <p className="whitespace-nowrap font-roboto text-[13px] font-semibold tracking-[0.25px] text-[#3c4043]">
+      <p className="font-roboto whitespace-nowrap text-[13px] font-semibold tracking-[0.25px] text-[#3c4043]">
         Acceder con Google
       </p>
     </button>
@@ -136,7 +123,7 @@ export const FacebookButton = () => {
       onClick={() => void signIn("facebook")}
       className="h-[35px] rounded-[2px] border border-[#1a77f2] bg-[#1a77f2] px-2 text-[#3c4043]  sm:px-4"
     >
-      <div className="flex items-center whitespace-nowrap font-roboto  text-[13px] font-semibold tracking-[0.25px] text-[#fff]">
+      <div className="font-roboto flex items-center whitespace-nowrap  text-[13px] font-semibold tracking-[0.25px] text-[#fff]">
         <FacebookIcon className="mr-2 h-4 w-4" /> Acceder con Facebook
       </div>
     </button>

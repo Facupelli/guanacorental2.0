@@ -22,12 +22,10 @@ const useLocationStore = create<LocationStore>()(
       pickupHour: "",
       actions: {
         setLocation: (location) => set({ location }),
-        toggleModal: () =>
-          set((state) => ({ showLocationModal: !state.showLocationModal })),
+        toggleModal: () => set((state) => ({ showLocationModal: !state.showLocationModal })),
         setPickupHour: (hour) => set({ pickupHour: hour }),
         initializeLocation: () => {
           const { location } = get();
-          console.log({ location });
           if (!location.id || !location.name) {
             console.log("INITIALIZE SHOW LOCATION MODAL");
             set({ showLocationModal: true });
@@ -44,9 +42,7 @@ const useLocationStore = create<LocationStore>()(
   )
 );
 
-export const useShowLocationModal = () =>
-  useLocationStore((state) => state.showLocationModal);
+export const useShowLocationModal = () => useLocationStore((state) => state.showLocationModal);
 export const useLocation = () => useLocationStore((state) => state.location);
 
-export const useLocationStoreActions = () =>
-  useLocationStore((state) => state.actions);
+export const useLocationStoreActions = () => useLocationStore((state) => state.actions);

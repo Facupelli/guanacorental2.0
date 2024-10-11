@@ -1,36 +1,25 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 
 import { Button } from "./ui/button";
 import SelectDateButton from "./ui/SelectDateButton";
 import CartItemCounter from "./CartItemCounter";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { ArrowRight, ShoppingCart, X } from "lucide-react";
 
 import { formatPrice } from "@/lib/utils";
 
 import { type Equipment } from "@/types/models";
-import { type Dispatch, type SetStateAction } from "react";
 import { type CartItem } from "@/types/cart";
 import { toArgentinaDate } from "@/lib/dates";
 import { useEndDate, useStartDate } from "stores/date.store";
-import { useCartItems, useCartStoreActions } from "stores/cart.store";
+import { useCartItems, useCartStoreActions, useShowCartModal } from "stores/cart.store";
 
-const Cart = ({
-  trigger,
-  open,
-  setOpen,
-}: {
-  trigger?: boolean;
-  open?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
-}) => {
+const Cart = ({ trigger }: { trigger?: boolean }) => {
+  const showCartModal = useShowCartModal();
+  const { setShowCartModal } = useCartStoreActions();
+
   const router = useRouter();
 
   const startDate = useStartDate();
@@ -43,13 +32,10 @@ const Cart = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={showCartModal} onOpenChange={setShowCartModal}>
       {trigger && (
         <SheetTrigger asChild className="p-0">
-          <Button
-            className="flex items-center gap-2 font-panton"
-            aria-label="shopping-cart-buton"
-          >
+          <Button className="font-panton flex items-center gap-2" aria-label="shopping-cart-buton">
             <span className="hidden text-base sm:block">CARRITO</span>
             <ShoppingCart className="h-6 w-6 sm:h-4 sm:w-4" />
           </Button>
@@ -65,8 +51,7 @@ const Cart = ({
             ) : (
               <div className="flex items-center justify-between">
                 <p>{toArgentinaDate(startDate)}</p>
-                <ArrowRight className="h-4 w-4" />{" "}
-                <p>{toArgentinaDate(endDate)}</p>
+                <ArrowRight className="h-4 w-4" /> <p>{toArgentinaDate(endDate)}</p>
               </div>
             )}
           </SheetDescription>
@@ -75,10 +60,7 @@ const Cart = ({
         <div className="relative flex h-[90%] flex-col gap-3 pt-4">
           <div className="grid gap-6 overflow-y-auto py-4">
             {cartItems.length === 0 ? (
-              <div>
-                Tu carrito está vacío. Agrega equipos desde reservas para poder
-                alquilarlos!
-              </div>
+              <div>Tu carrito está vacío. Agrega equipos desde reservas para poder alquilarlos!</div>
             ) : (
               cartItems.map((item) => <CartItem key={item.id} item={item} />)
             )}

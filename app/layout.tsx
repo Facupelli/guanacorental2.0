@@ -6,6 +6,7 @@ import "@/utils/dayjs-config";
 
 import { Providers } from "providers/providers";
 import ClientInitializer from "hooks/client-initializer";
+import { type Metadata } from "next";
 
 const panton = localFont({
   src: [
@@ -37,9 +38,17 @@ const panton = localFont({
   variable: "--font-panton",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Guanaco Rental",
-  description: "Alquiler de equipos audiovisuales",
+  description:
+    "Guanaco Rental, alquiler de equipos para cine y fotografía. San Juan, Argentina.",
+  openGraph: {
+    title: "Guanaco Rental",
+    description: "Aquiler de equipos para cine y fotografía.",
+  },
+  icons: {
+    icon: "/logo-favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -49,10 +58,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={panton.variable}>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+      </head>
       <body className={panton.className}>
         <Providers>
           <ClientInitializer />
-          <main>{children}</main>
+          <div>{children}</div>
         </Providers>
       </body>
     </html>

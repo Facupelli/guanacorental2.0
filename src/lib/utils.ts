@@ -71,8 +71,6 @@ export const handleLocationChange = (
   const locationId = e.split("-")[0];
   const locationName = e.split("-")[1];
 
-  console.log({ locationId, locationName });
-
   if (locationId && locationName) {
     setLocation({ id: locationId, name: locationName });
     if (toggleModal) {
@@ -81,10 +79,7 @@ export const handleLocationChange = (
   }
 };
 
-export const handleAdminLocationChange = (
-  e: string,
-  setLocation: (location: Location) => void
-) => {
+export const handleAdminLocationChange = (e: string, setLocation: (location: Location) => void) => {
   const locationId = e.split("-")[0];
   const locationName = e.split("-")[1];
   if (locationId && locationName) {
@@ -100,14 +95,8 @@ export const getIsEmployee = (session: Session | null) => {
   return session?.user.role.map((role) => role.name).includes(ROLES.EMPLOYEE);
 };
 
-export const calcaulateCartTotal = (
-  cartItems: Equipment[],
-  workingDays: number | undefined
-) => {
-  const cartSum = cartItems.reduce(
-    (acc, curr) => acc + curr.price * curr.quantity,
-    0
-  );
+export const calcaulateCartTotal = (cartItems: Equipment[], workingDays: number | undefined) => {
+  const cartSum = cartItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   if (workingDays) {
     return workingDays * cartSum;
   }
@@ -120,10 +109,7 @@ type DiscountProp = {
   code: string;
 };
 
-export const calculateTotalWithDiscount = (
-  total: number,
-  discount: DiscountProp
-) => {
+export const calculateTotalWithDiscount = (total: number, discount: DiscountProp) => {
   if (discount.typeName === DISCOUNT_TYPES.FIXED) {
     return Math.ceil(total - discount.value);
   }

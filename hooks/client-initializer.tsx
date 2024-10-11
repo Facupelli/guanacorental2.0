@@ -6,8 +6,6 @@ import { useLocationStoreActions } from "stores/location.store";
 export default function ClientInitializer() {
   const { initializeLocation } = useLocationStoreActions();
 
-  console.log("client initializer");
-
   useEffect(() => {
     initializeLocation();
   }, [initializeLocation]);
