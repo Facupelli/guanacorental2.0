@@ -1,6 +1,4 @@
 import { useForm } from "react-hook-form";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
 import { type GetServerSideProps, type NextPage } from "next";
 import Head from "next/head";
 import Nav from "@/components/Nav";
@@ -44,10 +42,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  useAdminRolesUserSearch,
-  useAdminStoreActions,
-} from "stores/admin.store";
+import { useAdminRolesUserSearch, useAdminStoreActions } from "stores/admin.store";
+import { auth } from "auth";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -62,9 +58,7 @@ type CellProps = unknown;
 const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
-    cell: (rowData) => (
-      <div>{toArgentinaDate(rowData.address?.created_at || new Date())}</div>
-    ),
+    cell: (rowData) => <div>{toArgentinaDate(rowData.address?.created_at || new Date())}</div>,
   },
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
   { title: "Teléfono", cell: (rowData) => <div>{rowData.address?.phone}</div> },
@@ -127,13 +121,7 @@ const AdminRoles: NextPage = () => {
             </div>
 
             <div>
-              {data?.users && (
-                <DataTable
-                  data={search ? data.users : []}
-                  setRowData={setUser}
-                  columns={userColumns}
-                />
-              )}
+              {data?.users && <DataTable data={search ? data.users : []} setRowData={setUser} columns={userColumns} />}
             </div>
           </div>
         </AdminLayout>
@@ -187,21 +175,14 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          className="bg-transparent py-1 text-sm font-normal text-primary hover:bg-secondary"
-        >
+        <Button size="sm" className="bg-transparent py-1 text-sm font-normal text-primary hover:bg-secondary">
           Asignar / Eliminar rol
         </Button>
       </DialogTrigger>
       <DialogContent className="md:min-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="font-bold md:text-2xl">
-            {user.name}
-          </DialogTitle>
-          <DialogDescription className="md:text-md">
-            Asigna | Elimina Roles
-          </DialogDescription>
+          <DialogTitle className="font-bold md:text-2xl">{user.name}</DialogTitle>
+          <DialogDescription className="md:text-md">Asigna | Elimina Roles</DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4 gap-y-8 pt-4 md:gap-8 md:p-3 md:pt-0">
           <div className="col-span-2 border-r-0 border-t-zinc-400 md:col-span-1 md:border-r">
@@ -210,9 +191,7 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
               {user.role.map((role) => (
                 <div key={role.id} className="flex items-center gap-2">
                   <p className="basis-1/2">{role.name}</p>
-                  {role.name !== "Customer" && (
-                    <RemoveStockAlert roleId={role.id} userId={user.id} />
-                  )}
+                  {role.name !== "Customer" && <RemoveStockAlert roleId={role.id} userId={user.id} />}
                 </div>
               ))}
             </div>
@@ -245,13 +224,7 @@ const AssignOrRemoveRoleDialog = ({ user }: { user: User }) => {
   );
 };
 
-const RemoveStockAlert = ({
-  userId,
-  roleId,
-}: {
-  userId: string;
-  roleId: string;
-}) => {
+const RemoveStockAlert = ({ userId, roleId }: { userId: string; roleId: string }) => {
   const ctx = api.useContext();
 
   const { mutate } = api.role.removeRoleFromUser.useMutation();
@@ -271,10 +244,7 @@ const RemoveStockAlert = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild className="h-6 ">
-        <Button
-          variant="outline"
-          className="basis-1/2 border-red-500 px-1.5 md:basis-0"
-        >
+        <Button variant="outline" className="basis-1/2 border-red-500 px-1.5 md:basis-0">
           <div className="flex items-center gap-2 text-red-500">
             <Trash2 className="h-4 w-4 " /> Eliminar
           </div>
@@ -282,12 +252,8 @@ const RemoveStockAlert = ({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Estas seguro que quieres eliminar este Rol?
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            El usuario perderá sus privilegios.
-          </AlertDialogDescription>
+          <AlertDialogTitle>Estas seguro que quieres eliminar este Rol?</AlertDialogTitle>
+          <AlertDialogDescription>El usuario perderá sus privilegios.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>No</AlertDialogCancel>
@@ -305,7 +271,7 @@ const RemoveStockAlert = ({
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   if (!session) {
     return {

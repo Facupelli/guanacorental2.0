@@ -1,6 +1,4 @@
 import superjason from "superjson";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
 import { type GetServerSideProps, type NextPage } from "next";
 import Head from "next/head";
 import Nav from "@/components/Nav";
@@ -8,16 +6,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { formatPrice, getIsAdmin } from "@/lib/utils";
 import { prisma } from "@/server/db";
 import { type Prisma } from "@prisma/client";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
 import MostBookedEquipments from "@/components/stats/MostBookedEquipments";
 import OrdersByMonth from "@/components/stats/OrdersByMonth";
 import OrdersByCategory from "@/components/stats/OrdersByCategory";
@@ -39,16 +28,9 @@ import {
 } from "@/components/ui/select";
 import { SelectCategory } from "@/components/ui/SelectCategory";
 import { type TopBookedEquipment } from "@/server/api/routers/stats";
+import { auth } from "auth";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 type Order = {
   categories: string[];
@@ -67,12 +49,7 @@ type StatsPageProps = {
   average: { subtotalAverage: number };
 };
 
-const StatsPage: NextPage<StatsPageProps> = ({
-  locations,
-  categories,
-  average,
-  monthAverage,
-}: StatsPageProps) => {
+const StatsPage: NextPage<StatsPageProps> = ({ locations, categories, average, monthAverage }: StatsPageProps) => {
   const { setValue, watch } = useForm<{
     location: string;
     category: string;
@@ -94,8 +71,9 @@ const StatsPage: NextPage<StatsPageProps> = ({
   //     equipmentId: "cl9h2fv1h0013eoqazquz1j8u",
   //   });
 
-  const { data: topCategoryOrders, isLoading: isLoadingCategoryOrders } =
-    api.stats.getTopCategoryOrders.useQuery({ location: locationId });
+  const { data: topCategoryOrders, isLoading: isLoadingCategoryOrders } = api.stats.getTopCategoryOrders.useQuery({
+    location: locationId,
+  });
 
   return (
     <>
@@ -113,10 +91,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
 
           <div className="flex flex-col gap-6 pt-6">
             <div>
-              <p>
-                Promedio precio alquileres:{" "}
-                {formatPrice(average.subtotalAverage)}
-              </p>
+              <p>Promedio precio alquileres: {formatPrice(average.subtotalAverage)}</p>
               <p>Promedio alquileres mensuales: {monthAverage.avg}</p>
             </div>
 
@@ -125,18 +100,12 @@ const StatsPage: NextPage<StatsPageProps> = ({
             <div className="my-8 flex w-full items-center gap-2 rounded-md bg-white p-4">
               <div className="flex-1 ">
                 <Label>Categoría</Label>
-                <SelectCategory
-                  categories={categories}
-                  setValue={(e) => setValue("category", e)}
-                />
+                <SelectCategory categories={categories} setValue={(e) => setValue("category", e)} />
               </div>
 
               <div className="flex-1 ">
                 <Label>Cantidad de equipos</Label>
-                <Select
-                  onValueChange={(e) => setValue("take", Number(e))}
-                  defaultValue="10"
-                >
+                <Select onValueChange={(e) => setValue("take", Number(e))} defaultValue="10">
                   <SelectTrigger>
                     <SelectValue placeholder="elegir" />
                   </SelectTrigger>
@@ -154,10 +123,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
 
               <div className="flex-1 ">
                 <Label>Sucursal</Label>
-                <AdminSelectLocation
-                  locations={locations}
-                  setValue={(e) => setValue("location", e)}
-                >
+                <AdminSelectLocation locations={locations} setValue={(e) => setValue("location", e)}>
                   <SelectItem value="all">Todas</SelectItem>
                 </AdminSelectLocation>
               </div>
@@ -165,9 +131,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
 
             {!isLoadingTopBookedEquipments && (
               <div className={`${take === 0 ? "h-[4500px]" : "h-[600px]"}`}>
-                <MostBookedEquipments
-                  equipments={topBookedEquipments as TopBookedEquipment[]}
-                />
+                <MostBookedEquipments equipments={topBookedEquipments as TopBookedEquipment[]} />
 
                 {/* NO SE UTILIZARÁ DE MOMENTO */}
                 {/* <MostBookedEquipmentsByDay
@@ -196,7 +160,7 @@ const StatsPage: NextPage<StatsPageProps> = ({
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   if (!session) {
     return {

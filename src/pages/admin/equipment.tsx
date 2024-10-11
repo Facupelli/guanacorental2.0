@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import superjason from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import { getServerSession } from "next-auth";
 import {
   type UseFieldArrayRemove,
   type UseFormRegister,
@@ -13,7 +12,6 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import Head from "next/head";
 import { type GetServerSideProps, type NextPage } from "next";
 import { prisma } from "@/server/db";
-import { authOptions } from "@/server/auth";
 import { appRouter } from "@/server/api/root";
 
 import Nav from "@/components/Nav";
@@ -74,6 +72,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SelectCategory } from "@/components/ui/SelectCategory";
+import { auth } from "auth";
 
 dayjs.locale("es");
 
@@ -100,11 +99,7 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
   {
     title: "Stock",
     cell: (rowData) => {
-      return (
-        <div className="w-[40px]">
-          {rowData.owner.reduce((acc, curr) => acc + curr.stock, 0)}
-        </div>
-      );
+      return <div className="w-[40px]">{rowData.owner.reduce((acc, curr) => acc + curr.stock, 0)}</div>;
     },
   },
   {
@@ -136,11 +131,7 @@ const equipmentColumns: Columns<Equipment, CellProps>[] = [
 
       return (
         <div className="flex justify-center">
-          <Switch
-            checked={rowData.available}
-            title="habilitado"
-            onCheckedChange={(e) => handleChangeAvailability(e)}
-          />
+          <Switch checked={rowData.available} title="habilitado" onCheckedChange={(e) => handleChangeAvailability(e)} />
         </div>
       );
     },
@@ -166,11 +157,7 @@ type Props = {
   categories: Category[];
 };
 
-const EquipmentAdmin: NextPage<Props> = ({
-  locations,
-  owners,
-  categories,
-}: Props) => {
+const EquipmentAdmin: NextPage<Props> = ({ locations, owners, categories }: Props) => {
   const { register, setValue, watch } = useForm<{
     search: string;
     location: string;
@@ -179,9 +166,7 @@ const EquipmentAdmin: NextPage<Props> = ({
 
   const ctx = api.useContext();
 
-  const [equipmentToEdit, setEquipmentToEdit] = useState<Equipment | null>(
-    null
-  );
+  const [equipmentToEdit, setEquipmentToEdit] = useState<Equipment | null>(null);
   const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -255,9 +240,7 @@ const EquipmentAdmin: NextPage<Props> = ({
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = `listado-equipos-guanaco-${dayjs().format(
-            "DD-MM-YYYY"
-          )}.xlsx`;
+          link.download = `listado-equipos-guanaco-${dayjs().format("DD-MM-YYYY")}.xlsx`;
           link.click();
           URL.revokeObjectURL(url);
         }
@@ -302,12 +285,7 @@ const EquipmentAdmin: NextPage<Props> = ({
           title={"Seguro que deseas eliminar el equipo?"}
         >
           <div className="flex justify-end">
-            <Button
-              onClick={() =>
-                equipment && handleDeleteEquipment(equipmentToEdit.id)
-              }
-              variant="destructive"
-            >
+            <Button onClick={() => equipment && handleDeleteEquipment(equipmentToEdit.id)} variant="destructive">
               Eliminar
             </Button>
           </div>
@@ -321,28 +299,18 @@ const EquipmentAdmin: NextPage<Props> = ({
           <h1 className="text-lg font-bold">Equipos</h1>
           <div className="grid items-start gap-6 pt-6 md:flex">
             <div className="grid grow gap-4 rounded-md bg-white p-4">
-              <Input
-                type="search"
-                placeholder="buscar por nombre, marca o modelo"
-                {...register("search")}
-              />
+              <Input type="search" placeholder="buscar por nombre, marca o modelo" {...register("search")} />
               <div className="flex flex-wrap gap-4 md:flex-nowrap">
                 <div className="w-full">
                   <Label>Sucursal</Label>
-                  <AdminSelectLocation
-                    locations={locations}
-                    setValue={(e) => setValue("location", e)}
-                  >
+                  <AdminSelectLocation locations={locations} setValue={(e) => setValue("location", e)}>
                     <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="none">Sin sucursal</SelectItem>
                   </AdminSelectLocation>
                 </div>
                 <div className="w-full">
                   <Label>Categoría</Label>
-                  <SelectCategory
-                    categories={categories}
-                    setValue={(e) => setValue("categoryId", e)}
-                  />
+                  <SelectCategory categories={categories} setValue={(e) => setValue("categoryId", e)} />
                 </div>
               </div>
             </div>
@@ -379,9 +347,7 @@ const EquipmentAdmin: NextPage<Props> = ({
                 cellProps={cellProps}
               />
             )}
-            {data?.equipment.length === 0 && (
-              <div className="p-4">No hay equipos.</div>
-            )}
+            {data?.equipment.length === 0 && <div className="p-4">No hay equipos.</div>}
 
             <Pagination
               totalCount={data?.totalCount ?? 0}
@@ -396,11 +362,7 @@ const EquipmentAdmin: NextPage<Props> = ({
   );
 };
 
-const EquipmentPriceChangeModal = ({
-  categories,
-}: {
-  categories: Category[];
-}) => {
+const EquipmentPriceChangeModal = ({ categories }: { categories: Category[] }) => {
   const {
     register,
     handleSubmit,
@@ -417,11 +379,7 @@ const EquipmentPriceChangeModal = ({
 
   const ctx = api.useContext();
 
-  const handleModifyPrice = (data: {
-    categoryId: string;
-    type: string;
-    percent: string;
-  }) => {
+  const handleModifyPrice = (data: { categoryId: string; type: string; percent: string }) => {
     mutate(data, {
       onSuccess: () => {
         void ctx.equipment.adminGetEquipment.invalidate();
@@ -442,18 +400,13 @@ const EquipmentPriceChangeModal = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Modificar precios por categoría</DialogTitle>
-          <DialogDescription>
-            Aplica un nuevo precio a todos los equipos de una categoría.
-          </DialogDescription>
+          <DialogDescription>Aplica un nuevo precio a todos los equipos de una categoría.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleModifyPrice)}>
           <div className="grid gap-6 py-4">
             <div>
               <Label>Categoría</Label>
-              <SelectCategory
-                categories={categories}
-                setValue={(e) => setValue("categoryId", e)}
-              />
+              <SelectCategory categories={categories} setValue={(e) => setValue("categoryId", e)} />
             </div>
 
             <div>
@@ -461,21 +414,11 @@ const EquipmentPriceChangeModal = ({
               <div>
                 <div className="flex items-center gap-2">
                   <Label className="font-normal">Aumentar</Label>
-                  <Input
-                    type="radio"
-                    value="increase"
-                    className="h-6 w-4"
-                    {...register("type")}
-                  />
+                  <Input type="radio" value="increase" className="h-6 w-4" {...register("type")} />
                 </div>
                 <div className="flex items-center gap-2">
                   <Label className="font-normal">Descontar</Label>
-                  <Input
-                    type="radio"
-                    value="decrease"
-                    className="h-6 w-4"
-                    {...register("type")}
-                  />
+                  <Input type="radio" value="decrease" className="h-6 w-4" {...register("type")} />
                 </div>
               </div>
             </div>
@@ -505,13 +448,7 @@ type OwnerLocationStockProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const OwnerLocationStockModal = ({
-  equipment,
-  locations,
-  owners,
-  isOpen,
-  setOpen,
-}: OwnerLocationStockProps) => {
+const OwnerLocationStockModal = ({ equipment, locations, owners, isOpen, setOpen }: OwnerLocationStockProps) => {
   const {
     register,
     control,
@@ -526,10 +463,8 @@ const OwnerLocationStockModal = ({
 
   const ctx = api.useContext();
 
-  const { mutate, isLoading } =
-    api.equipment.createEquipmentOnOwner.useMutation();
-  const deleteEquipmenOnOwner =
-    api.equipment.deleteEquipmentOnOwner.useMutation();
+  const { mutate, isLoading } = api.equipment.createEquipmentOnOwner.useMutation();
+  const deleteEquipmenOnOwner = api.equipment.deleteEquipmentOnOwner.useMutation();
 
   const onSubmit = (data: OwnerequipmentForm) => {
     const mutateData = {
@@ -580,23 +515,11 @@ const OwnerLocationStockModal = ({
           </div>
           <div className="grid gap-2">
             {equipment.owner?.map((owner) => (
-              <div
-                key={owner.id}
-                className="grid grid-cols-7 items-center gap-2"
-              >
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.owner?.name}
-                </p>
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.location.name}
-                </p>
-                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">
-                  {owner.stock}
-                </p>
-                <RemoveStockAlert
-                  isLoading={isLoading}
-                  handleDeleteStock={() => handleDeleteStock(owner.id)}
-                />
+              <div key={owner.id} className="grid grid-cols-7 items-center gap-2">
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">{owner.owner?.name}</p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">{owner.location.name}</p>
+                <p className="col-span-2 rounded-md border border-input px-3 py-1 text-sm">{owner.stock}</p>
+                <RemoveStockAlert isLoading={isLoading} handleDeleteStock={() => handleDeleteStock(owner.id)} />
               </div>
             ))}
             <div className="pt-4">
@@ -628,11 +551,7 @@ const OwnerLocationStockModal = ({
 
           <div className="flex justify-end pt-4">
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                "Actualizar"
-              )}
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Actualizar"}
             </Button>
           </div>
         </form>
@@ -646,10 +565,7 @@ type RemoveStockAlert = {
   isLoading: boolean;
 };
 
-const RemoveStockAlert = ({
-  handleDeleteStock,
-  isLoading,
-}: RemoveStockAlert) => {
+const RemoveStockAlert = ({ handleDeleteStock, isLoading }: RemoveStockAlert) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -659,20 +575,12 @@ const RemoveStockAlert = ({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Estas seguro que quieres eliminar este stock?
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            Marcará el stock como eliminado, y podrás crear uno nuevo.
-          </AlertDialogDescription>
+          <AlertDialogTitle>Estas seguro que quieres eliminar este stock?</AlertDialogTitle>
+          <AlertDialogDescription>Marcará el stock como eliminado, y podrás crear uno nuevo.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>No</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={isLoading}
-            onClick={handleDeleteStock}
-            className="bg-red-600"
-          >
+          <AlertDialogAction disabled={isLoading} onClick={handleDeleteStock} className="bg-red-600">
             {isLoading ? "Eliminando..." : "Eliminar"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -690,14 +598,7 @@ type FieldArrayProps = {
   remove: UseFieldArrayRemove;
 };
 
-const FieldArray = ({
-  owners,
-  locations,
-  register,
-  index,
-  remove,
-  setValue,
-}: FieldArrayProps) => {
+const FieldArray = ({ owners, locations, register, index, remove, setValue }: FieldArrayProps) => {
   return (
     <section className="grid grid-cols-7 items-center gap-2 rounded-md bg-slate-50 p-2">
       <div className="col-span-2">
@@ -717,11 +618,7 @@ const FieldArray = ({
         })}
         className="col-span-2 h-6"
       />
-      <Button
-        variant="link"
-        className="text-gray-800"
-        onClick={() => remove(index)}
-      >
+      <Button variant="link" className="text-gray-800" onClick={() => remove(index)}>
         <X className="h-3 w-3" />
       </Button>
     </section>
@@ -735,17 +632,9 @@ type SelectOwnerProps = {
   setValue: UseFormSetValue<OwnerequipmentForm>;
 };
 
-const SelectOwner = ({
-  defaultValue,
-  owners,
-  index,
-  setValue,
-}: SelectOwnerProps) => {
+const SelectOwner = ({ defaultValue, owners, index, setValue }: SelectOwnerProps) => {
   return (
-    <Select
-      defaultValue={defaultValue}
-      onValueChange={(e) => setValue(`owner.${index}.ownerId` as const, e)}
-    >
+    <Select defaultValue={defaultValue} onValueChange={(e) => setValue(`owner.${index}.ownerId` as const, e)}>
       <SelectTrigger className="h-6">
         <SelectValue placeholder="elegir" />
       </SelectTrigger>
@@ -838,11 +727,7 @@ type AddEquipmentProps = {
   setShowAddEquipmentModal?: Dispatch<SetStateAction<boolean>>;
 };
 
-const AddEquipment = ({
-  equipment,
-  setEquipmentToEdit,
-  setShowAddEquipmentModal,
-}: AddEquipmentProps) => {
+const AddEquipment = ({ equipment, setEquipmentToEdit, setShowAddEquipmentModal }: AddEquipmentProps) => {
   const { register, handleSubmit, setValue } = useForm<AddEquipmentForm>();
 
   const ctx = api.useContext();
@@ -878,81 +763,42 @@ const AddEquipment = ({
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Label htmlFor="name">Nombre</Label>
-        <Input
-          type="text"
-          id="name"
-          {...register("name")}
-          defaultValue={equipment?.name}
-        />
+        <Input type="text" id="name" {...register("name")} defaultValue={equipment?.name} />
       </div>
 
       <div>
         <Label htmlFor="brand">Marca</Label>
-        <Input
-          type="text"
-          id="brand"
-          {...register("brand")}
-          defaultValue={equipment?.brand}
-        />
+        <Input type="text" id="brand" {...register("brand")} defaultValue={equipment?.brand} />
       </div>
 
       <div>
         <Label htmlFor="model">Modelo</Label>
-        <Input
-          type="text"
-          id="model"
-          {...register("model")}
-          defaultValue={equipment?.model}
-        />
+        <Input type="text" id="model" {...register("model")} defaultValue={equipment?.model} />
       </div>
 
       <div>
         <Label htmlFor="price">Precio</Label>
-        <Input
-          type="text"
-          id="price"
-          {...register("price", { valueAsNumber: true })}
-          defaultValue={equipment?.price}
-        />
+        <Input type="text" id="price" {...register("price", { valueAsNumber: true })} defaultValue={equipment?.price} />
       </div>
 
       <div>
         <Label>Categoría</Label>
-        <SelectEquipmentCategory
-          setValue={setValue}
-          defaultValue={equipment?.categoryId}
-        />
+        <SelectEquipmentCategory setValue={setValue} defaultValue={equipment?.categoryId} />
       </div>
 
       <div>
         <Label htmlFor="image">Imagen</Label>
-        <Input
-          type="text"
-          id="image"
-          {...register("image")}
-          defaultValue={equipment?.image ?? undefined}
-        />
+        <Input type="text" id="image" {...register("image")} defaultValue={equipment?.image ?? undefined} />
       </div>
 
       <div>
         <Label htmlFor="accessories">Accesorios</Label>
-        <Input
-          type="text"
-          id="accessories"
-          {...register("accessories.0")}
-          defaultValue={equipment?.accessories[0]}
-        />
+        <Input type="text" id="accessories" {...register("accessories.0")} defaultValue={equipment?.accessories[0]} />
       </div>
 
       <div className="grid py-6">
         <Button disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : equipment ? (
-            "Actualizar"
-          ) : (
-            "Agregar"
-          )}
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : equipment ? "Actualizar" : "Agregar"}
         </Button>
       </div>
     </form>
@@ -969,10 +815,7 @@ const SelectEquipmentCategory = ({
   const { data } = api.category.getAllCategories.useQuery();
 
   return (
-    <Select
-      onValueChange={(e) => setValue("categoryId", e)}
-      defaultValue={defaultValue}
-    >
+    <Select onValueChange={(e) => setValue("categoryId", e)} defaultValue={defaultValue}>
       <SelectTrigger>
         <SelectValue placeholder="seleccionar categoría" />
       </SelectTrigger>
@@ -991,7 +834,7 @@ const SelectEquipmentCategory = ({
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   const isAdmin = getIsAdmin(session);
 

@@ -27,7 +27,6 @@ const useLocationStore = create<LocationStore>()(
         initializeLocation: () => {
           const { location } = get();
           if (!location.id || !location.name) {
-            console.log("INITIALIZE SHOW LOCATION MODAL");
             set({ showLocationModal: true });
           } else {
             set({ pickupHour: "09:00" });

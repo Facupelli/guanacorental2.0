@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { FacebookIcon, LogOut, Menu, UserCog } from "lucide-react";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import Cart from "./Cart";
 import { useSideMenu } from "@/hooks/useSideMenu";
+import { signOutFromApp } from "actions/auth";
 
 const Nav = () => {
   const router = useRouter();
@@ -72,7 +73,7 @@ const Nav = () => {
 
             {session ? (
               <li>
-                <button onClick={() => void signOut()} className="flex items-center gap-2">
+                <button onClick={signOutFromApp} className="flex items-center gap-2">
                   SALIR
                   <LogOut className="h-4 w-4" />
                 </button>

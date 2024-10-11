@@ -1,5 +1,4 @@
 import superjason from "superjson";
-import { getServerSession } from "next-auth";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { type UseFormRegister, useForm } from "react-hook-form";
@@ -7,7 +6,6 @@ import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
-import { authOptions } from "@/server/auth";
 import Head from "next/head";
 import { useState } from "react";
 
@@ -22,6 +20,7 @@ import { api } from "@/utils/api";
 import { equipmentsList, orderColumns } from "@/lib/order";
 
 import type { Prisma } from "@prisma/client";
+import { auth } from "auth";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -133,15 +132,9 @@ const AdminUserDetail: NextPage = () => {
               </div>
               <div className="ml-auto">
                 {editProfile ? (
-                  <CheckSquare
-                    className="h-5 w-5 cursor-pointer text-green-400"
-                    onClick={handleConfirmEdit}
-                  />
+                  <CheckSquare className="h-5 w-5 cursor-pointer text-green-400" onClick={handleConfirmEdit} />
                 ) : (
-                  <EditIcon
-                    className="h-5 w-5 cursor-pointer"
-                    onClick={() => setEditProfile(true)}
-                  />
+                  <EditIcon className="h-5 w-5 cursor-pointer" onClick={() => setEditProfile(true)} />
                 )}
               </div>
             </section>
@@ -239,11 +232,7 @@ const AdminUserDetail: NextPage = () => {
                   <div className="py-5">Actualmente no hay pedidos</div>
                 ) : (
                   data?.user.orders && (
-                    <DataTable
-                      data={data.user.orders}
-                      columns={orderColumns}
-                      expandedComponent={equipmentsList}
-                    />
+                    <DataTable data={data.user.orders} columns={orderColumns} expandedComponent={equipmentsList} />
                   )
                 )}
 
@@ -264,77 +253,37 @@ const AdminUserDetail: NextPage = () => {
   );
 };
 
-const EditProfile = ({
-  user,
-  register,
-}: {
-  user: User | undefined;
-  register: UseFormRegister<EditUserForm>;
-}) => {
+const EditProfile = ({ user, register }: { user: User | undefined; register: UseFormRegister<EditUserForm> }) => {
   return (
     <div className="grid">
-      <Input
-        type="text"
-        defaultValue={user?.name ?? ""}
-        {...register("fullName")}
-      />
+      <Input type="text" defaultValue={user?.name ?? ""} {...register("fullName")} />
       <p>{user?.email}</p>
       <div className="flex gap-2 text-sm">
-        <Input
-          type="text"
-          defaultValue={user?.address?.province ?? ""}
-          {...register("province")}
-        />
-        <Input
-          type="text"
-          defaultValue={user?.address?.city ?? ""}
-          {...register("city")}
-        />
+        <Input type="text" defaultValue={user?.address?.province ?? ""} {...register("province")} />
+        <Input type="text" defaultValue={user?.address?.city ?? ""} {...register("city")} />
       </div>
     </div>
   );
 };
 
-const EditPersonalInfo = ({
-  user,
-  register,
-}: {
-  user: User | undefined;
-  register: UseFormRegister<EditUserForm>;
-}) => {
+const EditPersonalInfo = ({ user, register }: { user: User | undefined; register: UseFormRegister<EditUserForm> }) => {
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Teléfono</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.phone ?? ""}
-          {...register("phone")}
-        />
+        <Input type="text" defaultValue={user?.address?.phone ?? ""} {...register("phone")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">DNI</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.dni_number ?? ""}
-          {...register("dni_number")}
-        />
+        <Input type="text" defaultValue={user?.address?.dni_number ?? ""} {...register("dni_number")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Dirección</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.address_1 ?? ""}
-          {...register("address_1")}
-        />
+        <Input type="text" defaultValue={user?.address?.address_1 ?? ""} {...register("address_1")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Ocupacción</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.occupation ?? ""}
-          {...register("occupation")}
-        />
+        <Input type="text" defaultValue={user?.address?.occupation ?? ""} {...register("occupation")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Estudiante</p>
@@ -346,34 +295,22 @@ const EditPersonalInfo = ({
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Empresa</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.company ?? ""}
-          {...register("company")}
-        />
+        <Input type="text" defaultValue={user?.address?.company ?? ""} {...register("company")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Cuit</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.cuit ?? ""}
-          {...register("cuit")}
-        />
+        <Input type="text" defaultValue={user?.address?.cuit ?? ""} {...register("cuit")} />
       </div>
       <div className="grid gap-1">
         <p className="text-xs text-primary/60">Razón social</p>
-        <Input
-          type="text"
-          defaultValue={user?.address?.bussines_name ?? ""}
-          {...register("bussinessName")}
-        />
+        <Input type="text" defaultValue={user?.address?.bussines_name ?? ""} {...register("bussinessName")} />
       </div>
     </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
   const { id } = context.query;
 
   if (id) {

@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth";
-import { useSession } from "next-auth/react";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
@@ -36,13 +34,13 @@ import { Input } from "@/components/ui/input";
 import { MoreHorizontal } from "lucide-react";
 
 import { api } from "@/utils/api";
-import { authOptions } from "@/server/auth";
 import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import { type Location, type Prisma, type Role } from "@prisma/client";
 import type { Columns } from "@/types/table";
 import { toArgentinaDate } from "@/lib/dates";
+import { auth } from "auth";
 
 type User = Prisma.UserGetPayload<{
   include: {
@@ -63,9 +61,7 @@ type CellProps = unknown;
 const userColumns: Columns<User, CellProps>[] = [
   {
     title: "Alta",
-    cell: (rowData) => (
-      <div>{toArgentinaDate(rowData.address?.created_at || new Date())}</div>
-    ),
+    cell: (rowData) => <div>{toArgentinaDate(rowData.address?.created_at || new Date())}</div>,
   },
   { title: "Nombre", cell: (rowData) => <div>{rowData.name}</div> },
   { title: "Teléfono", cell: (rowData) => <div>{rowData.address?.phone}</div> },
@@ -86,12 +82,9 @@ type Props = {
 };
 
 const AdminUsers: NextPage<Props> = ({}: Props) => {
-  const { data: session } = useSession();
   const router = useRouter();
   const [, setUser] = useState<User | null>(null);
-  const [petitionUserSelected, setPetitionUser] = useState<PetitionUser | null>(
-    null
-  );
+  const [petitionUserSelected, setPetitionUser] = useState<PetitionUser | null>(null);
 
   const { watch, setValue, register } = useForm<{
     roleId: string;
@@ -132,10 +125,7 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
           <h1 className="text-lg font-bold">CLIENTES</h1>
           <div className=" pt-6">
             <Tabs defaultValue="customers">
-              <TabsList
-                className="mb-4 w-full md:w-1/3"
-                defaultValue="customers"
-              >
+              <TabsList className="mb-4 w-full md:w-1/3" defaultValue="customers">
                 <TabsTrigger value="customers" className="w-full">
                   Clientes
                 </TabsTrigger>
@@ -147,37 +137,20 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
                 <div className="grid grid-cols-12 gap-6">
                   <div className="col-span-12 flex flex-wrap gap-4">
                     <div className="flex w-full items-center gap-4 rounded-md bg-white p-4">
-                      <Input
-                        type="search"
-                        placeholder="buscar por nombre y apellido"
-                        {...register("search")}
-                      />
+                      <Input type="search" placeholder="buscar por nombre y apellido" {...register("search")} />
 
-                      <Label className="whitespace-nowrap">
-                        Rol del cliente
-                      </Label>
-                      {roles.data && (
-                        <SelectRole roles={roles.data} setValue={setValue} />
-                      )}
+                      <Label className="whitespace-nowrap">Rol del cliente</Label>
+                      {roles.data && <SelectRole roles={roles.data} setValue={setValue} />}
                     </div>
                     <div className="col-span-12 ml-auto">
-                      <Button
-                        onClick={handleCreateUser}
-                        className="whitespace-nowrap"
-                      >
+                      <Button onClick={handleCreateUser} className="whitespace-nowrap">
                         Crear Cliente
                       </Button>
                     </div>
                   </div>
 
                   <div className="col-span-12">
-                    {data?.users && (
-                      <DataTable
-                        data={data.users}
-                        setRowData={setUser}
-                        columns={userColumns}
-                      />
-                    )}
+                    {data?.users && <DataTable data={data.users} setRowData={setUser} columns={userColumns} />}
 
                     <Pagination
                       totalCount={data?.totalCount ?? 0}
@@ -194,21 +167,14 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
                     {petitionUsers.data?.map((user) => (
                       <div
                         className={`flex cursor-pointer items-center gap-3 rounded-bl-md rounded-tl-md border-r-[2px] border-app-bg bg-white/60 p-4 hover:bg-white/40 ${
-                          petitionUserSelected?.id === user.id
-                            ? "border-secondary bg-white"
-                            : ""
+                          petitionUserSelected?.id === user.id ? "border-secondary bg-white" : ""
                         }`}
                         onClick={() => setPetitionUser(user)}
                         key={user.id}
                       >
                         {user.image && (
                           <div className="relative h-10 w-10 rounded-full ">
-                            <Image
-                              src={user.image}
-                              fill
-                              alt="profile picture"
-                              style={{ borderRadius: "100%" }}
-                            />
+                            <Image src={user.image} fill alt="profile picture" style={{ borderRadius: "100%" }} />
                           </div>
                         )}
                         <div>
@@ -219,10 +185,7 @@ const AdminUsers: NextPage<Props> = ({}: Props) => {
                     ))}
                   </div>
                   {petitionUserSelected && (
-                    <UserPetitionInfo
-                      user={petitionUserSelected}
-                      setPetitionUser={setPetitionUser}
-                    />
+                    <UserPetitionInfo user={petitionUserSelected} setPetitionUser={setPetitionUser} />
                   )}
                 </div>
               </TabsContent>
@@ -317,10 +280,7 @@ const UserPetitionInfo = ({
   };
 
   return (
-    <div
-      key={user.id}
-      className="col-span-3 grid gap-5 rounded-md bg-white sm:col-span-2"
-    >
+    <div key={user.id} className="col-span-3 grid gap-5 rounded-md bg-white sm:col-span-2">
       <div className="grid gap-6 p-6">
         <div className="grid grid-cols-3 sm:grid-cols-4">
           <div>
@@ -359,23 +319,13 @@ const UserPetitionInfo = ({
         <div className="grid grid-cols-4 gap-y-4">
           {user.address?.dni_front && (
             <div className="relative col-span-4 aspect-video w-full rounded sm:col-span-2 sm:w-[260px]">
-              <Image
-                src={user.address?.dni_front}
-                alt="dni_front"
-                fill
-                style={{ borderRadius: 5 }}
-              />
+              <Image src={user.address?.dni_front} alt="dni_front" fill style={{ borderRadius: 5 }} />
             </div>
           )}
 
           {user.address?.dni_back && (
             <div className="relative col-span-4 aspect-video w-full rounded sm:col-span-2 sm:w-[260px]">
-              <Image
-                src={user.address?.dni_back}
-                alt="dni_front"
-                fill
-                style={{ borderRadius: 5 }}
-              />
+              <Image src={user.address?.dni_back} alt="dni_front" fill style={{ borderRadius: 5 }} />
             </div>
           )}
         </div>
@@ -388,16 +338,12 @@ const UserPetitionInfo = ({
 
           <div>
             <p className="text-sm text-primary/60">Estudiante</p>
-            <p className="font-semibold">
-              {user.address?.student ? "Si" : "No"}
-            </p>
+            <p className="font-semibold">{user.address?.student ? "Si" : "No"}</p>
           </div>
 
           <div>
             <p className="text-sm text-primary/60">Empleado</p>
-            <p className="font-semibold">
-              {user.address?.employee ? "Si" : "No"}
-            </p>
+            <p className="font-semibold">{user.address?.employee ? "Si" : "No"}</p>
           </div>
 
           <div>
@@ -459,7 +405,7 @@ const UserPetitionInfo = ({
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   if (!session) {
     return {

@@ -1,6 +1,5 @@
 import superjason from "superjson";
 import { useForm } from "react-hook-form";
-import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -9,7 +8,6 @@ import { prisma } from "@/server/db";
 import { type GetServerSideProps, type NextPage } from "next";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "@/server/api/root";
-import { authOptions } from "@/server/auth";
 import Head from "next/head";
 
 import Nav from "@/components/Nav";
@@ -39,6 +37,7 @@ import { formatPrice, getIsAdmin } from "@/lib/utils";
 import useDebounce from "@/hooks/useDebounce";
 
 import type { Location, Prisma, Role } from "@prisma/client";
+import { auth } from "auth";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -119,12 +118,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                   }}
                 />
 
-                {order.earning && (
-                  <EquipmentsBooked
-                    equipments={order.equipments}
-                    order={order}
-                  />
-                )}
+                {order.earning && <EquipmentsBooked equipments={order.equipments} order={order} />}
 
                 <OrderInfo
                   info={{
@@ -153,18 +147,10 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
                     />
 
                     <section className="grid gap-2 rounded-md border border-red-400 p-4">
-                      <h2 className="pb-2 text-lg font-semibold">
-                        Cancelar Pedido
-                      </h2>
-                      <p>
-                        El pedido será cancelado. Se notificará al usuario via
-                        correo electrónico.
-                      </p>
+                      <h2 className="pb-2 text-lg font-semibold">Cancelar Pedido</h2>
+                      <p>El pedido será cancelado. Se notificará al usuario via correo electrónico.</p>
                       <div>
-                        <CancelOrderAlert
-                          bookId={order.bookId}
-                          orderId={order.id}
-                        />
+                        <CancelOrderAlert bookId={order.bookId} orderId={order.id} />
                       </div>
                     </section>
                   </>
@@ -178,13 +164,7 @@ const AdminOrderDetail: NextPage<Props> = ({}: Props) => {
   );
 };
 
-const CancelOrderAlert = ({
-  bookId,
-  orderId,
-}: {
-  bookId: string;
-  orderId: string;
-}) => {
+const CancelOrderAlert = ({ bookId, orderId }: { bookId: string; orderId: string }) => {
   const router = useRouter();
   const { mutate, isLoading } = api.order.deleteOrderById.useMutation();
 
@@ -209,12 +189,9 @@ const CancelOrderAlert = ({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Estas seguro que quieres cancelar el pedido?
-          </AlertDialogTitle>
+          <AlertDialogTitle>Estas seguro que quieres cancelar el pedido?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no puede deshacerse. Borrará el pedido permanetemente de
-            la base de datos.
+            Esta acción no puede deshacerse. Borrará el pedido permanetemente de la base de datos.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -308,10 +285,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
   const ctx = api.useContext();
   const { mutate } = api.order.removeEquipmentFromOrder.useMutation();
 
-  const handleDeleteEquipment = (
-    bookId: string,
-    ownerEquipment: EquipmentOwner
-  ) => {
+  const handleDeleteEquipment = (bookId: string, ownerEquipment: EquipmentOwner) => {
     if (order.earning?.id) {
       const data = {
         orderId: order.id,
@@ -334,16 +308,8 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
 
   return (
     <>
-      <DialogWithState
-        isOpen={addEquipment}
-        setOpen={setAddEquipment}
-        title="Argegar equipo al pedido"
-      >
-        <Input
-          placeholder="buscar equipo"
-          type="search"
-          {...register("search")}
-        />
+      <DialogWithState isOpen={addEquipment} setOpen={setAddEquipment} title="Argegar equipo al pedido">
+        <Input placeholder="buscar equipo" type="search" {...register("search")} />
 
         <div className="grid gap-2">
           {data?.equipments.map((equipment) => (
@@ -381,10 +347,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                 onClick={() => setEditEquipmentMode(false)}
               />
             ) : (
-              <EditIcon
-                className="h-5 w-5 cursor-pointer"
-                onClick={() => setEditEquipmentMode(true)}
-              />
+              <EditIcon className="h-5 w-5 cursor-pointer" onClick={() => setEditEquipmentMode(true)} />
             )}
           </div>
         </div>
@@ -401,17 +364,10 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
 
           <div className="grid gap-4 ">
             {equipments.map((ownerEquipment) => (
-              <div
-                key={ownerEquipment.id}
-                className="grid grid-cols-9 items-center gap-x-2"
-              >
+              <div key={ownerEquipment.id} className="grid grid-cols-9 items-center gap-x-2">
                 {ownerEquipment.equipment.image ? (
                   <div className="relative col-span-1 h-12 w-12">
-                    <Image
-                      src={ownerEquipment.equipment.image}
-                      alt="equipment picture"
-                      fill
-                    />
+                    <Image src={ownerEquipment.equipment.image} alt="equipment picture" fill />
                   </div>
                 ) : (
                   <div />
@@ -422,9 +378,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                     <p>{ownerEquipment.equipment.name}</p>
                     <p>{ownerEquipment.equipment.brand}</p>
                   </div>
-                  <p className="text-sm text-primary/70">
-                    {ownerEquipment.equipment.model}
-                  </p>
+                  <p className="text-sm text-primary/70">{ownerEquipment.equipment.model}</p>
                 </div>
 
                 <p className=" pl-6 font-semibold">
@@ -434,9 +388,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                   }, 0)}
                 </p>
 
-                <p className="text-xs">
-                  {formatPrice(ownerEquipment.equipment.price)}
-                </p>
+                <p className="text-xs">{formatPrice(ownerEquipment.equipment.price)}</p>
                 <p className="col-span-1 text-xs">
                   {formatPrice(
                     ownerEquipment.equipment.price *
@@ -460,9 +412,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
                   <Button
                     variant="secondary"
                     className="col-span-1 bg-transparent"
-                    onClick={() =>
-                      handleDeleteEquipment(order.bookId, ownerEquipment)
-                    }
+                    onClick={() => handleDeleteEquipment(order.bookId, ownerEquipment)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -473,12 +423,7 @@ const EquipmentsBooked = ({ equipments, order }: EquipmentsBookedProps) => {
         </div>
 
         {editEquipmentMode && (
-          <Button
-            onClick={() => setAddEquipment(true)}
-            className="flex w-1/4 gap-2"
-            size="sm"
-            variant="secondary"
-          >
+          <Button onClick={() => setAddEquipment(true)} className="flex w-1/4 gap-2" size="sm" variant="secondary">
             Agregar equipos <Plus className="h-4 w-4" />
           </Button>
         )}
@@ -507,13 +452,7 @@ type AddEquipmentProps = {
   discountId: string | null;
 };
 
-const AddEquipment = ({
-  equipment,
-  bookId,
-  orderId,
-  earningId,
-  discountId,
-}: AddEquipmentProps) => {
+const AddEquipment = ({ equipment, bookId, orderId, earningId, discountId }: AddEquipmentProps) => {
   const { register, getValues } = useForm<{ quantity: number }>();
 
   const ctx = api.useContext();
@@ -556,11 +495,7 @@ const AddEquipment = ({
       <p>
         {equipment.name} {equipment.brand} {equipment.model}
       </p>
-      <Input
-        type="text"
-        className="ml-auto w-[40px]"
-        {...register("quantity", { valueAsNumber: true })}
-      />
+      <Input type="text" className="ml-auto w-[40px]" {...register("quantity", { valueAsNumber: true })} />
       <Plus className="h-4 w-4 cursor-pointer" onClick={handleAddEquipment} />
     </div>
   );
@@ -596,13 +531,7 @@ type OrderInfoProps = {
   orderId: string;
 };
 
-const OrderInfo = ({
-  info,
-  discount,
-  setDiscount,
-  location,
-  orderId,
-}: OrderInfoProps) => {
+const OrderInfo = ({ info, discount, setDiscount, location, orderId }: OrderInfoProps) => {
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [editInfo, setEditInfo] = useState(false);
 
@@ -624,15 +553,9 @@ const OrderInfo = ({
           <h2 className="text-lg font-semibold">Información del pedido</h2>
           <div className="ml-auto">
             {editInfo ? (
-              <CheckSquare
-                className="h-5 w-5 cursor-pointer text-green-400"
-                onClick={() => setEditInfo(false)}
-              />
+              <CheckSquare className="h-5 w-5 cursor-pointer text-green-400" onClick={() => setEditInfo(false)} />
             ) : (
-              <EditIcon
-                className="h-5 w-5 cursor-pointer"
-                onClick={() => setEditInfo(true)}
-              />
+              <EditIcon className="h-5 w-5 cursor-pointer" onClick={() => setEditInfo(true)} />
             )}
           </div>
         </div>
@@ -681,10 +604,7 @@ const OrderInfo = ({
             <div className="flex items-center gap-4">
               <p className="text-xs text-primary/60">Descuento</p>
               {editInfo && (
-                <Button
-                  className="h-5 px-2 text-xs"
-                  onClick={() => setShowCouponModal(true)}
-                >
+                <Button className="h-5 px-2 text-xs" onClick={() => setShowCouponModal(true)}>
                   Aplicar
                 </Button>
               )}
@@ -737,7 +657,7 @@ const EarningsInfo = ({ oscar, federico, sub }: EarningsInfoProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
   const { id } = context.query;
 
   if (id && session) {

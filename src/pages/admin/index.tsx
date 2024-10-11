@@ -1,5 +1,4 @@
 import { es } from "date-fns/locale";
-import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,14 +12,8 @@ import SelectLocation from "@/components/ui/SelectLocation";
 import { SelectItem } from "@/components/ui/select";
 import DataTable from "@/components/ui/data-table";
 
-import { authOptions } from "@/server/auth";
 import { api } from "@/utils/api";
-import {
-  cn,
-  getIsAdmin,
-  getIsEmployee,
-  handleAdminLocationChange,
-} from "@/lib/utils";
+import { cn, getIsAdmin, getIsEmployee, handleAdminLocationChange } from "@/lib/utils";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
 import { equipmentsList, orderColumns } from "@/lib/order";
 
@@ -29,6 +22,7 @@ import { type Prisma } from "@prisma/client";
 import { buttonVariants } from "@/components/ui/button";
 import { useAdminCalendarDay, useAdminStoreActions } from "stores/admin.store";
 import { useLocation, useLocationStoreActions } from "stores/location.store";
+import { auth } from "auth";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -96,11 +90,7 @@ const Admin: NextPage = () => {
 
   const isPickupDay = (date: Date) => {
     const localDate = dayjs(date);
-    if (
-      data?.find((order) =>
-        dayjs(order.book.start_date).isSame(localDate, "day")
-      )
-    ) {
+    if (data?.find((order) => dayjs(order.book.start_date).isSame(localDate, "day"))) {
       return true;
     }
     return false;
@@ -109,11 +99,7 @@ const Admin: NextPage = () => {
   const isReturnDay = (date: Date) => {
     const localDate = dayjs(date);
 
-    if (
-      data?.find((order) =>
-        dayjs(order.book.end_date).isSame(dayjs(localDate), "day")
-      )
-    ) {
+    if (data?.find((order) => dayjs(order.book.end_date).isSame(dayjs(localDate), "day"))) {
       return true;
     }
     return false;
@@ -124,9 +110,7 @@ const Admin: NextPage = () => {
       data?.find(
         (order) =>
           dayjs(order.book.end_date).isSame(dayjs(date), "day") &&
-          data.find((order) =>
-            dayjs(order.book.start_date).isSame(dayjs(date), "day")
-          )
+          data.find((order) => dayjs(order.book.start_date).isSame(dayjs(date), "day"))
       )
     ) {
       return true;
@@ -156,9 +140,7 @@ const Admin: NextPage = () => {
                   locations={locations.data}
                   placeholder="elegir"
                   defaultValue={`${location.id}-${location.name}`}
-                  onValueChange={(e) =>
-                    handleAdminLocationChange(e, setLocation)
-                  }
+                  onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
                 >
                   <SelectItem value="all-all">Todos</SelectItem>
                 </SelectLocation>
@@ -219,8 +201,7 @@ const Admin: NextPage = () => {
                   <p>Devolución y Retiro de equipos</p>
                 </div>
                 <div className="py-4 text-primary/60">
-                  Selecciona una fecha para ver los pedidos que se retiran o
-                  devuelven ese mismo día.
+                  Selecciona una fecha para ver los pedidos que se retiran o devuelven ese mismo día.
                 </div>
               </div>
             </div>
@@ -242,7 +223,7 @@ const Admin: NextPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   if (!session) {
     return {

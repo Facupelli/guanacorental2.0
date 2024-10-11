@@ -1,11 +1,10 @@
-import { authOptions } from "@/server/auth";
 import { initTRPC, TRPCError } from "@trpc/server";
-import { getServerSession } from "next-auth";
 import { equipmentRouter } from "./routers/equipment";
 import { locationRouter } from "./routers/location";
 import { categoryRouter } from "./routers/category";
 import { orderRouter } from "./routers/order";
 import { userRouter } from "./routers/user";
+import { auth } from "auth";
 
 const t = initTRPC.create();
 
@@ -13,7 +12,7 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 const isAuthed = t.middleware(async ({ next }) => {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }

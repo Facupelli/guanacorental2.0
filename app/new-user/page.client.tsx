@@ -4,13 +4,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Dispatch, type SetStateAction, useEffect, useState, useRef } from "react";
-import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
-import { authOptions } from "@/server/auth";
 
-import Nav from "@/components/Nav";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,12 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import DialogWithState from "@/components/DialogWithState";
 
-import { api } from "@/utils/api";
 import { validationAddress } from "@/lib/validation";
 import { getIsAdmin } from "@/lib/utils";
-import { getServerSession } from "next-auth";
 
-import { type GetServerSideProps, type NextPage } from "next";
 import { type Role } from "@prisma/client";
 import { trpc } from "utils/trpc";
 

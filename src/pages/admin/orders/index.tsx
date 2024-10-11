@@ -1,4 +1,3 @@
-import { getServerSession } from "next-auth";
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import Head from "next/head";
 import { useState } from "react";
@@ -6,14 +5,7 @@ import { useState } from "react";
 import Nav from "@/components/Nav";
 import AdminLayout from "@/components/layout/AdminLayout";
 import SelectLocation from "@/components/ui/SelectLocation";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import Pagination from "@/components/ui/Pagination";
 import DataTable from "@/components/ui/data-table";
@@ -22,22 +14,15 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import { ADMIN_ORDERS_SORT } from "@/lib/constants";
 import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import {
-  getIsAdmin,
-  getIsEmployee,
-  handleAdminLocationChange,
-} from "@/lib/utils";
+import { getIsAdmin, getIsEmployee, handleAdminLocationChange } from "@/lib/utils";
 import { orderColumns, equipmentsList } from "@/lib/order";
-import { authOptions } from "@/server/auth";
 import useDebounce from "@/hooks/useDebounce";
 
 import { type GetServerSideProps, type NextPage } from "next";
 import { type Prisma } from "@prisma/client";
 import { useLocation, useLocationStoreActions } from "stores/location.store";
-import {
-  useAdminOrdersCurrentPage,
-  useAdminStoreActions,
-} from "stores/admin.store";
+import { useAdminOrdersCurrentPage, useAdminStoreActions } from "stores/admin.store";
+import { auth } from "auth";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -108,21 +93,14 @@ const AdminOrders: NextPage = () => {
                   locations={locations.data}
                   placeholder="elegir"
                   defaultValue={`${location.id}-${location.name}`}
-                  onValueChange={(e) =>
-                    handleAdminLocationChange(e, setLocation)
-                  }
+                  onValueChange={(e) => handleAdminLocationChange(e, setLocation)}
                 >
                   <SelectItem value="all-all">Todos</SelectItem>
                 </SelectLocation>
               )}
               <Label className="whitespace-nowrap	">Ordenar por:</Label>
               <SelectSortOrders setValue={setValue} />
-              <Input
-                type="search"
-                placeholder="buscar por número"
-                {...register("search")}
-                defaultValue={undefined}
-              />
+              <Input type="search" placeholder="buscar por número" {...register("search")} defaultValue={undefined} />
             </div>
             <div className="col-span-12">
               {filteredOrders && (
@@ -154,21 +132,14 @@ type SelectSortOrdersProps = {
 
 const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
   return (
-    <Select
-      defaultValue={ADMIN_ORDERS_SORT["NEXT ORDERS"]}
-      onValueChange={(e) => setValue("sort", e)}
-    >
+    <Select defaultValue={ADMIN_ORDERS_SORT["NEXT ORDERS"]} onValueChange={(e) => setValue("sort", e)}>
       <SelectTrigger>
         <SelectValue placeholder="elegir" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value={ADMIN_ORDERS_SORT["NEXT ORDERS"]}>
-            Próximos pedidos a entregar
-          </SelectItem>
-          <SelectItem value={ADMIN_ORDERS_SORT["LAST ORDERS"]}>
-            Últimos pedidos
-          </SelectItem>
+          <SelectItem value={ADMIN_ORDERS_SORT["NEXT ORDERS"]}>Próximos pedidos a entregar</SelectItem>
+          <SelectItem value={ADMIN_ORDERS_SORT["LAST ORDERS"]}>Últimos pedidos</SelectItem>
           <SelectItem value={ADMIN_ORDERS_SORT.HISTORY}>Historial</SelectItem>
         </SelectGroup>
       </SelectContent>
@@ -177,7 +148,7 @@ const SelectSortOrders = ({ setValue }: SelectSortOrdersProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await auth(context);
 
   if (!session) {
     return {
