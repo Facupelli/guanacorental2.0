@@ -2,7 +2,6 @@ import { serverTrpc } from "utils/serverTrpc";
 import type { Category, Location } from "@/types/models";
 import ShowLocationDialog from "./_components/dialog/showLocationDialog";
 import Cart from "@/components/Cart";
-import Nav from "./_components/nav";
 import { LeftBar } from "./_components/home/leftBar.home";
 import Filters from "./_components/home/filters.home";
 import SelectOrder from "./_components/home/selectOrder.home";
@@ -18,7 +17,6 @@ export default async function HomePage() {
   return (
     <>
       <ShowLocationDialog locations={locations} />
-      <Nav />
       <Cart />
 
       <main className="min-h-screen bg-app-bg px-4 pt-[70px] sm:px-6">

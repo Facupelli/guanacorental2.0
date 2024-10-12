@@ -8,6 +8,7 @@ import { Providers } from "providers/providers";
 import ClientInitializer from "hooks/client-initializer";
 import { type Metadata } from "next";
 import Script from "next/script";
+import Nav from "./_components/nav";
 
 const panton = localFont({
   src: [
@@ -76,6 +77,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={panton.className}>
         <Providers>
           <ClientInitializer />
+
+          <Nav />
           <div>{children}</div>
         </Providers>
       </body>

@@ -29,6 +29,7 @@ const Cart = ({ trigger }: { trigger?: boolean }) => {
 
   const handleGoToCartPage = () => {
     void router.push("/cart");
+    setShowCartModal(false);
   };
 
   return (
