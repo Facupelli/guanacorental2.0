@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import dayjs from "dayjs";
 import { z } from "zod";
@@ -28,9 +28,7 @@ type OrderQuery = {
 
 export const rentRouter = createTRPCRouter({
   getTotal: protectedProcedure
-    .input(
-      z.object({ month: z.string(), year: z.string(), location: z.string() })
-    )
+    .input(z.object({ month: z.string(), year: z.string(), location: z.string() }))
     .query(async ({ input }) => {
       const { month, year, location } = input;
 
@@ -52,9 +50,7 @@ export const rentRouter = createTRPCRouter({
           },
         };
       } else if (month !== "all" || year !== "all") {
-        const firstMonthDay = dayjs(`${year}-${month}`)
-          .startOf("month")
-          .toDate();
+        const firstMonthDay = dayjs(`${year}-${month}`).startOf("month").toDate();
         const lastMonthDay = dayjs(`${year}-${month}`).endOf("month").toDate();
 
         orderQuery.where = {

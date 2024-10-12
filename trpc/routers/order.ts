@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import { getEquipmentOnOwnerIds, getOrderEquipmentOnOwners } from "@/server/utils/order";

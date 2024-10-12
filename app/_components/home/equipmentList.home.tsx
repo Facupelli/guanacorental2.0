@@ -17,9 +17,9 @@ import type { Equipment } from "@/types/models";
 import { useLocation } from "stores/location.store";
 import { useEndDate, useStartDate } from "stores/date.store";
 import { useCartItems, useCartStoreActions } from "stores/cart.store";
-import { trpc } from "utils/trpc";
 import { useSearchParams } from "next/navigation";
 import { LocationName } from "@/lib/constants";
+import { trpc } from "trpc/client";
 
 export default function EquipmentList() {
   const { ref, inView } = useInView();

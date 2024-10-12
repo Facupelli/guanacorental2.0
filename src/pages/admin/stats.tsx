@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SelectCategory } from "@/components/ui/SelectCategory";
-import { type TopBookedEquipment } from "@/server/api/routers/stats";
+import { type TopBookedEquipment } from "trpc/routers/stats";
 import { auth } from "auth";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);

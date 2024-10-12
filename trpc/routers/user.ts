@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import { validationAddress } from "@/lib/validation";
 import { z } from "zod";
@@ -259,11 +259,7 @@ export const userRouter = createTRPCRouter({
       });
 
       if (user && user.email && customerApproved) {
-        await sendMail(
-          { email: user.email },
-          "customerApproved.handlebars",
-          "ALTA DE CLIENTE"
-        );
+        await sendMail({ email: user.email }, "customerApproved.handlebars", "ALTA DE CLIENTE");
       }
 
       return { message: "success", user };

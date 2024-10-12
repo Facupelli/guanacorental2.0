@@ -31,7 +31,7 @@ import Link from "next/link";
 import { useCartItems, useCartStoreActions } from "stores/cart.store";
 import { useEndDate, usePickupHour, useStartDate } from "stores/date.store";
 import { useLocation } from "stores/location.store";
-import { trpc } from "utils/trpc";
+import { trpc } from "trpc/client";
 
 type Discount = {
   value: number;
@@ -70,7 +70,7 @@ export default function RightBar() {
 
   const datesAreWeekend = disableWeekend(startDate, endDate);
 
-  const { mutate, isLoading } = trpc.order.createOrder.useMutation();
+  const { mutate, isPending } = trpc.order.createOrder.useMutation();
 
   const workingDays = useMemo(() => {
     if (startDate && endDate) {
@@ -289,15 +289,15 @@ export default function RightBar() {
           <div className="grid gap-2">
             <Button
               disabled={
-                cartItems.length <= 0 || !startDate || !endDate || isLoading || !areAllItemsAvailable || datesAreWeekend
+                cartItems.length <= 0 || !startDate || !endDate || isPending || !areAllItemsAvailable || datesAreWeekend
               }
               onClick={handleBookOrder}
             >
               <div className="grid">
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {(!startDate || !endDate) && <p>Selecciona una fecha para alquilar!</p>}
                 {cartItems.length <= 0 && <p>Tu carrito está vacío!</p>}
-                {cartItems.length > 0 && startDate && endDate && !isLoading && <p>Agendar Pedido</p>}
+                {cartItems.length > 0 && startDate && endDate && !isPending && <p>Agendar Pedido</p>}
               </div>
             </Button>
           </div>

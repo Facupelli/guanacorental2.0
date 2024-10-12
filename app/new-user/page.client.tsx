@@ -18,7 +18,7 @@ import { validationAddress } from "@/lib/validation";
 import { getIsAdmin } from "@/lib/utils";
 
 import { type Role } from "@prisma/client";
-import { trpc } from "utils/trpc";
+import { trpc } from "utils/clientTrpc";
 
 type NewUserFormData = {
   email?: string;

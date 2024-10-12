@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import { SORT_TYPES } from "@/lib/constants";
 import { TRPCError } from "@trpc/server";
@@ -53,8 +49,7 @@ export const equipmentRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const { name, brand, model, image, categoryId, accessories, price } =
-        input;
+      const { name, brand, model, image, categoryId, accessories, price } = input;
 
       const newEquipment = await prisma.equipment.create({
         data: {
@@ -100,16 +95,7 @@ export const equipmentRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const {
-        name,
-        brand,
-        model,
-        image,
-        price,
-        equipmentId,
-        categoryId,
-        accessories,
-      } = input;
+      const { name, brand, model, image, price, equipmentId, categoryId, accessories } = input;
 
       await prisma.equipment.update({
         where: { id: equipmentId },
@@ -128,42 +114,38 @@ export const equipmentRouter = createTRPCRouter({
       return { message: "success" };
     }),
 
-  deleteEquipmentOnOwner: protectedProcedure
-    .input(z.object({ ownerId: z.string() }))
-    .mutation(async ({ input }) => {
-      const { ownerId } = input;
+  deleteEquipmentOnOwner: protectedProcedure.input(z.object({ ownerId: z.string() })).mutation(async ({ input }) => {
+    const { ownerId } = input;
 
-      if (!ownerId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "missing ownerId",
-        });
-      }
-
-      await prisma.equipmentOnOwner.update({
-        where: { id: ownerId },
-        data: {
-          deleted: true,
-        },
+    if (!ownerId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "missing ownerId",
       });
+    }
 
-      return { message: "success" };
-    }),
+    await prisma.equipmentOnOwner.update({
+      where: { id: ownerId },
+      data: {
+        deleted: true,
+      },
+    });
 
-  deleteEquipment: protectedProcedure
-    .input(z.object({ equipmentId: z.string() }))
-    .mutation(async ({ input }) => {
-      const { equipmentId } = input;
+    return { message: "success" };
+  }),
 
-      const equipment = await prisma.equipment.update({
-        where: { id: equipmentId },
-        data: {
-          deleted: true,
-        },
-      });
+  deleteEquipment: protectedProcedure.input(z.object({ equipmentId: z.string() })).mutation(async ({ input }) => {
+    const { equipmentId } = input;
 
-      return { message: "success", equipment };
-    }),
+    const equipment = await prisma.equipment.update({
+      where: { id: equipmentId },
+      data: {
+        deleted: true,
+      },
+    });
+
+    return { message: "success", equipment };
+  }),
 
   createEquipmentOnOwner: protectedProcedure
     .input(

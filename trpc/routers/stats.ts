@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import { type Prisma } from "@prisma/client";
 import { z } from "zod";
@@ -129,9 +129,7 @@ export const statsRouter = createTRPCRouter({
 
       const categoryOrders = ordersWithCategories.map((order) => ({
         total: order.total,
-        categories: order.equipments.map(
-          (equipment) => equipment.equipment.category.name
-        ),
+        categories: order.equipments.map((equipment) => equipment.equipment.category.name),
       }));
 
       return categoryOrders;

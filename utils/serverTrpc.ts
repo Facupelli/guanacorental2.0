@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { type AppRouter } from "server/trpc";
+import type { AppRouter } from "trpc/routers";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return "";

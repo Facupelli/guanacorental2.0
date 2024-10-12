@@ -15,13 +15,13 @@
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
+// import { type Session } from "next-auth";
 
-import { prisma } from "@/server/db";
+// import { prisma } from "@/server/db";
 
-type CreateContextOptions = {
-  session: Session | null;
-};
+// type CreateContextOptions = {
+//   session: Session | null;
+// };
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -33,12 +33,12 @@ type CreateContextOptions = {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
-  return {
-    session: opts.session,
-    prisma,
-  };
-};
+// const createInnerTRPCContext = (opts: CreateContextOptions) => {
+//   return {
+//     session: opts.session,
+//     prisma,
+//   };
+// };
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -46,16 +46,16 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+export const createTRPCContext = cache(async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await auth(req, res);
 
-  return createInnerTRPCContext({
+  return {
     session,
-  });
-};
+  };
+});
 
 /**
  * 2. INITIALIZATION
@@ -68,6 +68,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { auth } from "auth";
+import { cache } from "react";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -81,6 +82,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     };
   },
 });
+
+export const createCallerFactory = t.createCallerFactory;
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)

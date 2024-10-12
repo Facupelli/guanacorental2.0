@@ -1,5 +1,5 @@
 import { calculateTotalWithDiscount, getDiscountStatus } from "@/lib/utils";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "trpc/init";
 import { prisma } from "@/server/db";
 import { calculateOwnerEarning } from "@/server/utils/order";
 import { TRPCError } from "@trpc/server";
@@ -22,17 +22,7 @@ export const discountRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const {
-        code,
-        endsAt,
-        startsAt,
-        locationIds,
-        usageLimit,
-        typeId,
-        value,
-        description,
-        minTotal,
-      } = input;
+      const { code, endsAt, startsAt, locationIds, usageLimit, typeId, value, description, minTotal } = input;
 
       const location = locationIds.map((id) => ({ id }));
 
@@ -61,29 +51,27 @@ export const discountRouter = createTRPCRouter({
       return discount;
     }),
 
-  getAllDiscounts: protectedProcedure
-    .input(z.object({ status: z.string() }))
-    .query(async ({}) => {
-      const discounts = await prisma.discount.findMany({
-        include: {
-          rule: {
-            include: {
-              type: true,
-            },
+  getAllDiscounts: protectedProcedure.input(z.object({ status: z.string() })).query(async ({}) => {
+    const discounts = await prisma.discount.findMany({
+      include: {
+        rule: {
+          include: {
+            type: true,
           },
-          location: true,
         },
-      });
+        location: true,
+      },
+    });
 
-      const discountsWithStatus = discounts.map((discount) => ({
-        ...discount,
-        status: getDiscountStatus(discount),
-      }));
+    const discountsWithStatus = discounts.map((discount) => ({
+      ...discount,
+      status: getDiscountStatus(discount),
+    }));
 
-      const types = await prisma.discountType.findMany();
+    const types = await prisma.discountType.findMany();
 
-      return { discounts: discountsWithStatus, types };
-    }),
+    return { discounts: discountsWithStatus, types };
+  }),
 
   apllyDiscountToOrder: protectedProcedure
     .input(
@@ -168,9 +156,7 @@ export const discountRouter = createTRPCRouter({
     }),
 
   getValidDiscountByCode: protectedProcedure
-    .input(
-      z.object({ code: z.string(), location: z.string(), total: z.number() })
-    )
+    .input(z.object({ code: z.string(), location: z.string(), total: z.number() }))
     .mutation(async ({ input }) => {
       const { code, location, total } = input;
 
@@ -200,9 +186,7 @@ export const discountRouter = createTRPCRouter({
         });
       }
 
-      if (
-        !discount?.location?.map((location) => location.id).includes(location)
-      ) {
+      if (!discount?.location?.map((location) => location.id).includes(location)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "El cupón no es aplicabale a esta sucursal",

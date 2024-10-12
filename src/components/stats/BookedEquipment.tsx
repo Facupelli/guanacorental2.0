@@ -1,4 +1,4 @@
-import { type BookedEquipment as BookedEquipmentType } from "@/server/api/routers/stats";
+import { type BookedEquipment as BookedEquipmentType } from "trpc/routers/stats";
 import { Bar } from "react-chartjs-2";
 
 const options = {
@@ -20,14 +20,8 @@ const options = {
   },
 };
 
-export default function BookedEquipment({
-  equipments,
-}: {
-  equipments: BookedEquipmentType[];
-}) {
-  const labels = equipments.map(
-    (equipment) => `${equipment.name} ${equipment.model}`
-  );
+export default function BookedEquipment({ equipments }: { equipments: BookedEquipmentType[] }) {
+  const labels = equipments.map((equipment) => `${equipment.name} ${equipment.model}`);
 
   function groupOwnersByLocation(equipments: BookedEquipmentType[]) {
     const result: { [key: string]: number } = {};

@@ -1,4 +1,3 @@
-import { serverTrpc } from "utils/serverTrpc";
 import type { Category, Location } from "@/types/models";
 import ShowLocationDialog from "./_components/dialog/showLocationDialog";
 import Cart from "@/components/Cart";
@@ -7,12 +6,13 @@ import Filters from "./_components/home/filters.home";
 import SelectOrder from "./_components/home/selectOrder.home";
 import EquipmentList from "./_components/home/equipmentList.home";
 import { Suspense } from "react";
+import { serverTrpc } from "utils/serverTrpc";
 
 export default async function HomePage() {
   const locations: Location[] = await serverTrpc.location.getAllLocations.query();
   const categories: Category[] = await serverTrpc.category.getAllCategories.query();
 
-  // TODO: save the default location in db, user preferences, so we can fetch the equipments in the server
+  // TODO: save the default location in db, user preferences, so we can prefetch the equipments in the server
 
   return (
     <>
