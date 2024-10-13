@@ -21,11 +21,6 @@ declare module "next-auth" {
       petitionSent: boolean;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -40,7 +35,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return baseUrl;
     },
     session: async ({ session, user }) => {
-      const userRole = await prisma.user.findUnique({
+      const dbUser = await prisma.user.findUnique({
         where: { id: user.id },
         select: {
           role: { select: { name: true } },
@@ -54,9 +49,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         user: {
           ...session.user,
           id: user.id,
-          role: userRole?.role,
-          customerApproved: userRole?.customer_approved,
-          petitionSent: userRole?.petition_sent,
+          role: dbUser?.role,
+          customerApproved: dbUser?.customer_approved,
+          petitionSent: dbUser?.petition_sent,
         },
       };
     },

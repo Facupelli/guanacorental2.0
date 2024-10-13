@@ -18,7 +18,7 @@ import { validationAddress } from "@/lib/validation";
 import { getIsAdmin } from "@/lib/utils";
 
 import { type Role } from "@prisma/client";
-import { trpc } from "utils/clientTrpc";
+import { trpc } from "trpc/client";
 
 type NewUserFormData = {
   email?: string;
@@ -100,7 +100,7 @@ export default function ClientNewUserPage() {
     }
   };
 
-  const { isLoading, mutate } = trpc.user.createUserAddress.useMutation();
+  const { isPending, mutate } = trpc.user.createUserAddress.useMutation();
 
   const onSubmit = (data: NewUserFormData) => {
     if (!session?.user.id) return;
@@ -280,8 +280,8 @@ export default function ClientNewUserPage() {
             </div>
           </div>
 
-          <Button className="font-semibold" type="submit" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Enviar"}
+          <Button className="font-semibold" type="submit" disabled={isPending}>
+            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Enviar"}
           </Button>
         </form>
       </section>

@@ -18,7 +18,7 @@ export default function OrdersByMonth({
   ordersByMonth: {
     ordersByMonth: { [key: number]: number };
     sjOrdersByMonth: { [key: number]: number };
-    mdzOrdersByMonth: { [key: number]: number };
+    slOrdersByMonth: { [key: number]: number };
     avg: string;
   };
 }) {
@@ -51,8 +51,8 @@ export default function OrdersByMonth({
         borderWidth: 1,
       },
       {
-        label: "Mendoza",
-        data: Object.values(ordersByMonth.mdzOrdersByMonth), // Tus datos aquí
+        label: "San Luis",
+        data: Object.values(ordersByMonth.slOrdersByMonth), // Tus datos aquí
         backgroundColor: "#204FCF",
         borderWidth: 1,
       },

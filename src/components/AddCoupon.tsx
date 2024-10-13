@@ -1,13 +1,15 @@
+"use client";
+
 import { type Dispatch, type SetStateAction, useState } from "react";
 import DialogWithState from "./DialogWithState";
 import { Button } from "./ui/button";
 import { DialogFooter } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { useForm } from "react-hook-form";
-import { api } from "@/utils/api";
 import { Label } from "./ui/label";
 import { useSession } from "next-auth/react";
 import { getIsAdmin } from "@/lib/utils";
+import { trpc } from "trpc/client";
 
 type Discount = {
   value: number;
@@ -44,10 +46,10 @@ const AddCoupon = ({
     applyToSub: boolean;
   }>();
 
-  const ctx = api.useContext();
+  const ctx = trpc.useContext();
 
-  const { mutate } = api.discount.getValidDiscountByCode.useMutation();
-  const orderMutate = api.discount.apllyDiscountToOrder.useMutation();
+  const { mutate } = trpc.discount.getValidDiscountByCode.useMutation();
+  const orderMutate = trpc.discount.apllyDiscountToOrder.useMutation();
 
   const isAdmin = getIsAdmin(session);
 
@@ -89,11 +91,7 @@ const AddCoupon = ({
 
   return (
     <>
-      <DialogWithState
-        title="Ingresar cupón de descuento"
-        isOpen={showCouponModal}
-        setOpen={setShowCouponModal}
-      >
+      <DialogWithState title="Ingresar cupón de descuento" isOpen={showCouponModal} setOpen={setShowCouponModal}>
         <div className="grid gap-2 p-2">
           <Input
             type="text"
@@ -116,9 +114,7 @@ const AddCoupon = ({
                   id="applyToSub"
                 />
               </div>
-              <Label htmlFor="applyToSub">
-                Aplicar descuento a subalquiler
-              </Label>
+              <Label htmlFor="applyToSub">Aplicar descuento a subalquiler</Label>
             </div>
           )}
           <p className="text-red-600">{error}</p>

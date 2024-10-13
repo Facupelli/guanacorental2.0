@@ -1,7 +1,22 @@
+import { getIsAdmin, getIsEmployee } from "@/lib/utils";
 import AdminNav from "app/_components/nav/adminNav";
+import { auth } from "auth";
+import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
+  if (!isAdmin && !isEmployee) {
+    redirect("/");
+  }
   return (
     <div className="bg-app-bg pt-[70px]">
       <section className="fixed top-[70px] z-20 w-full md:w-[200px]">

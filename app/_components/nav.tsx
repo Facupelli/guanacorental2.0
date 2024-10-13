@@ -101,7 +101,7 @@ const Nav = () => {
   );
 };
 
-const GoogleButton = () => {
+export const GoogleButton = () => {
   return (
     <button
       onClick={() => void signIn("google")}
@@ -117,7 +117,7 @@ const GoogleButton = () => {
   );
 };
 
-const FacebookButton = () => {
+export const FacebookButton = () => {
   return (
     <button
       onClick={() => void signIn("facebook")}

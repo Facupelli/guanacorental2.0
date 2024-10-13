@@ -5,7 +5,6 @@ import SelectLocation from "@/components/ui/SelectLocation";
 import { useSideMenu } from "@/hooks/useSideMenu";
 import { toArgentinaDate } from "@/lib/dates";
 import { handleLocationChange } from "@/lib/utils";
-import type { Category, Location } from "@/types/models";
 import { FilterIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -13,13 +12,11 @@ import { useRef } from "react";
 import { useCartStoreActions } from "stores/cart.store";
 import { useEndDate, useStartDate } from "stores/date.store";
 import { useLocation, useLocationStoreActions } from "stores/location.store";
+import { trpc } from "trpc/client";
 
-type LeftBarProps = {
-  locations: Location[];
-  categories: Category[];
-};
+export const LeftBar = () => {
+  const { data: categories } = trpc.category.getAllCategories.useQuery();
 
-export const LeftBar = ({ categories, locations }: LeftBarProps) => {
   const selectedCategory = useSearchParams()?.get("category") ?? "";
   const { showSideMenu, handleShowSideMenu, setShowSideMenu } = useSideMenu();
 
@@ -52,7 +49,6 @@ export const LeftBar = ({ categories, locations }: LeftBarProps) => {
         className="fixed left-[-110%] top-[70px] z-30  flex h-screen w-[60%] flex-col justify-start gap-6 overflow-y-auto bg-primary p-4 text-white transition-all duration-300 ease-in-out peer-checked:left-0 sm:z-0 lg:relative lg:left-0 lg:top-0 lg:col-span-3 lg:flex lg:h-[calc(100vh_-_148px)] lg:w-full lg:flex-col lg:gap-4 lg:rounded-md lg:bg-white lg:p-4 lg:text-primary lg:shadow-sm"
       >
         <SelectLocation
-          locations={locations}
           placeholder="Elegir sucursal"
           defaultValue={location.id ? `${location.id}-${location.name}` : undefined}
           onValueChange={(e) => {
@@ -89,7 +85,7 @@ export const LeftBar = ({ categories, locations }: LeftBarProps) => {
               <Link href={{ query: { category: "" } }}>Todos</Link>
             </li>
             {categories
-              .sort((a, b) => (a.order > b.order ? 1 : -1))
+              ?.sort((a, b) => (a.order > b.order ? 1 : -1))
               .map((category) => (
                 <li
                   key={category.id}

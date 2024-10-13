@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Select,
   SelectContent,
@@ -9,21 +11,17 @@ import {
 } from "@/components/ui/select";
 import type { Location } from "@/types/models";
 import { type ReactNode } from "react";
+import { trpc } from "trpc/client";
 
 type SelectLocationProps = {
-  locations: Location[];
   placeholder: string;
   defaultValue?: string;
   onValueChange: (e: string) => void;
   children?: ReactNode;
 };
-const SelectLocation = ({
-  locations,
-  placeholder,
-  defaultValue,
-  onValueChange,
-  children,
-}: SelectLocationProps) => {
+const SelectLocation = ({ placeholder, defaultValue, onValueChange, children }: SelectLocationProps) => {
+  const { data: locations } = trpc.location.getAllLocations.useQuery();
+
   return (
     <Select onValueChange={(e) => onValueChange(e)} value={defaultValue}>
       <SelectTrigger className="font-bold">
@@ -33,11 +31,8 @@ const SelectLocation = ({
         <SelectGroup>
           <SelectLabel>Sucursales</SelectLabel>
           {children}
-          {locations.map((location) => (
-            <SelectItem
-              value={`${location.id}-${location.name}`}
-              key={location.id}
-            >
+          {locations?.map((location) => (
+            <SelectItem value={`${location.id}-${location.name}`} key={location.id}>
               {location.name}
             </SelectItem>
           ))}
@@ -53,12 +48,7 @@ type AdminSelectLocationProps = {
   className?: string;
   children?: ReactNode;
 };
-export const AdminSelectLocation = ({
-  setValue,
-  locations,
-  className,
-  children,
-}: AdminSelectLocationProps) => {
+export const AdminSelectLocation = ({ setValue, locations, className, children }: AdminSelectLocationProps) => {
   return (
     <Select onValueChange={setValue} defaultValue="all">
       <SelectTrigger className={className}>

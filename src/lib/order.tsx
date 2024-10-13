@@ -16,19 +16,14 @@ import DialogWithState from "@/components/DialogWithState";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
-import {
-  ORDER_DELIVER_STATUS,
-  ORDER_RETURN_STATUS,
-  orderReturnedClass,
-  orderStatusClass,
-} from "./constants";
+import { ORDER_DELIVER_STATUS, ORDER_RETURN_STATUS, orderReturnedClass, orderStatusClass } from "./constants";
 
 import { type Columns } from "@/types/table";
 import { type Prisma } from "@prisma/client";
 import { useState, type MouseEvent } from "react";
 import { Label } from "@/components/ui/label";
-import { api } from "@/utils/api";
 import { toArgentinaDate } from "./dates";
+import { trpc } from "trpc/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -84,9 +79,7 @@ export const orderColumns: Columns<Order, CellProps>[] = [
 
       return (
         <div className={`flex items-center gap-2`}>
-          <p className={isToday ? "font-bold" : ""}>
-            {isToday ? "HOY" : toArgentinaDate(rowData.book.end_date)}
-          </p>
+          <p className={isToday ? "font-bold" : ""}>{isToday ? "HOY" : toArgentinaDate(rowData.book.end_date)}</p>
           <span className={orderReturnedClass[statusValue]}>{statusValue}</span>
         </div>
       );
@@ -107,17 +100,11 @@ export const orderColumns: Columns<Order, CellProps>[] = [
       return (
         <div>
           {cellData.cellFunctions.isRowExpanded ? (
-            <button
-              className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={handleClickExpand}
-            >
+            <button className="rounded-full p-2 hover:bg-primary-foreground" onClick={handleClickExpand}>
               <ChevronUp className="h-4 w-4" />
             </button>
           ) : (
-            <button
-              className="rounded-full p-2 hover:bg-primary-foreground"
-              onClick={handleClickExpand}
-            >
+            <button className="rounded-full p-2 hover:bg-primary-foreground" onClick={handleClickExpand}>
               <ChevronDown className="h-4 w-4" />
             </button>
           )}
@@ -150,9 +137,7 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
             <p className="font-semibold">{ownerEquipment.equipment.name}</p>
             <p className="font-semibold">{ownerEquipment.equipment.brand}</p>
             <p>{ownerEquipment.equipment.model}</p>
-            <p className="text-xs text-primary/60">
-              {ownerEquipment.owner.name}
-            </p>
+            <p className="text-xs text-primary/60">{ownerEquipment.owner.name}</p>
           </div>
           <div>
             <p>
@@ -169,17 +154,15 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
 };
 
 const DynamicButton = dynamic<{ order: Order }>(() =>
-  import("../components/remito/DownloadRemitoButton").then(
-    (mod) => mod.DownloadRemitoButton
-  )
+  import("../components/remito/DownloadRemitoButton").then((mod) => mod.DownloadRemitoButton)
 );
 
 const OrderActionsDropMenu = ({ order }: { order: Order }) => {
   const { register, handleSubmit } = useForm<{ file: FileList }>();
 
-  const ctx = api.useContext();
-  const { mutate } = api.order.setOrderDelivered.useMutation();
-  const setOrderReturned = api.order.setOrderReturned.useMutation();
+  const ctx = trpc.useContext();
+  const { mutate } = trpc.order.setOrderDelivered.useMutation();
+  const setOrderReturned = trpc.order.setOrderReturned.useMutation();
 
   const [isLoading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -237,11 +220,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
 
   return (
     <>
-      <DialogWithState
-        isOpen={showModal}
-        setOpen={setShowModal}
-        title="Adjuntar remito"
-      >
+      <DialogWithState isOpen={showModal} setOpen={setShowModal} title="Adjuntar remito">
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
           <Input type="file" {...register("file")} />
           <Button size="sm" type="submit">
@@ -266,18 +245,13 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
           <DropdownMenuItem>
             <DynamicButton order={order} />
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setShowModal(true)}
-            className="flex cursor-pointer gap-2"
-          >
+          <DropdownMenuItem onClick={() => setShowModal(true)} className="flex cursor-pointer gap-2">
             <div className="m-0 p-0 ">
               <Input
                 type="checkbox"
                 id="delivered"
                 className="h-4"
-                defaultChecked={
-                  order.deliver_status === ORDER_DELIVER_STATUS.DELIVERED
-                }
+                defaultChecked={order.deliver_status === ORDER_DELIVER_STATUS.DELIVERED}
               />
             </div>
             <Label className="cursor-pointer font-normal" htmlFor="delivered">
@@ -294,9 +268,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
                 type="checkbox"
                 id="returned"
                 className="h-4"
-                defaultChecked={
-                  order.return_status === ORDER_RETURN_STATUS.RETURNED
-                }
+                defaultChecked={order.return_status === ORDER_RETURN_STATUS.RETURNED}
               />
             </div>
             <Label className="cursor-pointer font-normal" htmlFor="returned">

@@ -4,10 +4,9 @@ import DialogWithState from "@/components/DialogWithState";
 import { Label } from "@/components/ui/label";
 import SelectLocation from "@/components/ui/SelectLocation";
 import { handleLocationChange } from "@/lib/utils";
-import type { Location } from "@/types/models";
 import { useLocationStoreActions, useShowLocationModal } from "stores/location.store";
 
-export default function ShowLocationDialog(props: { locations: Location[] }) {
+export default function ShowLocationDialog() {
   const { toggleModal, setLocation } = useLocationStoreActions();
   const showLocationModal = useShowLocationModal();
 
@@ -17,7 +16,6 @@ export default function ShowLocationDialog(props: { locations: Location[] }) {
         Sucursal:
       </Label>
       <SelectLocation
-        locations={props.locations}
         placeholder="seleccionar"
         onValueChange={(e) => handleLocationChange(e, setLocation, toggleModal)}
       />

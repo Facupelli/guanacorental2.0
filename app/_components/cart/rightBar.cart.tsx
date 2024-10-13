@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 import { useMemo, useState } from "react";
 
-import { FacebookButton, GoogleButton } from "@/components/Nav";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import SelectDateButton from "@/components/ui/SelectDateButton";
@@ -32,6 +31,7 @@ import { useCartItems, useCartStoreActions } from "stores/cart.store";
 import { useEndDate, usePickupHour, useStartDate } from "stores/date.store";
 import { useLocation } from "stores/location.store";
 import { trpc } from "trpc/client";
+import { FacebookButton, GoogleButton } from "../nav";
 
 type Discount = {
   value: number;
