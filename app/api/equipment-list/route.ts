@@ -31,6 +31,7 @@ type Query = {
   };
 };
 
+// TODO: move to a server action
 export async function POST(request: Request) {
   const { location }: { location: string } = await request.json();
 

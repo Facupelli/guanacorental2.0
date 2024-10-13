@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 
 const NODEMAILER_G_APP = process.env.NODEMAILER_G_APP;
 
+// TODO: move to a server action
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
     });
 
     const templateSource = await fs.readFile(
-      path.resolve(process.cwd() + `/src/server/utils/templates/orderDelivered.handlebars`),
+      path.resolve(process.cwd() + `/src/utils/handlebars/templates/orderDelivered.handlebars`),
       "utf-8"
     );
 

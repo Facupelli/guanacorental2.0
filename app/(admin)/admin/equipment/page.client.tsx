@@ -217,8 +217,8 @@ export default function ClientEquipmentAdmin({ locations, owners, categories }: 
     const fetch4nodeBuffer = () =>
       fetch(
         process.env.NODE_ENV === "production"
-          ? "https://www.guanacorental.shop/api/generateEquipmentsExcel"
-          : `http://localhost:3000/api/generateEquipmentsExcel`,
+          ? "https://www.guanacorental.shop/api/equipment-list"
+          : `http://localhost:3000/api/equipment-list`,
         options
       );
 

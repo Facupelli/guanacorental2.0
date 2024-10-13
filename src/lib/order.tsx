@@ -183,7 +183,7 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
     formData.append("email", order.customer.email);
     formData.append("orderNumber", String(order.number));
 
-    const response = await fetch("/api/send-email", {
+    const response = await fetch("/api/send-order-email", {
       method: "POST",
       body: formData,
     });
@@ -197,6 +197,9 @@ const OrderActionsDropMenu = ({ order }: { order: Order }) => {
             void ctx.order.getCalendarOrders.invalidate();
             void ctx.order.getOrders.invalidate();
             setLoading(false);
+          },
+          onError: (error) => {
+            console.error(error);
           },
         }
       );

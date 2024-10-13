@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
-import handlebars from "handlebars";
+import Handlebars from "handlebars/runtime";
 
 const NODEMAILER_G_APP = process.env.NODEMAILER_G_APP;
 
@@ -25,17 +25,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendMail = async (
-  user: User,
-  templateName: string,
-  subject: string
-) => {
+export const sendMail = async (user: User, templateName: string, subject: string) => {
   const templateSource = fs.readFileSync(
-    path.resolve(process.cwd() + `/src/server/utils/templates/${templateName}`),
+    path.resolve(process.cwd() + `/src/utils/handlebars/templates/${templateName}`),
     "utf-8"
   );
 
-  const template = handlebars.compile(templateSource);
+  const template = Handlebars.compile(templateSource);
 
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",
@@ -50,13 +46,11 @@ export const sendMail = async (
 
 export const sendMailToGuanaco = async (user: User, subject: string) => {
   const templateSource = fs.readFileSync(
-    path.resolve(
-      process.cwd() + `/src/server/utils/templates/newOrder.handlebars`
-    ),
+    path.resolve(process.cwd() + `/src/utils/handlebars/templates/newOrder.handlebars`),
     "utf-8"
   );
 
-  const template = handlebars.compile(templateSource);
+  const template = Handlebars.compile(templateSource);
 
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",
@@ -69,18 +63,13 @@ export const sendMailToGuanaco = async (user: User, subject: string) => {
   return mail;
 };
 
-export const sendCancelOrderMail = async (
-  email: string,
-  orderNumber: number
-) => {
+export const sendCancelOrderMail = async (email: string, orderNumber: number) => {
   const templateSource = fs.readFileSync(
-    path.resolve(
-      process.cwd() + `/src/server/utils/templates/orderCanceled.handlebars`
-    ),
+    path.resolve(process.cwd() + `/src/utils/handlebars/templates/orderCanceled.handlebars`),
     "utf-8"
   );
 
-  const template = handlebars.compile(templateSource);
+  const template = Handlebars.compile(templateSource);
 
   const mailOptions = {
     from: "Guanaco Rental hola@guanacorental.com",

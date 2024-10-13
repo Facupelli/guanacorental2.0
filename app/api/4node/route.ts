@@ -31,6 +31,7 @@ type Query = {
   };
 };
 
+// TODO: move to a server action
 export async function POST(req: Request) {
   const body = await req.json();
   const { year, month, location }: { year: string; month: string; location: string } = body;
