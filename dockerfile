@@ -16,7 +16,7 @@ ENV SKIP_ENV_VALIDATION=true
 
 # Add Prisma CLI and generate client
 RUN npm install -g prisma
-COPY prisma ./prisma
+COPY ./src/prisma ./prisma
 RUN npx prisma generate
 
 # build app
