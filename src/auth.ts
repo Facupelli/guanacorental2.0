@@ -26,7 +26,6 @@ declare module "next-auth" {
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [Facebook, Google],
-  trustHost: true,
   callbacks: {
     redirect({ url, baseUrl }) {
       // Allows relative callback URLs
