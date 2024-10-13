@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { type Prisma } from "@prisma/client";
-import type { Equipment, EquipmentOnOwner } from "@/types/models";
-import { COUPON_STATUS, DISCOUNT_TYPES, ROLES } from "./magic_strings";
+import type { Equipment, EquipmentOnOwner, Location } from "types/models";
+import { COUPON_STATUS, DISCOUNT_TYPES, ROLES } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -65,32 +65,25 @@ export const isEquipmentAvailable = (
 
 export const handleLocationChange = (
   e: string,
-  setLocation: (location: { locationId: string; locationName: string }) => void,
+  setLocation: (location: Location) => void,
   toggleModal?: () => void
 ) => {
   const locationId = e.split("-")[0];
   const locationName = e.split("-")[1];
 
   if (locationId && locationName) {
-    setLocation({ locationId, locationName });
-    localStorage.setItem(
-      "location.v2",
-      JSON.stringify({ locationId, locationName })
-    );
+    setLocation({ id: locationId, name: locationName });
     if (toggleModal) {
       toggleModal();
     }
   }
 };
 
-export const handleAdminLocationChange = (
-  e: string,
-  setLocation: (location: { locationId: string; locationName: string }) => void
-) => {
+export const handleAdminLocationChange = (e: string, setLocation: (location: Location) => void) => {
   const locationId = e.split("-")[0];
   const locationName = e.split("-")[1];
   if (locationId && locationName) {
-    setLocation({ locationId, locationName });
+    setLocation({ id: locationId, name: locationName });
   }
 };
 
@@ -102,14 +95,8 @@ export const getIsEmployee = (session: Session | null) => {
   return session?.user.role.map((role) => role.name).includes(ROLES.EMPLOYEE);
 };
 
-export const calcaulateCartTotal = (
-  cartItems: Equipment[],
-  workingDays: number | undefined
-) => {
-  const cartSum = cartItems.reduce(
-    (acc, curr) => acc + curr.price * curr.quantity,
-    0
-  );
+export const calcaulateCartTotal = (cartItems: Equipment[], workingDays: number | undefined) => {
+  const cartSum = cartItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   if (workingDays) {
     return workingDays * cartSum;
   }
@@ -122,10 +109,7 @@ type DiscountProp = {
   code: string;
 };
 
-export const calculateTotalWithDiscount = (
-  total: number,
-  discount: DiscountProp
-) => {
+export const calculateTotalWithDiscount = (total: number, discount: DiscountProp) => {
   if (discount.typeName === DISCOUNT_TYPES.FIXED) {
     return Math.ceil(total - discount.value);
   }
