@@ -1,6 +1,6 @@
 /* eslint-disable */
 const xl = require("excel4node");
-import { prisma } from "@/server/db";
+import { prisma } from "~/utils/db";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 

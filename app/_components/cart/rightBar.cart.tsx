@@ -6,17 +6,16 @@ import { useRouter } from "next/navigation";
 
 import { useMemo, useState } from "react";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import SelectDateButton from "@/components/ui/SelectDateButton";
-import DialogWithState from "@/components/DialogWithState";
-import { DialogFooter } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover";
+import { Button } from "@components/ui/button";
+import SelectDateButton from "@components/ui/SelectDateButton";
+import DialogWithState from "@components/DialogWithState";
+import { DialogFooter } from "@components/ui/dialog";
 import { Info, Loader2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import AddCoupon from "@/components/AddCoupon";
+import { Textarea } from "@components/ui/textarea";
+import { Input } from "@components/ui/input";
 
-import { disableWeekend, getDatesInRange, getTotalWorkingDays, toArgentinaDate } from "@/lib/dates";
+import { disableWeekend, getDatesInRange, getTotalWorkingDays, toArgentinaDate } from "~/lib/dates";
 import {
   calcaulateCartTotal,
   calculateTotalWithDiscount,
@@ -24,14 +23,15 @@ import {
   getIsAdmin,
   getIsEmployee,
   isEquipmentAvailable,
-} from "@/lib/utils";
+} from "~/lib/utils";
 
 import Link from "next/link";
-import { useCartItems, useCartStoreActions } from "stores/cart.store";
-import { useEndDate, usePickupHour, useStartDate } from "stores/date.store";
-import { useLocation } from "stores/location.store";
-import { trpc } from "trpc/client";
+import { useCartItems, useCartStoreActions } from "~/stores/cart.store";
+import { useEndDate, usePickupHour, useStartDate } from "~/stores/date.store";
+import { useLocation } from "~/stores/location.store";
+import { trpc } from "~/trpc/client";
 import { FacebookButton, GoogleButton } from "../nav";
+import AddCoupon from "../AddCoupon";
 
 type Discount = {
   value: number;

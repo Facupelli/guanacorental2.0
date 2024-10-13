@@ -1,11 +1,11 @@
 "use client";
 
-import CartItemCounter from "@/components/CartItemCounter";
-import { formatPrice, isEquipmentAvailable } from "@/lib/utils";
-import type { Equipment } from "@/types/models";
+import CartItemCounter from "@components/CartItemCounter";
+import { formatPrice, isEquipmentAvailable } from "~/lib/utils";
+import type { Equipment } from "types/models";
 import { X } from "lucide-react";
-import { useCartItems, useCartStoreActions } from "stores/cart.store";
-import { useEndDate, useStartDate } from "stores/date.store";
+import { useCartItems, useCartStoreActions } from "~/stores/cart.store";
+import { useEndDate, useStartDate } from "~/stores/date.store";
 
 export default function ItemsList() {
   const items = useCartItems();

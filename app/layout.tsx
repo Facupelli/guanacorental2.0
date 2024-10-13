@@ -1,11 +1,11 @@
 import localFont from "next/font/local";
 
-import "@/styles/globals.css";
-import "@/styles/reactcalendar.css";
-import "@/utils/dayjs-config";
+import "../styles/globals.css";
+import "../styles/reactcalendar.css";
+import "~/utils/dayjs-config";
 
-import { Providers } from "providers/providers";
-import ClientInitializer from "hooks/client-initializer";
+import { Providers } from "~/providers/providers";
+import ClientInitializer from "~/hooks/client-initializer";
 import { type Metadata } from "next";
 import Script from "next/script";
 import Nav from "./_components/nav";

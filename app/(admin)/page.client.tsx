@@ -3,23 +3,23 @@
 import { es } from "date-fns/locale";
 import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@components/ui/calendar";
 import { useCallback, useEffect, useState } from "react";
 
-import { Label } from "@/components/ui/label";
-import SelectLocation from "@/components/ui/SelectLocation";
-import { SelectItem } from "@/components/ui/select";
-import DataTable from "@/components/ui/data-table";
+import { Label } from "@components/ui/label";
+import SelectLocation from "@components/ui/SelectLocation";
+import { SelectItem } from "@components/ui/select";
+import DataTable from "@components/ui/data-table";
 
-import { cn, getIsAdmin, handleAdminLocationChange } from "@/lib/utils";
-import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { equipmentsList, orderColumns } from "@/lib/order";
+import { cn, getIsAdmin, handleAdminLocationChange } from "~/lib/utils";
+import { getOrderEquipmentOnOwners } from "~/utils/order";
+import { equipmentsList, orderColumns } from "~/lib/order";
 
 import { type Prisma } from "@prisma/client";
-import { buttonVariants } from "@/components/ui/button";
-import { useAdminCalendarDay, useAdminStoreActions } from "stores/admin.store";
-import { useLocation, useLocationStoreActions } from "stores/location.store";
-import { trpc } from "trpc/client";
+import { buttonVariants } from "@components/ui/button";
+import { useAdminCalendarDay, useAdminStoreActions } from "~/stores/admin.store";
+import { useLocation, useLocationStoreActions } from "~/stores/location.store";
+import { trpc } from "~/trpc/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {

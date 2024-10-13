@@ -1,4 +1,4 @@
-import { trpc } from "trpc/server";
+import { trpc } from "~/trpc/server";
 import ClientEquipmentAdmin from "./page.client";
 
 export default async function AdminEquipmentPage() {

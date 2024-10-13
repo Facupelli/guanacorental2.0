@@ -12,28 +12,28 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import DialogWithState from "@/components/DialogWithState";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/select";
+import { Button } from "@components/ui/button";
+import DialogWithState from "@components/DialogWithState";
+import { Label } from "@components/ui/label";
+import { Input } from "@components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import DataTable from "@/components/ui/data-table";
+} from "@components/ui/dropdown-menu";
+import DataTable from "@components/ui/data-table";
 import { MoreHorizontal } from "lucide-react";
 
-import { getIsAdmin } from "@/lib/utils";
-import { COUPON_STATUS, discountStatusClass } from "@/lib/constants";
+import { getIsAdmin } from "~/lib/utils";
+import { COUPON_STATUS, discountStatusClass } from "~/lib/constants";
 
 import type { DiscountType, Prisma } from "@prisma/client";
-import type { Columns } from "@/types/table";
-import { toArgentinaDate } from "@/lib/dates";
-import { trpc } from "trpc/client";
+import type { Columns } from "types/table";
+import { toArgentinaDate } from "~/lib/dates";
+import { trpc } from "~/trpc/client";
 
 type Discount = Prisma.DiscountGetPayload<{
   include: {

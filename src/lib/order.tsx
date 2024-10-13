@@ -4,26 +4,26 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import DialogWithState from "@/components/DialogWithState";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/dropdown-menu";
+import DialogWithState from "@components/DialogWithState";
+import { Input } from "@components/ui/input";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 
 import { ORDER_DELIVER_STATUS, ORDER_RETURN_STATUS, orderReturnedClass, orderStatusClass } from "./constants";
 
-import { type Columns } from "@/types/table";
+import { type Columns } from "types/table";
 import { type Prisma } from "@prisma/client";
 import { useState, type MouseEvent } from "react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@components/ui/label";
 import { toArgentinaDate } from "./dates";
-import { trpc } from "trpc/client";
+import { trpc } from "~/trpc/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -154,7 +154,7 @@ export const equipmentsList = ({ rowData }: { rowData: Order }) => {
 };
 
 const DynamicButton = dynamic<{ order: Order }>(() =>
-  import("../components/remito/DownloadRemitoButton").then((mod) => mod.DownloadRemitoButton)
+  import("../../app/_components/remito/DownloadRemitoButton").then((mod) => mod.DownloadRemitoButton)
 );
 
 const OrderActionsDropMenu = ({ order }: { order: Order }) => {

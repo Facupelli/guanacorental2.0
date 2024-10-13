@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 
 import { FacebookIcon, LogOut, Menu, UserCog } from "lucide-react";
 
-import { getIsAdmin, getIsEmployee } from "@/lib/utils";
-import { useSideMenu } from "@/hooks/useSideMenu";
-import Cart from "@/components/Cart";
+import { getIsAdmin, getIsEmployee } from "~/lib/utils";
+import { useSideMenu } from "~/hooks/useSideMenu";
+import Cart from "./Cart";
 
 const Nav = () => {
   const router = useRouter();

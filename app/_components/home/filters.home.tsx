@@ -1,8 +1,8 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import useDebounce from "@/hooks/useDebounce";
-import { useGetQueryParams } from "hooks/useGetQueryParams";
+import { Input } from "@components/ui/input";
+import useDebounce from "~/hooks/useDebounce";
+import { useGetQueryParams } from "~/hooks/useGetQueryParams";
 import { SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

@@ -6,20 +6,20 @@ import { useInView } from "react-intersection-observer";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-import { Calendar } from "@/components/ui/calendar";
-import { Button, buttonVariants } from "@/components/ui/button";
-import DialogWithState from "@/components/DialogWithState";
+import { Calendar } from "@components/ui/calendar";
+import { Button, buttonVariants } from "@components/ui/button";
+import DialogWithState from "@components/DialogWithState";
 import { ShoppingCart } from "lucide-react";
 
-import { cn, formatPrice, isEquipmentAvailable } from "@/lib/utils";
+import { cn, formatPrice, isEquipmentAvailable } from "~/lib/utils";
 
-import type { Equipment } from "@/types/models";
-import { useLocation } from "stores/location.store";
-import { useEndDate, useStartDate } from "stores/date.store";
-import { useCartItems, useCartStoreActions } from "stores/cart.store";
+import type { Equipment } from "types/models";
+import { useLocation } from "~/stores/location.store";
+import { useEndDate, useStartDate } from "~/stores/date.store";
+import { useCartItems, useCartStoreActions } from "~/stores/cart.store";
 import { useSearchParams } from "next/navigation";
-import { LocationName } from "@/lib/constants";
-import { trpc } from "trpc/client";
+import { LocationName } from "~/lib/constants";
+import { trpc } from "~/trpc/client";
 
 export default function EquipmentList() {
   const { ref, inView } = useInView();

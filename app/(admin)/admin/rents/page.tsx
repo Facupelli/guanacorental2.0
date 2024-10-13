@@ -11,14 +11,14 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+} from "@components/ui/select";
+import { Label } from "@components/ui/label";
+import { Button } from "@components/ui/button";
 
-import { formatPrice } from "@/lib/utils";
-import { MONTHS, monthList, yearList } from "@/lib/constants";
-import { AdminSelectLocation } from "@/components/ui/SelectLocation";
-import { trpc } from "trpc/client";
+import { formatPrice } from "~/lib/utils";
+import { MONTHS, monthList, yearList } from "~/lib/constants";
+import { AdminSelectLocation } from "@components/ui/SelectLocation";
+import { trpc } from "~/trpc/client";
 
 type RentForm = { month: string; year: string; location: string };
 

@@ -1,13 +1,13 @@
 "use client";
 
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import MostBookedEquipments from "@/components/stats/MostBookedEquipments";
-import OrdersByMonth from "@/components/stats/OrdersByMonth";
-import OrdersByCategory from "@/components/stats/OrdersByCategory";
-import { AdminSelectLocation } from "@/components/ui/SelectLocation";
+import MostBookedEquipments from "app/_components/stats/MostBookedEquipments";
+import OrdersByMonth from "app/_components/stats/OrdersByMonth";
+import OrdersByCategory from "app/_components/stats/OrdersByCategory";
+import { AdminSelectLocation } from "@components/ui/SelectLocation";
 import { useForm } from "react-hook-form";
-import type { Category, Location } from "@/types/models";
-import { Label } from "@/components/ui/label";
+import type { Category, Location } from "types/models";
+import { Label } from "@components/ui/label";
 import {
   Select,
   SelectContent,
@@ -16,11 +16,11 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { SelectCategory } from "@/components/ui/SelectCategory";
-import { type TopBookedEquipment } from "trpc/routers/stats";
-import { trpc } from "trpc/client";
-import { formatPrice } from "@/lib/utils";
+} from "@components/ui/select";
+import { SelectCategory } from "@components/ui/SelectCategory";
+import { type TopBookedEquipment } from "~/trpc/routers/stats";
+import { trpc } from "~/trpc/client";
+import { formatPrice } from "~/lib/utils";
 import { type Metadata } from "next";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -40,10 +40,6 @@ type StatsPageProps = {
     avg: string;
   };
   average: { subtotalAverage: number };
-};
-
-export const metadata: Metadata = {
-  title: "Guanaco | Estadísticas",
 };
 
 export default function ClientAdminStatsPage({ locations, categories, average, monthAverage }: StatsPageProps) {

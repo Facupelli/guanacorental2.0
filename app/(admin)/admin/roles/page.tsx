@@ -1,23 +1,23 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Label } from "@/components/ui/label";
+import { Label } from "@components/ui/label";
 
-import { Input } from "@/components/ui/input";
-import useDebounce from "@/hooks/useDebounce";
-import DataTable from "@/components/ui/data-table";
+import { Input } from "@components/ui/input";
+import useDebounce from "~/hooks/useDebounce";
+import DataTable from "@components/ui/data-table";
 import { useState } from "react";
-import { toArgentinaDate } from "@/lib/dates";
+import { toArgentinaDate } from "~/lib/dates";
 import { type Prisma } from "@prisma/client";
-import type { Columns } from "@/types/table";
-import { Button } from "@/components/ui/button";
+import type { Columns } from "types/table";
+import { Button } from "@components/ui/button";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,9 +37,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useAdminRolesUserSearch, useAdminStoreActions } from "stores/admin.store";
-import { trpc } from "trpc/client";
+} from "@components/ui/alert-dialog";
+import { useAdminRolesUserSearch, useAdminStoreActions } from "~/stores/admin.store";
+import { trpc } from "~/trpc/client";
 
 type User = Prisma.UserGetPayload<{
   include: {

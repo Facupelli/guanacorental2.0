@@ -1,8 +1,8 @@
 import ClientNewUserPage from "./page.client";
 import { redirect } from "next/navigation";
-import { getIsAdmin } from "@/lib/utils";
+import { getIsAdmin } from "~/lib/utils";
 import Script from "next/script";
-import { auth } from "auth";
+import { auth } from "~/auth";
 
 export default async function NewUserPage() {
   const session = await auth();

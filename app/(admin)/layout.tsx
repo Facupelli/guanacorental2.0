@@ -1,6 +1,6 @@
-import { getIsAdmin, getIsEmployee } from "@/lib/utils";
+import { getIsAdmin, getIsEmployee } from "~/lib/utils";
 import AdminNav from "app/_components/nav/adminNav";
-import { auth } from "auth";
+import { auth } from "~/auth";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 

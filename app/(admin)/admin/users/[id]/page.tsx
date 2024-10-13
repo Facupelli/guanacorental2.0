@@ -4,14 +4,14 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { type UseFormRegister, useForm } from "react-hook-form";
 import { useState } from "react";
-import Pagination from "@/components/ui/Pagination";
-import { Input } from "@/components/ui/input";
-import DataTable from "@/components/ui/data-table";
+import Pagination from "@components/ui/Pagination";
+import { Input } from "@components/ui/input";
+import DataTable from "@components/ui/data-table";
 import { CheckSquare, EditIcon } from "lucide-react";
 
 import type { Prisma } from "@prisma/client";
-import { trpc } from "trpc/client";
-import { equipmentsList, orderColumns } from "@/lib/order";
+import { trpc } from "~/trpc/client";
+import { equipmentsList, orderColumns } from "~/lib/order";
 
 type User = Prisma.UserGetPayload<{
   include: {

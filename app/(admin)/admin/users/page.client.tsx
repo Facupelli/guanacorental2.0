@@ -6,7 +6,7 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import Pagination from "@/components/ui/Pagination";
+import Pagination from "@components/ui/Pagination";
 import {
   Select,
   SelectContent,
@@ -15,27 +15,27 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from "@components/ui/select";
+import { Label } from "@components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import DataTable from "@/components/ui/data-table";
-import { Input } from "@/components/ui/input";
+} from "@components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
+import { Button } from "@components/ui/button";
+import DataTable from "@components/ui/data-table";
+import { Input } from "@components/ui/input";
 import { MoreHorizontal } from "lucide-react";
 
-import useDebounce from "@/hooks/useDebounce";
+import useDebounce from "~/hooks/useDebounce";
 
 import { type Prisma, type Role } from "@prisma/client";
-import type { Columns } from "@/types/table";
-import { toArgentinaDate } from "@/lib/dates";
-import { trpc } from "trpc/client";
+import type { Columns } from "types/table";
+import { toArgentinaDate } from "~/lib/dates";
+import { trpc } from "~/trpc/client";
 
 type User = Prisma.UserGetPayload<{
   include: {

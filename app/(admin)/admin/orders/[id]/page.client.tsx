@@ -5,11 +5,10 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useState } from "react";
-import { Button } from "@/components/ui/button";
-import DialogWithState from "@/components/DialogWithState";
-import { Input } from "@/components/ui/input";
-import { DialogFooter } from "@/components/ui/dialog";
-import AddCoupon from "@/components/AddCoupon";
+import { Button } from "@components/ui/button";
+import DialogWithState from "@components/DialogWithState";
+import { Input } from "@components/ui/input";
+import { DialogFooter } from "@components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,16 +19,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@components/ui/alert-dialog";
 import { EditIcon, Trash2, CheckSquare, Plus } from "lucide-react";
 
-import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { formatPrice, getIsAdmin } from "@/lib/utils";
+import { getOrderEquipmentOnOwners } from "~/utils/order";
+import { formatPrice, getIsAdmin } from "~/lib/utils";
 
-import useDebounce from "@/hooks/useDebounce";
+import useDebounce from "~/hooks/useDebounce";
 
-import type { Location, Prisma, Role } from "@prisma/client";
-import { trpc } from "trpc/client";
+import type { Location, Prisma } from "@prisma/client";
+import { trpc } from "~/trpc/client";
+import AddCoupon from "app/_components/AddCoupon";
 
 type Order = Prisma.OrderGetPayload<{
   include: {
@@ -49,14 +49,6 @@ type Order = Prisma.OrderGetPayload<{
     };
   };
 }>;
-
-type Props = {
-  user: {
-    name: string;
-    role: Role[];
-    id: string;
-  };
-};
 
 export default function ClientAdminOrderDetail() {
   const { data: session } = useSession();

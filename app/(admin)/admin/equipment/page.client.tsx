@@ -9,15 +9,15 @@ import {
   useForm,
 } from "react-hook-form";
 import { type Dispatch, type SetStateAction, useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { Switch } from "@components/ui/switch";
+import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -26,19 +26,19 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { AdminSelectLocation } from "@/components/ui/SelectLocation";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Pagination from "@/components/ui/Pagination";
-import DialogWithState from "@/components/DialogWithState";
-import DataTable from "@/components/ui/data-table";
+} from "@components/ui/select";
+import { AdminSelectLocation } from "@components/ui/SelectLocation";
+import { Input } from "@components/ui/input";
+import { Label } from "@components/ui/label";
+import Pagination from "@components/ui/Pagination";
+import DialogWithState from "@components/DialogWithState";
+import DataTable from "@components/ui/data-table";
 import { Loader2, MoreHorizontal, Plus, Trash2, X } from "lucide-react";
-import useDebounce from "@/hooks/useDebounce";
-import type { Location, Owner } from "@/types/models";
+import useDebounce from "~/hooks/useDebounce";
+import type { Location, Owner } from "types/models";
 import type { Category, Prisma } from "@prisma/client";
-import type { Columns } from "@/types/table";
-import { type OwnerequipmentForm } from "@/types/ownerEquipment";
+import type { Columns } from "types/table";
+import { type OwnerequipmentForm } from "types/ownerEquipment";
 import {
   AlertDialog,
   AlertDialogTitle,
@@ -49,7 +49,7 @@ import {
   AlertDialogAction,
   AlertDialogContent,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@components/ui/alert-dialog";
 import {
   Dialog,
   DialogClose,
@@ -59,9 +59,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { SelectCategory } from "@/components/ui/SelectCategory";
-import { trpc } from "trpc/client";
+} from "@components/ui/dialog";
+import { SelectCategory } from "@components/ui/SelectCategory";
+import { trpc } from "~/trpc/client";
 
 dayjs.locale("es");
 

@@ -1,11 +1,11 @@
 import ShowLocationDialog from "./_components/dialog/showLocationDialog";
-import Cart from "@/components/Cart";
 import { LeftBar } from "./_components/home/leftBar.home";
 import Filters from "./_components/home/filters.home";
 import SelectOrder from "./_components/home/selectOrder.home";
 import EquipmentList from "./_components/home/equipmentList.home";
 import { Suspense } from "react";
-import { trpc } from "trpc/server";
+import { trpc } from "~/trpc/server";
+import Cart from "./_components/Cart";
 
 export default async function HomePage() {
   await trpc.location.getAllLocations.prefetch();

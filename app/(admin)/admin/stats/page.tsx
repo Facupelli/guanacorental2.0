@@ -1,7 +1,7 @@
-import { trpc } from "trpc/server";
+import { trpc } from "~/trpc/server";
 import ClientAdminStatsPage from "./page.client";
-import { prisma } from "@/server/db";
-import { LocationName } from "@/lib/constants";
+import { prisma } from "~/utils/db";
+import { LocationName } from "~/lib/constants";
 import { Prisma } from "@prisma/client";
 
 type OrderAverage = Prisma.OrderGetPayload<{

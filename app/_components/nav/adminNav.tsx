@@ -1,7 +1,7 @@
 "use client";
 
-import { buttonVariants } from "@/components/ui/button";
-import { getIsEmployee } from "@/lib/utils";
+import { buttonVariants } from "@components/ui/button";
+import { getIsEmployee } from "~/lib/utils";
 import { BarChart4, CalendarDays, Camera, CrownIcon, Percent, PiggyBank, ShoppingBag, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";

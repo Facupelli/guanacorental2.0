@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { type Prisma } from "@prisma/client";
-import type { Equipment, EquipmentOnOwner, Location } from "@/types/models";
+import type { Equipment, EquipmentOnOwner, Location } from "types/models";
 import { COUPON_STATUS, DISCOUNT_TYPES, ROLES } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {

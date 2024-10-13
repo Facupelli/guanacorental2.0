@@ -3,23 +3,23 @@
 import { type UseFormSetValue, useForm } from "react-hook-form";
 import { useState } from "react";
 
-import SelectLocation from "@/components/ui/SelectLocation";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import Pagination from "@/components/ui/Pagination";
-import DataTable from "@/components/ui/data-table";
-import { Input } from "@/components/ui/input";
+import SelectLocation from "@components/ui/SelectLocation";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
+import { Label } from "@components/ui/label";
+import Pagination from "@components/ui/Pagination";
+import DataTable from "@components/ui/data-table";
+import { Input } from "@components/ui/input";
 
-import { ADMIN_ORDERS_SORT } from "@/lib/constants";
-import { getOrderEquipmentOnOwners } from "@/server/utils/order";
-import { handleAdminLocationChange } from "@/lib/utils";
-import { orderColumns, equipmentsList } from "@/lib/order";
-import useDebounce from "@/hooks/useDebounce";
+import { ADMIN_ORDERS_SORT } from "~/lib/constants";
+import { getOrderEquipmentOnOwners } from "~/utils/order";
+import { handleAdminLocationChange } from "~/lib/utils";
+import { orderColumns, equipmentsList } from "~/lib/order";
+import useDebounce from "~/hooks/useDebounce";
 
 import { type Prisma } from "@prisma/client";
-import { useLocation, useLocationStoreActions } from "stores/location.store";
-import { useAdminOrdersCurrentPage, useAdminStoreActions } from "stores/admin.store";
-import { trpc } from "trpc/client";
+import { useLocation, useLocationStoreActions } from "~/stores/location.store";
+import { useAdminOrdersCurrentPage, useAdminStoreActions } from "~/stores/admin.store";
+import { trpc } from "~/trpc/client";
 
 type Order = Prisma.OrderGetPayload<{
   include: {

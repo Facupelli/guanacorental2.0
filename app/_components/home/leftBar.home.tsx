@@ -1,18 +1,18 @@
 "use client";
 
-import SelectDateButton from "@/components/ui/SelectDateButton";
-import SelectLocation from "@/components/ui/SelectLocation";
-import { useSideMenu } from "@/hooks/useSideMenu";
-import { toArgentinaDate } from "@/lib/dates";
-import { handleLocationChange } from "@/lib/utils";
+import SelectDateButton from "@components/ui/SelectDateButton";
+import SelectLocation from "@components/ui/SelectLocation";
+import { useSideMenu } from "~/hooks/useSideMenu";
+import { toArgentinaDate } from "~/lib/dates";
+import { handleLocationChange } from "~/lib/utils";
 import { FilterIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRef } from "react";
-import { useCartStoreActions } from "stores/cart.store";
-import { useEndDate, useStartDate } from "stores/date.store";
-import { useLocation, useLocationStoreActions } from "stores/location.store";
-import { trpc } from "trpc/client";
+import { useCartStoreActions } from "~/stores/cart.store";
+import { useEndDate, useStartDate } from "~/stores/date.store";
+import { useLocation, useLocationStoreActions } from "~/stores/location.store";
+import { trpc } from "~/trpc/client";
 
 export const LeftBar = () => {
   const { data: categories } = trpc.category.getAllCategories.useQuery();

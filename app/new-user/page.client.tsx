@@ -7,18 +7,18 @@ import { type Dispatch, type SetStateAction, useEffect, useState, useRef } from 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { DialogFooter } from "@components/ui/dialog";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Label } from "@components/ui/label";
 import { Loader2 } from "lucide-react";
-import DialogWithState from "@/components/DialogWithState";
+import DialogWithState from "@components/DialogWithState";
 
-import { validationAddress } from "@/lib/validation";
-import { getIsAdmin } from "@/lib/utils";
+import { validationAddress } from "~/lib/validation";
+import { getIsAdmin } from "~/lib/utils";
 
 import { type Role } from "@prisma/client";
-import { trpc } from "trpc/client";
+import { trpc } from "~/trpc/client";
 
 type NewUserFormData = {
   email?: string;

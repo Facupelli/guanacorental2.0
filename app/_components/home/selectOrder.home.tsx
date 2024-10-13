@@ -8,8 +8,8 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGetQueryParams } from "hooks/useGetQueryParams";
+} from "@components/ui/select";
+import { useGetQueryParams } from "~/hooks/useGetQueryParams";
 import { useRouter } from "next/navigation";
 
 export default function SelectOrder() {
