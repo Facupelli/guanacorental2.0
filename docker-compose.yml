@@ -7,7 +7,7 @@ services:
       - NODE_ENV=production
       - SKIP_ENV_VALIDATION=true
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - AUTH_TRUST_HOST=true
+      - AUTH_TRUST_HOST=${AUTH_TRUST_HOST}
       - AUTH_URL=${AUTH_URL}
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID}
