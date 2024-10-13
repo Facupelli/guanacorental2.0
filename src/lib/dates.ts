@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { SCHEDULES } from "./magic_strings";
+import { SCHEDULES } from "./constants";
 
 export const toArgentinaDate = (date: Date) => {
   return new Date(date).toLocaleDateString("es-AR", {
