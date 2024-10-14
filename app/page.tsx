@@ -4,15 +4,9 @@ import Filters from "./_components/home/filters.home";
 import SelectOrder from "./_components/home/selectOrder.home";
 import EquipmentList from "./_components/home/equipmentList.home";
 import { Suspense } from "react";
-import { trpc } from "~/trpc/server";
 import Cart from "./_components/Cart";
 
-export default async function HomePage() {
-  await trpc.location.getAllLocations.prefetch();
-  await trpc.category.getAllCategories.prefetch();
-
-  // TODO: save the default location in db, user preferences, so we can prefetch the equipments in the server
-
+export default function HomePage() {
   return (
     <>
       <ShowLocationDialog />

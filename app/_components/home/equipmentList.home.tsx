@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { Calendar } from "@components/ui/calendar";
 import { Button, buttonVariants } from "@components/ui/button";
 import DialogWithState from "@components/DialogWithState";
-import { ShoppingCart } from "lucide-react";
+import { Loader2Icon, ShoppingCart } from "lucide-react";
 
 import { cn, formatPrice, isEquipmentAvailable } from "~/lib/utils";
 
@@ -61,6 +61,14 @@ export default function EquipmentList() {
       ...item,
       owner: item.owner.filter((ownerOnEquipment) => ownerOnEquipment.locationId === location.id),
     }));
+
+  if (isLoading) {
+    return (
+      <div className="mt-20 flex justify-center">
+        <Loader2Icon className="h-10 w-10 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>

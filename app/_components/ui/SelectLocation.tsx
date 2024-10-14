@@ -20,11 +20,11 @@ type SelectLocationProps = {
   children?: ReactNode;
 };
 const SelectLocation = ({ placeholder, defaultValue, onValueChange, children }: SelectLocationProps) => {
-  const { data: locations } = trpc.location.getAllLocations.useQuery();
+  const { data: locations, isLoading } = trpc.location.getAllLocations.useQuery();
 
   return (
     <Select onValueChange={(e) => onValueChange(e)} value={defaultValue}>
-      <SelectTrigger className="font-bold">
+      <SelectTrigger className="font-bold" disabled={isLoading}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

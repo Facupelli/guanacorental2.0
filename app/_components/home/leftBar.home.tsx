@@ -5,7 +5,7 @@ import SelectLocation from "@components/ui/SelectLocation";
 import { useSideMenu } from "~/hooks/useSideMenu";
 import { toArgentinaDate } from "~/lib/dates";
 import { handleLocationChange } from "~/lib/utils";
-import { FilterIcon } from "lucide-react";
+import { FilterIcon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRef } from "react";
@@ -15,9 +15,6 @@ import { useLocation, useLocationStoreActions } from "~/stores/location.store";
 import { trpc } from "~/trpc/client";
 
 export const LeftBar = () => {
-  const { data: categories } = trpc.category.getAllCategories.useQuery();
-
-  const selectedCategory = useSearchParams()?.get("category") ?? "";
   const { showSideMenu, handleShowSideMenu, setShowSideMenu } = useSideMenu();
 
   const filtersSectionRef = useRef<HTMLElement | null>(null);
@@ -76,27 +73,7 @@ export const LeftBar = () => {
 
         <div className="grid gap-2">
           <p className="font-bold">Categorías:</p>
-          <ul className="grid">
-            <li
-              className={`cursor-pointer rounded-sm px-2 py-1 ${
-                !selectedCategory ? "bg-secondary font-bold text-secondary-foreground" : ""
-              }`}
-            >
-              <Link href={{ query: { category: "" } }}>Todos</Link>
-            </li>
-            {categories
-              ?.sort((a, b) => (a.order > b.order ? 1 : -1))
-              .map((category) => (
-                <li
-                  key={category.id}
-                  className={`cursor-pointer rounded-sm px-2 py-1 ${
-                    selectedCategory === category.id ? "bg-secondary font-bold text-secondary-foreground" : ""
-                  }`}
-                >
-                  <Link href={{ query: { category: category.id } }}>{category.name}</Link>
-                </li>
-              ))}
-          </ul>
+          <CategoryList />
         </div>
       </section>
       {showSideMenu && (
@@ -106,5 +83,42 @@ export const LeftBar = () => {
         />
       )}
     </>
+  );
+};
+
+const CategoryList = () => {
+  const selectedCategory = useSearchParams()?.get("category") ?? "";
+  const { data: categories, isLoading } = trpc.category.getAllCategories.useQuery();
+
+  if (isLoading) {
+    return (
+      <ul className="grid place-content-center">
+        <Loader2Icon className="h-5 w-5 animate-spin" />
+      </ul>
+    );
+  }
+
+  return (
+    <ul className="grid">
+      <li
+        className={`cursor-pointer rounded-sm px-2 py-1 ${
+          !selectedCategory ? "bg-secondary font-bold text-secondary-foreground" : ""
+        }`}
+      >
+        <Link href={{ query: { category: "" } }}>Todos</Link>
+      </li>
+      {categories
+        ?.sort((a, b) => (a.order > b.order ? 1 : -1))
+        .map((category) => (
+          <li
+            key={category.id}
+            className={`cursor-pointer rounded-sm px-2 py-1 ${
+              selectedCategory === category.id ? "bg-secondary font-bold text-secondary-foreground" : ""
+            }`}
+          >
+            <Link href={{ query: { category: category.id } }}>{category.name}</Link>
+          </li>
+        ))}
+    </ul>
   );
 };

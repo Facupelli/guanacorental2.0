@@ -9,6 +9,7 @@ import ClientInitializer from "~/hooks/client-initializer";
 import { type Metadata } from "next";
 import Script from "next/script";
 import Nav from "./_components/nav";
+import { trpc } from "~/trpc/server";
 
 const panton = localFont({
   src: [
@@ -52,7 +53,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  await trpc.location.getAllLocations.prefetch();
+  await trpc.category.getAllCategories.prefetch();
+  // TODO: save the default location in db, user preferences, so we can prefetch the equipments in the server
+
   return (
     <html lang="en" className={panton.variable}>
       <head>
