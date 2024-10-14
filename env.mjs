@@ -23,6 +23,11 @@ export const env = createEnv({
     AUTH_FACEBOOK_ID: z.string(),
     AUTH_FACEBOOK_SECRET: z.string(),
     NODEMAILER_G_APP: z.string(),
+    // CLOUDINARY
+    // CLOUDINARY_UPLOAD_PRESET: z.string(),
+    // CLOUDINARY_CLOUD_NAME: z.string(),
+    CLOUDINARY_API_KEY: z.string(),
+    CLOUDINARY_API_SECRET: z.string(),
   },
 
   /**
@@ -32,8 +37,8 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
-    NEXT_PUBLIC_CL_CLOUD_NAME: z.string(),
-    NEXT_PUBLIC_CL_UPLOAD_PRESET: z.string(),
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string(),
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
   },
 
   /**
@@ -49,8 +54,11 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     AUTH_FACEBOOK_ID: process.env.AUTH_FACEBOOK_ID,
     AUTH_FACEBOOK_SECRET: process.env.AUTH_FACEBOOK_SECRET,
-    NEXT_PUBLIC_CL_CLOUD_NAME: process.env.NEXT_PUBLIC_CL_CLOUD_NAME,
-    NEXT_PUBLIC_CL_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CL_UPLOAD_PRESET,
     NODEMAILER_G_APP: process.env.NODEMAILER_G_APP,
+    // CLOUDINARY
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   },
 });

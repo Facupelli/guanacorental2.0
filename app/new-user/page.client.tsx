@@ -19,6 +19,7 @@ import { getIsAdmin } from "~/lib/utils";
 
 import { type Role } from "@prisma/client";
 import { trpc } from "~/trpc/client";
+import { CldUploadWidget } from "next-cloudinary";
 
 type NewUserFormData = {
   email?: string;
@@ -78,27 +79,6 @@ export default function ClientNewUserPage() {
   useEffect(() => {
     setShowModal(true);
   }, []);
-
-  const openWidget = (setImagePublicId: Dispatch<SetStateAction<string>>) => {
-    if (typeof window !== "undefined" && window.cloudinary) {
-      const widget = window.cloudinary.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CL_CLOUD_NAME,
-          uploadPreset: process.env.NEXT_PUBLIC_CL_UPLOAD_PRESET,
-          sources: ["local"],
-          maxFileSize: 5000000,
-          folder: "customers_dni",
-        },
-
-        (e: string, result: Result) => {
-          if (result?.event === "success" && result?.info.resource_type === "image") {
-            setImagePublicId(result.info.secure_url);
-          }
-        }
-      );
-      widget.open(); // open up the widget after creation
-    }
-  };
 
   const { isPending, mutate } = trpc.user.createUserAddress.useMutation();
 
@@ -179,16 +159,42 @@ export default function ClientNewUserPage() {
           <div className="grid scroll-my-[150px] grid-cols-2 gap-x-8 gap-y-2" ref={divRef}>
             <div className="grid gap-2">
               <Label>Foto de tu DNI frente (5mb max)</Label>
-              <Button size="sm" type="button" onClick={() => openWidget(setDniFront)}>
-                {dniFront ? "Archivo cargado" : "Subir archvio"}
-              </Button>
+              <CldUploadWidget
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                onSuccess={(results) => {
+                  if (results.event === "success" && results.info && typeof results.info !== "string") {
+                    setDniFront(results.info.secure_url);
+                  }
+                }}
+              >
+                {({ open }) => {
+                  return (
+                    <Button size="sm" type="button" onClick={() => open()}>
+                      {dniFront ? "Archivo cargado" : "Subir archvio"}
+                    </Button>
+                  );
+                }}
+              </CldUploadWidget>
             </div>
 
             <div className="grid gap-2">
               <Label>Foto de tu DNI reverso (5mb max)</Label>
-              <Button size="sm" type="button" onClick={() => openWidget(setDniBack)}>
-                {dniBack ? "Archivo cargado" : "Subir archvio"}
-              </Button>
+              <CldUploadWidget
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                onSuccess={(results) => {
+                  if (results.event === "success" && results.info && typeof results.info !== "string") {
+                    setDniBack(results.info.secure_url);
+                  }
+                }}
+              >
+                {({ open }) => {
+                  return (
+                    <Button size="sm" type="button" onClick={() => open()}>
+                      {dniBack ? "Archivo cargado" : "Subir archvio"}
+                    </Button>
+                  );
+                }}
+              </CldUploadWidget>
             </div>
 
             <p className="col-span-2 text-red-600">{dniError}</p>
