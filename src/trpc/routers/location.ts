@@ -3,7 +3,11 @@ import { prisma } from "~/utils/db";
 
 export const locationRouter = createTRPCRouter({
   getAllLocations: publicProcedure.query(async () => {
-    const locations = await prisma.location.findMany({});
+    const locations = await prisma.location.findMany({
+      where: {
+        isActive: true,
+      },
+    });
 
     return locations;
   }),

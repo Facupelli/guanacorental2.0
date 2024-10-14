@@ -84,6 +84,7 @@ export default function EquipmentList() {
 type EquipmentCardProps = {
   equipment: Equipment;
 };
+
 const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   const { setShowCartModal } = useCartStoreActions();
   const [showCalendar, setShowCalendar] = useState(false);
