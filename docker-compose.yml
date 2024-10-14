@@ -3,6 +3,7 @@ services:
     build: .
     ports:
       - "3000:3000"
+    restart: always
     environment:
       - NODE_ENV=production
       - SKIP_ENV_VALIDATION=true
@@ -17,6 +18,8 @@ services:
       - NODEMAILER_G_APP=${NODEMAILER_G_APP}
       - NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=${NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
       - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+      - NEXT_PUBLIC_CLOUDINARY_API_KEY=${NEXT_PUBLIC_CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
     depends_on:
       db:
         condition: service_healthy
@@ -25,6 +28,7 @@ services:
 
   db:
     image: postgres:latest
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
