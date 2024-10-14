@@ -25,6 +25,8 @@ export default function EquipmentList() {
   const { ref, inView } = useInView();
   const searchParams = useSearchParams();
 
+  console.log("Cloudinary Cloud Name:", process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME);
+
   const category = useSearchParams()?.get("category") ?? "";
   const search = searchParams?.get("s") ?? undefined;
   const sort = searchParams?.get("sortBy") ?? undefined;
