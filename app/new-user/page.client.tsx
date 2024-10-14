@@ -1,23 +1,18 @@
 "use client";
 
-/* eslint-disable */
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Dispatch, type SetStateAction, useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
 import { DialogFooter } from "@components/ui/dialog";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 import { Loader2 } from "lucide-react";
 import DialogWithState from "@components/DialogWithState";
-
 import { validationAddress } from "~/lib/validation";
 import { getIsAdmin } from "~/lib/utils";
-
-import { type Role } from "@prisma/client";
 import { trpc } from "~/trpc/client";
 import { CldUploadWidget } from "next-cloudinary";
 
@@ -43,22 +38,6 @@ type NewUserFormData = {
   contact_2: string;
   bond_1: string;
   bond_2: string;
-};
-
-type Props = {
-  user: {
-    name: string;
-    role: Role[];
-    id: string;
-  };
-};
-
-type Result = {
-  event: string;
-  info: {
-    resource_type: string;
-    secure_url: string;
-  };
 };
 
 export default function ClientNewUserPage() {
