@@ -28,11 +28,6 @@ const config = {
       },
     ],
   },
-  publicRuntimeConfig: {
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    NEXT_PUBLIC_CLOUDINARY_API_KEY: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-  },
   // Nginx will do gzip compression. We disable
   // compression here so we can prevent buffering
   // streaming responses
