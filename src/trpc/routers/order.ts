@@ -80,6 +80,29 @@ const cartValidation = z.array(
   })
 );
 
+const createOrderSchema = z.object({
+  discount: z
+    .object({
+      value: z.number(),
+      typeName: z.string(),
+      code: z.string(),
+    })
+    .nullish(),
+  email: z.string().email().nullish(),
+  startDate: z.date(),
+  endDate: z.date(),
+  workingDays: z.number(),
+  pickupHour: z.string(),
+  message: z.string(),
+  customerId: z.string(),
+  locationId: z.string(),
+  subtotal: z.number(),
+  total: z.number(),
+  cart: cartValidation,
+});
+
+export type CreateOrderData = z.infer<typeof createOrderSchema>;
+
 export const orderRouter = createTRPCRouter({
   removeEquipmentFromOrder: protectedProcedure
     .input(
@@ -363,243 +386,220 @@ export const orderRouter = createTRPCRouter({
       return { orders, totalCount };
     }),
 
-  createOrder: protectedProcedure
-    .input(
-      z.object({
-        discount: z
-          .object({
-            value: z.number(),
-            typeName: z.string(),
-            code: z.string(),
-          })
-          .nullish(),
-        email: z.string().email().nullish(),
-        startDate: z.date(),
-        endDate: z.date(),
-        workingDays: z.number(),
-        pickupHour: z.string(),
-        message: z.string(),
-        customerId: z.string(),
-        locationId: z.string(),
-        subtotal: z.number(),
-        total: z.number(),
-        cart: cartValidation,
-      })
-    )
-    .mutation(async ({ input }) => {
-      const {
-        discount,
-        email,
-        startDate,
-        endDate,
-        pickupHour,
-        locationId,
-        message,
-        customerId,
-        cart,
-        subtotal,
-        total,
-        workingDays,
-      } = input;
+  createOrder: protectedProcedure.input(createOrderSchema).mutation(async ({ input }) => {
+    const {
+      discount,
+      email,
+      startDate,
+      endDate,
+      pickupHour,
+      locationId,
+      message,
+      customerId,
+      cart,
+      subtotal,
+      total,
+      workingDays,
+    } = input;
 
-      let customer;
+    let customer;
 
-      if (locationId === "clh6ck61q0002e7dopcv0u9rp") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Cannot books in Mendoza",
-        });
-      }
+    if (locationId === "clh6ck61q0002e7dopcv0u9rp") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Cannot books in Mendoza",
+      });
+    }
 
-      if (email) {
-        customer = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!customer) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Wrong customer email, customer does not exist",
-          });
-        }
-      }
-
-      //GET UPDATED CART WITH MOST RECENT BOOKS
-
-      const updatedCart = await getUpdatedCart(cart);
-
-      const sameLocationEquipmentCart = updatedCart.map((item) => ({
-        ...item,
-        owner: item.owner.filter((ownerOnEquipment) => ownerOnEquipment.locationId === locationId),
-      }));
-
-      //CHECK ALL EQUIPMENT AVAILABILITY
-      if (!sameLocationEquipmentCart.every((item) => isEquipmentAvailable(item, { startDate, endDate }))) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Alguno de los equipos no está disponible para la fecha",
-        });
-      }
-
-      //CREATE BOOK WITH DATES AND HOUR OF RENT
-      const newBook = await prisma.book.create({
-        data: {
-          start_date: startDate,
-          end_date: endDate,
-          pickup_hour: pickupHour,
-          working_days: workingDays,
-        },
+    if (email) {
+      customer = await prisma.user.findUnique({
+        where: { email },
       });
 
-      if (!newBook) {
+      if (!customer) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Create Book failed",
+          code: "BAD_REQUEST",
+          message: "Wrong customer email, customer does not exist",
         });
       }
+    }
 
-      //CHOOSE THE EQUIPMENT TO BOOK
+    //GET UPDATED CART WITH MOST RECENT BOOKS
 
-      const equipmentOnOwnerIds = sameLocationEquipmentCart
-        .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
-        .flat();
+    const updatedCart = await getUpdatedCart(cart);
 
-      //CREATE BOOK TO THOSE EQUIPMENTS
-      try {
-        await prisma.$transaction(
-          equipmentOnOwnerIds.map((item) =>
-            prisma.bookOnEquipment.create({
-              data: {
-                book: { connect: { id: newBook.id } },
-                equipment: { connect: { id: item.id } },
-                quantity: item.quantity,
-              },
-            })
-          )
-        );
-      } catch (err) {
-        await prisma.book.delete({
-          where: { id: newBook.id },
-        });
+    const sameLocationEquipmentCart = updatedCart.map((item) => ({
+      ...item,
+      owner: item.owner.filter((ownerOnEquipment) => ownerOnEquipment.locationId === locationId),
+    }));
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Create BookOnEquipment failed",
-        });
-      }
+    //CHECK ALL EQUIPMENT AVAILABILITY
+    if (!sameLocationEquipmentCart.every((item) => isEquipmentAvailable(item, { startDate, endDate }))) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Alguno de los equipos no está disponible para la fecha",
+      });
+    }
 
-      // IF DISCOUNT UPDATE DISCOUNT
-      let discountModel;
-      if (discount) {
-        discountModel = await prisma.discount.update({
-          where: {
-            code: discount.code,
-          },
-          data: {
-            usage_count: {
-              increment: 1,
+    //CREATE BOOK WITH DATES AND HOUR OF RENT
+    const newBook = await prisma.book.create({
+      data: {
+        start_date: startDate,
+        end_date: endDate,
+        pickup_hour: pickupHour,
+        working_days: workingDays,
+      },
+    });
+
+    if (!newBook) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Create Book failed",
+      });
+    }
+
+    //CHOOSE THE EQUIPMENT TO BOOK
+
+    const equipmentOnOwnerIds = sameLocationEquipmentCart
+      .map((item) => getEquipmentOnOwnerIds(item, item.quantity))
+      .flat();
+
+    //CREATE BOOK TO THOSE EQUIPMENTS
+    try {
+      await prisma.$transaction(
+        equipmentOnOwnerIds.map((item) =>
+          prisma.bookOnEquipment.create({
+            data: {
+              book: { connect: { id: newBook.id } },
+              equipment: { connect: { id: item.id } },
+              quantity: item.quantity,
             },
+          })
+        )
+      );
+    } catch (err) {
+      await prisma.book.delete({
+        where: { id: newBook.id },
+      });
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Create BookOnEquipment failed",
+      });
+    }
+
+    // IF DISCOUNT UPDATE DISCOUNT
+    let discountModel;
+    if (discount) {
+      discountModel = await prisma.discount.update({
+        where: {
+          code: discount.code,
+        },
+        data: {
+          usage_count: {
+            increment: 1,
           },
-        });
-      }
+        },
+      });
+    }
 
-      const equipmentsIds = equipmentOnOwnerIds.map((item) => ({
-        id: item.id,
-      }));
+    const equipmentsIds = equipmentOnOwnerIds.map((item) => ({
+      id: item.id,
+    }));
 
-      //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
-      let newOrder;
+    //CREATE ORDER WITH THE EQUIPMENONBOOKS IDS
+    let newOrder;
 
-      try {
-        newOrder = await prisma.order.create({
-          data: {
-            customer: { connect: { id: customer ? customer.id : customerId } },
-            equipments: { connect: equipmentsIds },
-            book: { connect: { id: newBook.id } },
-            location: { connect: { id: locationId } },
-            total,
-            subtotal,
-            message,
-            deliver_status: ORDER_DELIVER_STATUS.PENDING,
-            return_status: ORDER_RETURN_STATUS.PENDING,
-            discount: discountModel ? { connect: { id: discountModel?.id } } : undefined,
+    try {
+      newOrder = await prisma.order.create({
+        data: {
+          customer: { connect: { id: customer ? customer.id : customerId } },
+          equipments: { connect: equipmentsIds },
+          book: { connect: { id: newBook.id } },
+          location: { connect: { id: locationId } },
+          total,
+          subtotal,
+          message,
+          deliver_status: ORDER_DELIVER_STATUS.PENDING,
+          return_status: ORDER_RETURN_STATUS.PENDING,
+          discount: discountModel ? { connect: { id: discountModel?.id } } : undefined,
+        },
+        include: {
+          book: true,
+          equipments: {
+            include: { books: true, owner: true, equipment: true },
           },
-          include: {
-            book: true,
-            equipments: {
-              include: { books: true, owner: true, equipment: true },
-            },
-            discount: {
-              include: {
-                rule: {
-                  include: {
-                    type: true,
-                  },
+          discount: {
+            include: {
+              rule: {
+                include: {
+                  type: true,
                 },
               },
             },
-            customer: {
-              include: {
-                address: true,
-              },
+          },
+          customer: {
+            include: {
+              address: true,
             },
           },
-        });
-      } catch (err) {
-        await prisma.bookOnEquipment.deleteMany({
-          where: {
-            bookId: newBook.id,
-          },
-        });
+        },
+      });
+    } catch (err) {
+      await prisma.bookOnEquipment.deleteMany({
+        where: {
+          bookId: newBook.id,
+        },
+      });
 
-        await prisma.book.delete({
-          where: { id: newBook.id },
-        });
+      await prisma.book.delete({
+        where: { id: newBook.id },
+      });
 
-        console.log(err);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Create Order failed, please try again later",
-        });
-      }
+      console.log(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Create Order failed, please try again later",
+      });
+    }
 
-      //CALCULATE AND CREATE EARNINGS FOR EACH OWNER
+    //CALCULATE AND CREATE EARNINGS FOR EACH OWNER
 
-      const earnings = await calcualteAndCreateEarnings(newOrder);
+    const earnings = await calcualteAndCreateEarnings(newOrder);
 
-      //SEND MAIL TO CUSTOMER
-      if (isProdEnv() && newOrder.customer.email && newOrder.customer.name) {
-        const filteredOrder = {
-          ...newOrder,
-          equipments: getOrderEquipmentOnOwners(newOrder.equipments, newOrder.bookId),
-        };
+    //SEND MAIL TO CUSTOMER
+    if (isProdEnv() && newOrder.customer.email && newOrder.customer.name) {
+      const filteredOrder = {
+        ...newOrder,
+        equipments: getOrderEquipmentOnOwners(newOrder.equipments, newOrder.bookId),
+      };
 
-        const equipmentList = filteredOrder.equipments.map((equipment) => ({
-          item: `${equipment.equipment.name} ${equipment.equipment.brand} ${equipment.equipment.model}`,
-          quantity: `${equipment.books.reduce((acc, curr) => {
-            return acc + curr.quantity;
-          }, 0)}`,
-        }));
+      const equipmentList = filteredOrder.equipments.map((equipment) => ({
+        item: `${equipment.equipment.name} ${equipment.equipment.brand} ${equipment.equipment.model}`,
+        quantity: `${equipment.books.reduce((acc, curr) => {
+          return acc + curr.quantity;
+        }, 0)}`,
+      }));
 
-        const mailData = {
-          name: newOrder.customer.name,
-          email: newOrder.customer.email,
-          phone: newOrder.customer.address?.phone,
-          number: newOrder.number,
-          startDate: toArgentinaDate(startDate),
-          endDate: toArgentinaDate(endDate),
-          pickupHour,
-          equipmentList,
-          total: formatPrice(newOrder.total),
-        };
+      const mailData = {
+        name: newOrder.customer.name,
+        email: newOrder.customer.email,
+        phone: newOrder.customer.address?.phone,
+        number: newOrder.number,
+        startDate: toArgentinaDate(startDate),
+        endDate: toArgentinaDate(endDate),
+        pickupHour,
+        equipmentList,
+        total: formatPrice(newOrder.total),
+      };
 
-        await sendMail(mailData, "newOrder.handlebars", `NUEVO PEDIDO REALIZADO #${newOrder.number}`);
+      await sendMail(mailData, "newOrder.handlebars", `NUEVO PEDIDO REALIZADO #${newOrder.number}`);
 
-        await sendMailToGuanaco(mailData, `NUEVO PEDIDO REALIZADO #${newOrder.number}`);
-      }
+      await sendMailToGuanaco(mailData, `NUEVO PEDIDO REALIZADO #${newOrder.number}`);
+    }
 
-      return { newOrder, earnings };
-    }),
+    return { newOrder, earnings };
+  }),
 
   setOrderDelivered: protectedProcedure.input(z.object({ orderId: z.string() })).mutation(async ({ input }) => {
     const { orderId } = input;

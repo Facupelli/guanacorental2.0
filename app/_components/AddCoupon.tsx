@@ -19,7 +19,7 @@ type Discount = {
 
 type AddCouponProps = {
   location: { id: string; name: string };
-  setDiscount: Dispatch<SetStateAction<Discount | null>>;
+  setDiscount: (discount: Discount | null) => void;
   discount: Discount | null;
   total: number;
   setShowCouponModal: Dispatch<SetStateAction<boolean>>;
@@ -28,7 +28,7 @@ type AddCouponProps = {
   orderId?: string;
 };
 
-const AddCoupon = ({
+const AddCouponModal = ({
   location,
   setDiscount,
   discount,
@@ -135,4 +135,4 @@ const AddCoupon = ({
   );
 };
 
-export default AddCoupon;
+export default AddCouponModal;

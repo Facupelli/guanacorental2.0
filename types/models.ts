@@ -14,6 +14,12 @@ export type Role = {
   name: string;
 };
 
+export type Discount = {
+  value: number;
+  typeName: string;
+  code: string;
+};
+
 export type Equipment = {
   id: string;
   name: string;

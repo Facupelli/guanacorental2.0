@@ -21,7 +21,6 @@ import { SelectCategory } from "@components/ui/SelectCategory";
 import { type TopBookedEquipment } from "~/trpc/routers/stats";
 import { trpc } from "~/trpc/client";
 import { formatPrice } from "~/lib/utils";
-import { type Metadata } from "next";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 

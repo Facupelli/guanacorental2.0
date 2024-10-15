@@ -2,9 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
-import { useMemo, useState } from "react";
+import { type Dispatch, useReducer } from "react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover";
 import { Button } from "@components/ui/button";
@@ -15,15 +14,8 @@ import { Info, Loader2 } from "lucide-react";
 import { Textarea } from "@components/ui/textarea";
 import { Input } from "@components/ui/input";
 
-import { disableWeekend, getDatesInRange, getTotalWorkingDays, toArgentinaDate } from "~/lib/dates";
-import {
-  calcaulateCartTotal,
-  calculateTotalWithDiscount,
-  formatPrice,
-  getIsAdmin,
-  getIsEmployee,
-  isEquipmentAvailable,
-} from "~/lib/utils";
+import { toArgentinaDate } from "~/lib/dates";
+import { formatPrice, getIsAdmin, getIsEmployee } from "~/lib/utils";
 
 import Link from "next/link";
 import { useCartItems, useCartStoreActions } from "~/stores/cart.store";
@@ -31,201 +23,78 @@ import { useEndDate, usePickupHour, useStartDate } from "~/stores/date.store";
 import { useLocation } from "~/stores/location.store";
 import { trpc } from "~/trpc/client";
 import { FacebookButton, GoogleButton } from "../nav";
-import AddCoupon from "../AddCoupon";
-
-type Discount = {
-  value: number;
-  typeName: string;
-  code: string;
-};
-
-const loginError = "Debes iniciar sesión para realizar una reserva.";
-const noPetitionSentError =
-  "No has enviado el alta de cliente. Para poder alquilar equipos es necesario llenar el formulario de alta de cliente.";
+import AddCouponModal from "../AddCoupon";
+import type { Discount } from "types/models";
+import {
+  CLOSE_ERROR_MODAL,
+  type RightBarAction,
+  rightBarInitialState,
+  rightBarReducer,
+  SET_DISCOUNT,
+  SHOW_ERROR_MODAL,
+  SHOW_SUCCESS_MODAL,
+  TOGGLE_COUPON_MODAL,
+  TOGGLE_ERROR_MODAL,
+} from "~/utils/reducers/cart.reducer";
+import { useCartState } from "~/hooks/cart/useCartState";
+import { useDateState } from "~/hooks/cart/useDateState";
+import { loginError, noPetitionSentError } from "~/utils/validation/validateMakeOrder";
+import { useSubmitOrder } from "~/hooks/cart/useSubmitOrder";
 
 export default function RightBar() {
+  const [state, dispatch] = useReducer(rightBarReducer, rightBarInitialState);
   const { data: session } = useSession();
-  const router = useRouter();
+  const cartItems = useCartItems();
+  const startDate = useStartDate();
+  const endDate = useEndDate();
+  const location = useLocation();
+  const pickupHour = usePickupHour();
+
+  const { workingDays, datesAreWeekend } = useDateState();
+  const { areAllItemsAvailable, subtotal, cartTotal } = useCartState(workingDays, state.discount);
+
+  const isAdmin = getIsAdmin(session);
+  const isEmployee = getIsEmployee(session);
+
+  const handleSetDiscount = (discount: Discount | null) => {
+    dispatch({ type: SET_DISCOUNT, payload: discount });
+  };
 
   const { register, getValues } = useForm<{
     message: string;
     email?: string;
   }>();
 
-  const [discount, setDiscount] = useState<Discount | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showErrorModal, setErrorModal] = useState(false);
-  const [error, setError] = useState("");
-
-  const cartItems = useCartItems();
+  const { submitOrder } = useSubmitOrder(workingDays, getValues, state.discount);
   const { emptyCart } = useCartStoreActions();
-
-  const startDate = useStartDate();
-  const endDate = useEndDate();
-  const location = useLocation();
-  const pickupHour = usePickupHour();
-
-  const [showCouponModal, setShowCouponModal] = useState(false);
-  const areAllItemsAvailable = cartItems.every((item) => isEquipmentAvailable(item, { startDate, endDate }));
-
-  const datesAreWeekend = disableWeekend(startDate, endDate);
-
-  const { mutate, isPending } = trpc.order.createOrder.useMutation();
-
-  const workingDays = useMemo(() => {
-    if (startDate && endDate) {
-      const datesInRange = getDatesInRange(startDate, endDate);
-      return getTotalWorkingDays(datesInRange, pickupHour);
-    }
-    return undefined;
-  }, [startDate, endDate, pickupHour]);
-
-  const subtotal = calcaulateCartTotal(cartItems, workingDays);
-
-  const cartTotal = useMemo(() => {
-    if (workingDays) {
-      const total = subtotal;
-      if (discount) {
-        return calculateTotalWithDiscount(total, discount);
-      }
-
-      return total;
-    }
-    return 0;
-  }, [workingDays, discount, subtotal]);
-
-  const isAdmin = getIsAdmin(session);
-  const isEmployee = getIsEmployee(session);
+  const { isPending } = trpc.order.createOrder.useMutation();
 
   const handleBookOrder = () => {
-    if (!session?.user) {
-      setError(loginError);
-      setErrorModal(true);
-      return;
+    try {
+      submitOrder();
+      emptyCart();
+      dispatch({ type: SHOW_SUCCESS_MODAL });
+    } catch (error) {
+      dispatch({
+        type: SHOW_ERROR_MODAL,
+        payload: error instanceof Error ? error.message : "Ocurrió un error al realizar la orden",
+      });
     }
-
-    if (!startDate || !endDate || !workingDays) {
-      return;
-    }
-
-    if (!session.user.petitionSent) {
-      setError(noPetitionSentError);
-      setErrorModal(true);
-      return;
-    }
-
-    if (!session.user.customerApproved) {
-      setError("Tu alta de cliente todavía no fue aprobada");
-      setErrorModal(true);
-      return;
-    }
-
-    const message = getValues("message");
-    const email = getValues("email");
-
-    const cart = cartItems.map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      owner: item.owner?.map((owner) => ({
-        id: owner.id,
-        ownerId: owner.ownerId,
-        onwerName: owner.owner?.name,
-        stock: owner.stock,
-        locationId: owner.locationId,
-      })),
-    }));
-
-    mutate(
-      {
-        discount,
-        startDate,
-        endDate,
-        locationId: location.id,
-        customerId: session.user.id,
-        pickupHour,
-        subtotal,
-        total: cartTotal,
-        message,
-        cart,
-        workingDays,
-        email: email ? email : null,
-      },
-      {
-        onSuccess: () => {
-          setShowSuccessModal(true);
-          emptyCart();
-        },
-        onError: (err) => {
-          setError(err.message);
-          setErrorModal(true);
-        },
-      }
-    );
   };
 
   return (
     <>
-      <DialogWithState isOpen={showSuccessModal} title="Pedido realizado con éxito">
-        <div>
-          <p>Te enviamos un correo con todos los datos del pedido.</p>
-          <p>
-            Te esperamos el{" "}
-            <strong>
-              {startDate?.toLocaleDateString("es-AR", {
-                year: "numeric",
-                day: "numeric",
-                month: "short",
-                timeZone: "America/Argentina/Buenos_Aires",
-              })}
-            </strong>{" "}
-            a las <strong>{pickupHour}hs</strong> por el rental!
-          </p>
-        </div>
-        <DialogFooter>
-          <Button
-            onClick={() => {
-              void router.push("/");
-            }}
-          >
-            ACEPTAR
-          </Button>
-        </DialogFooter>
-      </DialogWithState>
-
-      <DialogWithState title="Ocurrió un error" isOpen={showErrorModal} setOpen={setErrorModal}>
-        <p>{error}</p>
-        {error === noPetitionSentError && (
-          <Link href="/new-user" className="font-semibold text-primary hover:underline">
-            ir al alta
-          </Link>
-        )}
-        {error === loginError && (
-          <div className="grid gap-2">
-            <GoogleButton />
-            <FacebookButton />
-          </div>
-        )}
-        <DialogFooter>
-          <Button
-            onClick={() => {
-              setErrorModal(false);
-              setError("");
-            }}
-          >
-            ACEPTAR
-          </Button>
-        </DialogFooter>
-      </DialogWithState>
-
-      <AddCoupon
+      <SuccessModal isOpen={state.showSuccessModal} startDate={startDate} pickupHour={pickupHour} />
+      <ErrorModal isOpen={state.showErrorModal} error={state.error} dispatch={dispatch} />
+      <AddCouponModal
         location={location}
-        setDiscount={setDiscount}
-        discount={discount}
+        setDiscount={handleSetDiscount}
+        discount={state.discount}
         total={cartTotal}
-        showCouponModal={showCouponModal}
-        setShowCouponModal={setShowCouponModal}
+        showCouponModal={state.showCouponModal}
+        setShowCouponModal={() => dispatch({ type: TOGGLE_COUPON_MODAL })}
       />
+
       <section className="col-span-12 rounded-md bg-white p-4 sm:col-span-4">
         <div className="grid gap-6">
           {startDate && endDate && (
@@ -257,8 +126,8 @@ export default function RightBar() {
                 <p className="font-bold">{location.name}</p>
               </div>
 
-              <Button onClick={() => setShowCouponModal(true)} variant="secondary" className="h-8">
-                {discount ? "Cupón aplicado" : "Ingresar cupon de descuento"}
+              <Button onClick={() => dispatch({ type: TOGGLE_COUPON_MODAL })} variant="secondary" className="h-8">
+                {state.discount ? "Cupón aplicado" : "Ingresar cupon de descuento"}
               </Button>
             </div>
 
@@ -279,7 +148,7 @@ export default function RightBar() {
               <div className="flex items-center justify-between font-semibold">
                 <div className="flex items-center">
                   <p>Email cliente:</p>
-                  <CLientEmailTip />
+                  <ClientEmailTip />
                 </div>
                 <Input type="email" {...register("email")} className="ml-auto h-8 w-1/2" />
               </div>
@@ -307,7 +176,7 @@ export default function RightBar() {
   );
 }
 
-const CLientEmailTip = () => {
+const ClientEmailTip = () => {
   return (
     <Popover>
       <PopoverTrigger className=" border-none hover:bg-secondary" asChild>
@@ -320,5 +189,76 @@ const CLientEmailTip = () => {
         <p>El pedido estará registrado a nombre del usuario asociado al correo electrónico provisto.</p>
       </PopoverContent>
     </Popover>
+  );
+};
+
+const SuccessModal = ({
+  isOpen,
+  startDate,
+  pickupHour,
+}: {
+  isOpen: boolean;
+  startDate: Date | undefined;
+  pickupHour: string;
+}) => {
+  return (
+    <DialogWithState isOpen={isOpen} title="Pedido realizado con éxito">
+      <div>
+        <p>Te enviamos un correo con todos los datos del pedido.</p>
+        <p>
+          Te esperamos el{" "}
+          <strong>
+            {startDate?.toLocaleDateString("es-AR", {
+              year: "numeric",
+              day: "numeric",
+              month: "short",
+              timeZone: "America/Argentina/Buenos_Aires",
+            })}
+          </strong>{" "}
+          a las <strong>{pickupHour}hs</strong> por el rental!
+        </p>
+      </div>
+      <DialogFooter>
+        <Link href="/">
+          <Button>ACEPTAR</Button>
+        </Link>
+      </DialogFooter>
+    </DialogWithState>
+  );
+};
+
+const ErrorModal = ({
+  isOpen,
+  error,
+  dispatch,
+}: {
+  isOpen: boolean;
+  error: string;
+  dispatch: Dispatch<RightBarAction>;
+}) => {
+  return (
+    <DialogWithState title="Ocurrió un error" isOpen={isOpen} setOpen={() => dispatch({ type: TOGGLE_ERROR_MODAL })}>
+      <p>{error}</p>
+      {error === noPetitionSentError && (
+        <Link href="/new-user" className="font-semibold text-primary hover:underline">
+          ir al alta
+        </Link>
+      )}
+      {error === loginError && (
+        <div className="grid gap-2">
+          <GoogleButton />
+          <FacebookButton />
+        </div>
+      )}
+      <DialogFooter>
+        <Button
+          onClick={() => {
+            dispatch({ type: CLOSE_ERROR_MODAL });
+          }}
+        >
+          ACEPTAR
+        </Button>
+      </DialogFooter>
+    </DialogWithState>
   );
 };
